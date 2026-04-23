@@ -76,9 +76,14 @@ def check_measurement_method(extraction: dict, spec: dict) -> tuple[bool, str]:
             continue
         if alpha_target is not None:
             details = mm.get("details", {}) or {}
-            alpha = details.get("reliability_reported")
+            # Handle multiple reliability shapes:
+            # (a) details.reliability_reported: 0.82       (v0.1 style)
+            # (b) details.reliability: 0.82                 (bare number)
+            # (c) details.reliability: {"alpha": 0.82}     (legacy dict)
+            # (d) details.reliability: {"type": "cronbach_alpha", "value": 0.82}  (v0.3+ structured)
+            alpha = details.get("reliability_reported", details.get("reliability"))
             if isinstance(alpha, dict):
-                alpha = alpha.get("alpha")
+                alpha = alpha.get("value", alpha.get("alpha"))
             try:
                 if alpha is not None and abs(float(alpha) - alpha_target) <= 0.05:
                     return True, f"found {mm.get('id')} with alpha={alpha}"
@@ -158,8 +163,16 @@ def check_claim(extraction: dict, spec: dict) -> tuple[bool, str]:
             if "direct_p_after_mediator_near" in must:
                 l3 = c.get("l3_json", {}) or {}
                 m = l3.get("mediation", {}) if isinstance(l3, dict) else {}
-                p = m.get("direct_p") if isinstance(m, dict) else None
-                # Accept string or numeric
+                # Accept several field-name variants: direct_p, direct_p_when_mediator_included,
+                # direct_p_with_mediator, direct_p_after_controlling, etc.
+                p = None
+                if isinstance(m, dict):
+                    for key in ("direct_p", "direct_p_when_mediator_included",
+                                "direct_p_with_mediator", "direct_p_after_controlling",
+                                "direct_effect_p"):
+                        if key in m:
+                            p = m[key]
+                            break
                 try:
                     p_val = float(str(p).replace("=", "").replace("<", "").strip()) if p is not None else None
                     if p_val is None or abs(p_val - must["direct_p_after_mediator_near"]) > 0.1:

@@ -139,7 +139,7 @@
       "template_type": "EXISTENCE_CLAIM",
       "must_have": {
         "sample_size_numbers_mentioned_any_of": [51, 427],
-        "source_section_includes_any_of": ["Methods", "METHODS", "Research Site", "Sample"]
+        "source_section_includes_any_of": ["Methods", "METHODS", "Research Site", "Sample", "Procedure", "Phase", "Survey", "Data"]
       },
       "description": "51 teams, 427 individuals — sample size facts"
     },

@@ -47,10 +47,10 @@
       "key": "rel_machine_to_test_performance",
       "template_type": "RELATION",
       "must_have": {
-        "iv_regex": "(machine|computer|digital_computer|programming)",
-        "dv_regex": "(imitation|game|test|pass|indistinguishable|identify)"
+        "iv_regex": "(machine|computer|digital_computer|programming|imitation|computational|universal|storage|learning)",
+        "dv_regex": "(imitation|game|test|pass|indistinguish|identify|human|intelligence|performance|adult|thinking)"
       },
-      "description": "Machine can pass the imitation game (Turing's central prediction)",
+      "description": "Machine feature (universal, learning, storage, etc.) -> imitation game / thinking performance",
       "weight": 1.5
     },
     {

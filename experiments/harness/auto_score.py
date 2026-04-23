@@ -33,6 +33,8 @@ PDF_TO_GOLD = [
     ("Shannon", "shannon_1948_gold.json"),
     ("Hubinger_2024", "hubinger_2024_gold.json"),
     ("Sleeper_Agents", "hubinger_2024_gold.json"),
+    ("Park_2023", "park_2023_gold.json"),
+    ("Generative_Agents", "park_2023_gold.json"),
 ]
 
 

@@ -1,0 +1,87 @@
+{
+  "paper_doi_hint": "Park et al. 2023, Generative Agents: Interactive Simulacra of Human Behavior, UIST",
+  "paper_title": "Generative Agents: Interactive Simulacra of Human Behavior",
+  "paper_author_year": "Park et al. 2023",
+  "source": "hand-authored from ML paper knowledge",
+  "notes": [
+    "Simulates a small town of 25 LLM-based agents. Introduces memory-stream architecture with three components: memory retrieval, reflection, planning.",
+    "Evaluated via human crowdworker studies comparing agent believability to baselines."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical ML paper with user studies"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "description": "design_basis = computational_demonstration or quasi_experimental",
+      "weight": 1.5
+    },
+    {
+      "key": "def_generative_agent",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(generative_agent|agent|simulacra|interactive)",
+        "key_elements_include_any_of": ["behavior", "memory", "plan", "reflect", "believable", "human"]
+      },
+      "description": "Generative agent concept",
+      "weight": 2.0
+    },
+    {
+      "key": "def_memory_stream",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(memory|memory_stream|retrieval)"
+      },
+      "description": "Memory stream architecture"
+    },
+    {
+      "key": "def_reflection",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(reflection|reflect)"
+      },
+      "description": "Reflection mechanism"
+    },
+    {
+      "key": "def_planning",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(plan|planning)"
+      },
+      "description": "Planning component"
+    },
+    {
+      "key": "rel_architecture_to_believability",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(memory|reflection|plan|agent|architecture|retrieval)",
+        "dv_regex": "(believ|behav|quality|human|evaluat|rating)"
+      },
+      "description": "Architecture component -> agent believability/behavior quality",
+      "weight": 1.5
+    },
+    {
+      "key": "exist_small_town_25_agents",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["25 agents", "small town", "Smallville", "sandbox", "simulacra"]
+      },
+      "description": "25 agents in Smallville sandbox"
+    },
+    {
+      "key": "exist_emergent_social_behavior",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(emergent|social|gathering|party|election|Valentine)"
+      },
+      "description": "Emergent social behavior (e.g., Valentine's Day party organization)"
+    }
+  ]
+}

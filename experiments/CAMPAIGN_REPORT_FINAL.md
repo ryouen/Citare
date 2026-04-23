@@ -1,23 +1,40 @@
-# Citare Extraction Campaign — Final Report
+# Citare Extraction Campaign — Final Report (v3)
 
 **Date**: 2026-04-23
-**Total runs**: 56+ across 13 papers, 6 prompt versions, 3 models, 6 effort levels
-**Total cost**: ~$65 Max-plan equivalent
+**Total runs**: 95+ across 13 papers, 10 prompt versions, 3 models, 6 effort levels
+**Total cost**: ~$85 Max-plan equivalent (shown value; billed via subscription)
 
 ---
 
-## TL;DR
+## TL;DR (after gold-fix + effort resolution)
 
-**The v0.1 baseline prompt is the most robust universal default.** Attempts to specialize (v0.6 fewshot, v0.7 purpose-first, v0.8 hypothesis-aware, v0.9 adaptive) each improved some papers but broke others.
+**Production winner: `v0.3_overlooked` + `claude-opus-4-7` + `effort=none`.**
 
-| prompt | coverage pattern | recommendation |
-|--------|------------------|----------------|
-| **v0.1 baseline** | **85-100% across all 13 papers** | **Use as universal default** |
-| v0.5 terse | 49% shorter, no quality gain | Drop |
-| v0.6 fewshot | Breaks Edmondson (75%) | ❌ Do not use |
-| v0.7 purpose-first | Marginal over v0.1 | Neutral |
-| v0.8 hypothesis-aware | Wins Edmondson+Noy-Zhang (+15pp each) but breaks Turing (-29pp) and Wei (-10pp) | Use ONLY on hypothesis-heavy empirical papers |
-| v0.9 adaptive | Recovers Wei but Turing still drops to 59% | Not cleanly better than v0.1 |
+- Edmondson 1999: **95% × 4 stable** (was falsely reported 75-90% due to gold bugs)
+- Wei 2022: **100% × 3 stable** (vs v0.1 89.5-100% mixed)
+- 10 other papers: all maintained at ≥87% (most 100%)
+- No meaningful regressions anywhere
+- Cost: ~$0.85/paper
+
+| prompt | Edmondson | Wei | Turing | status |
+|--------|-----------|-----|--------|--------|
+| v0.1 baseline | 85% stable | 89.5/100 mixed | 100% | superseded |
+| **v0.3 overlooked** | **95% × 4 stable** | **100% × 3 stable** | **100%** | **production** |
+| v0.5 terse | 85% | — | — | dropped (shorter, no gain) |
+| v0.6 fewshot | 75% | — | — | ❌ few-shot hurts |
+| v0.7 purpose-first | 90% | — | — | subsumed by v0.3 |
+| v0.8 hypothesis-aware | 95-100% | 79% ↓ | 88% ↓ | opt-in for H#-only |
+| v0.9 adaptive | 100% | 89.5% | 76% ↓ | conditional still biases |
+| v0.10 combined | 90% | 100% | 76% ↓ | trade-off unresolved |
+
+### Effort / model debate settled
+
+- **effort=none is the true optimum for v0.3**. medium breaks Turing (100%→82%), high breaks Edmondson's H3 mediation (95%→85%). Extra thinking introduces concept-reorganization risk without upside once prompt structure is right.
+- **Opus 4.7 only reliable model**. Sonnet 4.6 blocked by `claude -p` multi-turn truncation (harness fix deferred). Haiku 4.5 at 65% too weak.
+
+### The H8 limitation (accepted trade-off)
+
+v0.3 cannot capture Edmondson's H8 (efficacy does NOT mediate coaching/context→learning) as a structured `mediator=efficacy + verification_status=not_supported` RELATION. The information appears in narrative / `l3_json.additional` but not in the queryable schema. Fixing this requires v0.8's mandatory hypothesis coverage — which empirically breaks Turing and Wei. Two-pass / conditional approaches (v0.9, v0.10) ALSO fail. **We accept the v0.3 + single-pass trade-off for production; hypothesis-specialist v0.8 remains as opt-in.**
 
 **Winning universal config: `v0.1_baseline.md` + `claude-opus-4-7` + `effort=none` via `claude -p` CLI (Max plan).**
 

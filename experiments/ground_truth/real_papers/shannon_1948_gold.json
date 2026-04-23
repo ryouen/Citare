@@ -1,0 +1,81 @@
+{
+  "paper_doi_hint": "Shannon 1948, A Mathematical Theory of Communication, Bell System Technical Journal",
+  "paper_title": "A Mathematical Theory of Communication",
+  "paper_author_year": "Shannon 1948",
+  "source": "hand-authored from information theory domain knowledge",
+  "notes": [
+    "Foundational paper of information theory.",
+    "Introduces entropy H = -Σ p_i log p_i, channel capacity, source coding theorem, noisy channel coding theorem.",
+    "Two parts: discrete noiseless system and continuous noisy system."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["empirical", "conceptual"]
+      },
+      "description": "Paper type"
+    },
+    {
+      "key": "paper_default_theoretical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "design_basis = theoretical"
+    },
+    {
+      "key": "def_entropy",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(entropy|H_X|information_entropy|shannon_entropy)",
+        "key_elements_include_any_of": ["-Σ", "log", "uncertainty", "surprise", "information", "probability"]
+      },
+      "description": "Definition of entropy H = -Σ p log p",
+      "weight": 2.0
+    },
+    {
+      "key": "def_channel_capacity",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(channel|capacity|channel_capacity)"
+      },
+      "description": "Channel capacity",
+      "weight": 1.5
+    },
+    {
+      "key": "def_information_source",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(source|information_source|markov_source|discrete_source)"
+      },
+      "description": "Information source"
+    },
+    {
+      "key": "formal_entropy_equation",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(entropy|H_X|information)"
+      },
+      "description": "At least one DEFINITION related to entropy — l3_json should have formal equation"
+    },
+    {
+      "key": "rel_noise_to_capacity",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(noise|snr|signal)",
+        "dv_regex": "(capacity|rate|bandwidth|throughput)"
+      },
+      "description": "Noise/signal affects channel capacity"
+    },
+    {
+      "key": "exist_coding_theorem",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(coding|encoding|theorem|noiseless|capacity)"
+      },
+      "description": "Source coding theorem or noisy channel coding theorem"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "paper_doi_hint": "Hayes 2006, ACT Model, Behaviour Research and Therapy",
+  "paper_title": "Acceptance and Commitment Therapy: Model, processes and outcomes",
+  "paper_author_year": "Hayes et al. 2006",
+  "source": "hand-authored from ACT/RFT domain knowledge",
+  "notes": [
+    "Seminal review/conceptual paper introducing the ACT hexaflex model (6 core processes + their inflexibility opposites).",
+    "ACT = Acceptance and Commitment Therapy; RFT = Relational Frame Theory underlies it.",
+    "Key processes: acceptance, cognitive defusion, being present, self-as-context, values, committed action."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_review_or_conceptual",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["review", "conceptual"]},
+      "description": "Paper is a review/conceptual introduction to ACT model"
+    },
+    {
+      "key": "def_act",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(acceptance_commitment|act|acceptance_and_commitment)",
+        "key_elements_include_any_of": ["acceptance", "commitment", "therapy", "psychological flexibility", "value"]
+      },
+      "description": "Definition of ACT (Acceptance and Commitment Therapy)",
+      "weight": 2.0
+    },
+    {
+      "key": "def_psychological_flexibility",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(psychological_flexibility|flexibility)"
+      },
+      "description": "Psychological flexibility (the core target of ACT)",
+      "weight": 2.0
+    },
+    {
+      "key": "def_acceptance",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(acceptance|willingness)"
+      },
+      "description": "One of 6 hexaflex processes: acceptance"
+    },
+    {
+      "key": "def_defusion",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(defusion|cognitive_defusion)"
+      },
+      "description": "Cognitive defusion"
+    },
+    {
+      "key": "def_values",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(value|values)"
+      },
+      "description": "Values (hexaflex process)"
+    },
+    {
+      "key": "def_committed_action",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(committed_action|commitment|action)"
+      },
+      "description": "Committed action (hexaflex process)"
+    },
+    {
+      "key": "rel_act_to_outcomes",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(act|acceptance|psychological_flexibility)",
+        "dv_regex": "(outcome|well|distress|functioning|health|symptom)"
+      },
+      "description": "ACT/flexibility → outcomes (broad relation)"
+    },
+    {
+      "key": "paper_default_theoretical_or_empirical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "Conceptual review: design_basis=theoretical (could also be theoretical_integration)"
+    }
+  ]
+}

@@ -158,6 +158,19 @@ _ai_workspace/
 CLAUDE.md
 .anthropic/
 
+# Copyrighted source PDFs (never commit)
+pdfs/
+
+# Experiment raw outputs (large, regeneratable)
+experiments/runs/
+experiments/_cache/
+
+# Local DB files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
 # Secrets
 *.pem
 *.key

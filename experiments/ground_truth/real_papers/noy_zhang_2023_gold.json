@@ -1,0 +1,74 @@
+{
+  "paper_doi_hint": "10.1126/science.adh2586",
+  "paper_title": "Experimental evidence on the productivity effects of generative artificial intelligence",
+  "paper_author_year": "Noy & Zhang 2023",
+  "source": "hand-authored from domain knowledge of the paper's RCT design",
+  "notes": [
+    "RCT (n=453 college-educated professionals) on writing tasks with/without ChatGPT. Published in Science.",
+    "Key findings: ChatGPT access substantially reduces time spent, improves output quality, narrows inequality between high/low ability participants."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical RCT"
+    },
+    {
+      "key": "paper_default_design_rct",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "rct"
+      },
+      "description": "RCT design",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_chatgpt_to_time",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(chatgpt|gpt|ai|generative_ai)",
+        "dv_regex": "(time|speed|completion)",
+        "relation": "negative"
+      },
+      "description": "ChatGPT access → reduced time on task"
+    },
+    {
+      "key": "rel_chatgpt_to_quality",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(chatgpt|gpt|ai|generative_ai)",
+        "dv_regex": "(quality|grade|rating|score)",
+        "relation": "positive"
+      },
+      "description": "ChatGPT access → improved output quality",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_inequality_narrowing",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(chatgpt|gpt|ai|generative_ai)",
+        "dv_regex": "(inequality|gap|variance|dispersion|spread)"
+      },
+      "description": "ChatGPT narrows quality inequality between high/low ability writers",
+      "weight": 1.5
+    },
+    {
+      "key": "exist_writing_task_sample",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["college", "professional", "writing", "453", "RCT", "experiment"]
+      },
+      "description": "Sample and design: college-educated professionals, writing tasks"
+    },
+    {
+      "key": "exist_effect_heterogeneity",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(heterogen|differential|individual|baseline|ability|skill)"
+      },
+      "description": "Effect heterogeneity by baseline ability"
+    }
+  ]
+}

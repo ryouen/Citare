@@ -1,0 +1,92 @@
+{
+  "paper_doi_hint": "10.1002/andp.19053221004",
+  "paper_title": "Zur Elektrodynamik bewegter Körper (On the Electrodynamics of Moving Bodies)",
+  "paper_author_year": "Einstein 1905",
+  "source": "hand-authored from physics domain knowledge",
+  "notes": [
+    "EXTREME test: German-language scanned PDF with no text layer; 1905 typesetting; physics equations throughout.",
+    "This is Einstein's special relativity paper — the LaTeX of the claims should include time dilation, length contraction, relativity of simultaneity, and Lorentz transformation (addition of velocities).",
+    "paper_type: conceptual/theoretical (theoretical derivation, not empirical)."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_title_in_german_or_english",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["conceptual", "empirical"]
+      },
+      "description": "Paper type (could be conceptual for theoretical derivation)"
+    },
+    {
+      "key": "paper_author_einstein",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["conceptual", "empirical"]
+      },
+      "description": "Just checks paper_type was extracted (placeholder)"
+    },
+    {
+      "key": "paper_default_theoretical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "design_basis = theoretical (no experimental data, pure derivation)",
+      "weight": 2.0
+    },
+    {
+      "key": "def_relativity_principle",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(relativity|relativity_principle|principle_of_relativity|relativitätsprinzip)"
+      },
+      "description": "Principle of relativity: laws of physics same in all inertial frames",
+      "weight": 2.0
+    },
+    {
+      "key": "def_light_speed_constancy",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(light|speed_of_light|light_speed|lichtgeschwindigkeit|constancy|invariant)"
+      },
+      "description": "Constancy of the speed of light (second postulate)"
+    },
+    {
+      "key": "rel_time_dilation",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(velocity|speed|motion|movement|gesch)",
+        "dv_regex": "(time|clock|time_dilation|Zeit|Uhr)"
+      },
+      "description": "Velocity -> time dilation (moving clocks tick slower)",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_length_contraction",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(velocity|speed|motion|gesch)",
+        "dv_regex": "(length|rod|size|rigid|Länge|Stab)"
+      },
+      "description": "Velocity -> length contraction (Lorentz contraction)",
+      "weight": 2.0
+    },
+    {
+      "key": "formal_equation_present",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(velocity|speed|motion|gesch|frame|time|length)",
+        "dv_regex": "(time|length|clock|rod|simult|frame)"
+      },
+      "description": "At least one RELATION should have formal equation (time dilation, length contraction, etc.)"
+    },
+    {
+      "key": "exist_simultaneity_relative",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(simultane|gleichzeit|absolute|relative)"
+      },
+      "description": "Simultaneity is relative (not absolute) - foundational observation"
+    }
+  ]
+}

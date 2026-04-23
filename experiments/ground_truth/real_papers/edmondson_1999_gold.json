@@ -1,0 +1,184 @@
+{
+  "paper_doi": "10.2307/2666999",
+  "paper_title": "Psychological Safety and Learning Behavior in Work Teams",
+  "paper_author_year": "Edmondson 1999",
+  "source": "synthesized from 4 chapter-read subagents (Theory p3-9, Methods p10-14, Results p15-21, Discussion p22-32) on 2026-04-23",
+  "total_claims_in_subagent_synthesis": 85,
+  "must_catch_count": 17,
+  "notes": [
+    "Paper has H1-H8 hypotheses (NOT H1-H7 as an earlier summary suggested)",
+    "The key hallmark finding is the H3 mediation: B=.67 direct becomes B=.25 p=.42 when controlling for learning behavior — classic effect_disappears_under_control"
+  ],
+  "must_catch_claims": [
+    {
+      "key": "def_psychological_safety",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(team[_ ])?psychological[_ ]safety",
+        "key_elements_include_any_of": ["shared belief", "interpersonal risk", "safe", "risk taking"],
+        "source_page_range": [352, 356]
+      },
+      "description": "Definition of team psychological safety as shared belief about safety for interpersonal risk taking"
+    },
+    {
+      "key": "def_team_learning_behavior",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "team[_ ]learning[_ ]behavior",
+        "key_elements_include_any_of": ["seeking feedback", "experimenting", "discussing errors", "asking for help", "process of reflection"],
+        "source_page_range": [351, 355]
+      },
+      "description": "Definition of team learning behavior"
+    },
+    {
+      "key": "rel_H1_learning_to_performance",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "team[_ ]learning[_ ]behavior",
+        "dv_regex": "team[_ ]performance",
+        "relation": "positive",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "description": "H1: team learning behavior -> team performance (positive)"
+    },
+    {
+      "key": "rel_H2_safety_to_learning",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "team[_ ]psychological[_ ]safety",
+        "dv_regex": "team[_ ]learning[_ ]behavior",
+        "relation": "positive",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "description": "H2: team psychological safety -> team learning behavior"
+    },
+    {
+      "key": "rel_H3_mediation_CRITICAL",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "team[_ ]psychological[_ ]safety",
+        "dv_regex": "team[_ ]performance",
+        "mediator_regex": "team[_ ]learning[_ ]behavior",
+        "l3_mediation_must_exist": true,
+        "direct_p_after_mediator_near": 0.42
+      },
+      "description": "H3 FULL MEDIATION: safety->performance via learning. direct_effect drops to B=.25, p=.42 when controlling for learning. This is THE hallmark effect_disappears_under_control finding.",
+      "weight": 2.0
+    },
+    {
+      "key": "incompleteness_effect_disappears",
+      "where": "claim_relations or claim-level incompleteness_category",
+      "must_have": {
+        "incompleteness_category_include": ["effect_disappears_under_control"]
+      },
+      "description": "The effect_disappears_under_control flag must appear somewhere — this is the incompleteness signal for H3",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_H4_efficacy_to_learning",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "team[_ ]efficacy",
+        "dv_regex": "team[_ ]learning[_ ]behavior",
+        "relation": "positive"
+      },
+      "description": "H4: team efficacy -> team learning behavior"
+    },
+    {
+      "key": "rel_H6_coaching_context_to_safety",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(coaching|context[_ ]support)",
+        "dv_regex": "team[_ ]psychological[_ ]safety",
+        "relation": "positive"
+      },
+      "description": "H6: team leader coaching + context support -> team psychological safety"
+    },
+    {
+      "key": "rel_H7_mediation_ps_mediates",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(coaching|context[_ ]support)",
+        "dv_regex": "team[_ ]learning[_ ]behavior",
+        "mediator_regex": "team[_ ]psychological[_ ]safety"
+      },
+      "description": "H7: PS mediates between coaching/context support and learning behavior"
+    },
+    {
+      "key": "rel_H8_efficacy_NOT_mediate",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(coaching|context[_ ]support)",
+        "dv_regex": "team[_ ]learning[_ ]behavior",
+        "mediator_regex": "team[_ ]efficacy",
+        "verification_status_include": ["not_supported", "mixed_support", "proposed_in_paper"]
+      },
+      "description": "H8 was NOT SUPPORTED. Capturing it is nontrivial because author rejects it — verification_status must reflect that."
+    },
+    {
+      "key": "exist_ICC_psychological_safety",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["ICC", ".39"],
+        "phenomenon_regex": "(variance|ICC|between[_ ]team|aggregation)"
+      },
+      "description": "ICC=.39 for psychological safety — justifies team-level aggregation"
+    },
+    {
+      "key": "exist_cross_sectional_limitation_CRITICAL",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_all_of": ["cross-sectional"],
+        "source_text_contains_any_of": ["causality", "demonstration", "prevent"]
+      },
+      "description": "THE critical claim: Author explicitly admits cross-sectional design prevents causal inference (p31). Any extraction missing this is a failure.",
+      "weight": 2.0
+    },
+    {
+      "key": "exist_sample_51_teams_427_individuals",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "sample_size_numbers_mentioned_any_of": [51, 427],
+        "source_section_includes_any_of": ["Methods", "METHODS", "Research Site", "Sample"]
+      },
+      "description": "51 teams, 427 individuals — sample size facts"
+    },
+    {
+      "key": "measurement_method_ps_scale",
+      "where": "measurement_methods",
+      "must_have": {
+        "measures_regex": "psychological[_ ]safety",
+        "reliability_reported_near": 0.82
+      },
+      "description": "Edmondson's PS scale with alpha=.82"
+    },
+    {
+      "key": "paper_default_causal_strength",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "cross_sectional",
+        "author_framing_include": ["associational", "causal"],
+        "temporal_precedence": "none"
+      },
+      "description": "Paper-level causal_strength: design_basis=cross_sectional (not RCT, not longitudinal). This determines whether safe citation says 'associated with' vs 'causes'."
+    },
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["empirical"]
+      },
+      "description": "paper_type = empirical"
+    },
+    {
+      "key": "paper_default_method_team_unit",
+      "where": "paper.default_method",
+      "must_have": {
+        "unit_of_analysis": "team",
+        "sample_size_near": 51,
+        "study_design_contains_any_of": ["cross-sectional", "survey", "mixed", "multi-method"]
+      },
+      "description": "Paper-level method metadata: 51 teams, cross-sectional survey + observer + qualitative"
+    }
+  ]
+}

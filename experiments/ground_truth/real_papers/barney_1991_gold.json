@@ -1,0 +1,100 @@
+{
+  "paper_doi_hint": "10.1177/014920639101700108",
+  "paper_title": "Firm Resources and Sustained Competitive Advantage",
+  "paper_author_year": "Barney 1991",
+  "source": "hand-authored from domain knowledge; VRIO / RBV framework",
+  "notes": [
+    "Foundational conceptual paper on the Resource-Based View (RBV). Defines firm resources and the VRIN/VRIO framework.",
+    "No empirical data — paper_type = conceptual, evidence_type = conceptual_argument or theoretical_integration",
+    "Key contribution: 4 attributes (Valuable, Rare, Inimitable, Non-substitutable — later VRIN, further extended to VRIO) → framework"
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_conceptual",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["conceptual"]},
+      "description": "Conceptual (theoretical) paper — no empirical data"
+    },
+    {
+      "key": "paper_default_causal_theoretical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "Paper-level: design_basis=theoretical (no data)"
+    },
+    {
+      "key": "def_firm_resources",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(firm_resource|firm_resources|resource)",
+        "key_elements_include_any_of": ["asset", "capability", "attribute", "control", "firm"]
+      },
+      "description": "Definition of firm resources",
+      "weight": 1.5
+    },
+    {
+      "key": "def_sustained_competitive_advantage",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(sustained|competitive_advantage)",
+        "key_elements_include_any_of": ["strategy", "rent", "value", "competitor", "imitat"]
+      },
+      "description": "Definition of sustained competitive advantage"
+    },
+    {
+      "key": "def_valuable",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(valuable|value)",
+        "key_elements_include_any_of": ["exploit", "neutralize", "opportunit", "threat", "efficien"]
+      },
+      "description": "V in VRIN: resource is valuable (enables exploiting opportunities or neutralizing threats)"
+    },
+    {
+      "key": "def_rare",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(rare|rarity)",
+        "key_elements_include_any_of": ["few", "competitor", "possess", "unique", "small number"]
+      },
+      "description": "R in VRIN: resource is rare (not possessed by many competitors)"
+    },
+    {
+      "key": "def_inimitable",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(inimit|imperfectly_imitab|imitation)",
+        "key_elements_include_any_of": ["imitat", "unique historical", "causal ambiguity", "social complex"]
+      },
+      "description": "I in VRIN: resource is imperfectly imitable (historical, causally ambiguous, or socially complex)",
+      "weight": 1.5
+    },
+    {
+      "key": "def_non_substitutable",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(substitut|non_substit|strategic(ally)?_equivalent|strategic_equivalen)",
+        "key_elements_include_any_of": ["substitute", "strategic equivalent", "alternative", "equivalent", "same strateg", "same strategies", "exploited"]
+      },
+      "description": "N in VRIN: non-substitutability (or equivalently, 'strategically equivalent resources')"
+    },
+    {
+      "key": "rel_vrin_to_sustained_advantage",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(valuable|rare|inimit|non_substit|vrin|vrio|firm_resource)",
+        "dv_regex": "(sustained|competitive_advantage|advantage)",
+        "relation": "positive"
+      },
+      "description": "Framework proposition: VRIN attributes → sustained competitive advantage",
+      "weight": 2.0
+    },
+    {
+      "key": "theory_rbv_captured",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["conceptual"]},
+      "description": "Paper captured as conceptual — theory field should list RBV or resource-based framework"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "paper_doi_hint": "Harvard Business School Working Paper 24-013",
+  "paper_title": "Navigating the Jagged Technological Frontier: Field Experimental Evidence of the Effects of AI on Knowledge Worker Productivity and Quality",
+  "paper_author_year": "Dell'Acqua et al. 2023",
+  "source": "hand-authored from domain knowledge of RCT design; verify claim rubric against actual extraction",
+  "notes": [
+    "This is an RCT with BCG consultants. The paper's central claim is the 'jagged technological frontier' — AI boosts performance inside its capability frontier but hurts outside.",
+    "must-catch items are design-level rather than exhaustive claim counts"
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical RCT paper"
+    },
+    {
+      "key": "paper_default_design_rct",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "rct",
+        "author_framing_include": ["causal", "existence_proof"]
+      },
+      "description": "Paper-level: RCT design (not cross-sectional), author makes causal claims (justified by RCT)",
+      "weight": 2.0
+    },
+    {
+      "key": "paper_default_manipulation_true",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "rct"
+      },
+      "description": "design_basis must be rct (not cross_sectional/longitudinal/quasi)",
+      "weight": 1.5
+    },
+    {
+      "key": "rel_ai_boosts_inside_frontier",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(ai|gpt|chatgpt|llm|chatgpt_4|gpt_4|generative_ai)",
+        "dv_regex": "(performance|productivity|quality|output)",
+        "relation": "positive"
+      },
+      "description": "AI access → task performance (positive effect on in-frontier tasks)"
+    },
+    {
+      "key": "rel_ai_hurts_outside_frontier",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(ai|gpt|chatgpt|llm|chatgpt_4|gpt_4|generative_ai)",
+        "dv_regex": "(performance|productivity|quality|accuracy|correctness)",
+        "relation": "negative"
+      },
+      "description": "AI access → task performance (NEGATIVE effect on out-of-frontier tasks). This is the distinctive finding.",
+      "weight": 2.0
+    },
+    {
+      "key": "def_jagged_frontier",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(jagged|frontier|capability)",
+        "key_elements_include_any_of": ["boundary", "capability", "capable", "frontier", "uneven", "invisible"]
+      },
+      "description": "The 'jagged technological frontier' concept — definitional to the paper",
+      "weight": 2.0
+    },
+    {
+      "key": "exist_bcg_sample",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["BCG", "Boston Consulting", "consultant", "consultants"]
+      },
+      "description": "Study conducted with BCG consultants"
+    },
+    {
+      "key": "exist_task_differentiation",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(frontier|task|differential|boundary|asymmetric)"
+      },
+      "description": "Existence claim about jagged/asymmetric task boundary"
+    }
+  ]
+}

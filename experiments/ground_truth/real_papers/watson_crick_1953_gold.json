@@ -1,0 +1,64 @@
+{
+  "paper_doi_hint": "10.1038/171737a0",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+  "paper_author_year": "Watson & Crick 1953",
+  "source": "hand-authored from biology domain knowledge",
+  "notes": [
+    "1-page Nature paper. Iconic. Proposes DNA double helix structure with complementary base pairing.",
+    "Dense: every paragraph is a claim.",
+    "paper_type: conceptual (structural proposal from X-ray diffraction, theoretical)"
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_conceptual_or_empirical",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["conceptual", "empirical"]
+      },
+      "description": "Paper type (theoretical structural proposal)"
+    },
+    {
+      "key": "paper_default_theoretical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "design_basis = theoretical (inference from X-ray data)"
+    },
+    {
+      "key": "def_double_helix",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(double_helix|helix|dna|nucleic_acid|deoxyribose)"
+      },
+      "description": "Double helix structure",
+      "weight": 2.0
+    },
+    {
+      "key": "def_base_pairing",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(base|pair|complementary|purine|pyrimidine|adenine|thymine|guanine|cytosine)"
+      },
+      "description": "Base pairing (A-T, G-C)",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_base_complementarity",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(base|adenine|thymine|guanine|cytosine|purine|pyrimidine|identity)",
+        "dv_regex": "(base|pair|complement|chain|opposite|specific|identity)"
+      },
+      "description": "Base on one chain determines base on complementary chain"
+    },
+    {
+      "key": "exist_phosphate_backbone",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["phosphate", "backbone", "sugar", "deoxyribose", "ribose"]
+      },
+      "description": "Phosphate-sugar backbone (outside of helix)"
+    }
+  ]
+}

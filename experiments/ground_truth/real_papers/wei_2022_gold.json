@@ -1,0 +1,73 @@
+{
+  "paper_doi_hint": "Wei et al. 2022, Chain-of-Thought Prompting, NeurIPS",
+  "paper_title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "paper_author_year": "Wei et al. 2022",
+  "source": "hand-authored from ML paper knowledge",
+  "notes": [
+    "Introduces CoT prompting: a few-shot prompt where exemplars include intermediate reasoning steps.",
+    "Key findings: CoT improves performance on arithmetic, commonsense, and symbolic reasoning tasks, especially with larger models."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical ML paper"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "description": "design_basis = computational_demonstration (benchmark evaluation)",
+      "weight": 1.5
+    },
+    {
+      "key": "def_chain_of_thought",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(chain_of_thought|cot|prompt|prompting)",
+        "key_elements_include_any_of": ["reasoning", "step", "intermediate", "exemplar", "few-shot"]
+      },
+      "description": "Chain-of-thought prompting definition",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_cot_to_performance",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(chain_of_thought|cot|prompting)",
+        "dv_regex": "(accuracy|performance|reasoning|score)",
+        "relation": "positive"
+      },
+      "description": "CoT prompting → improved reasoning performance",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_model_scale_interaction",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(model_scale|model_size|scale|parameter)",
+        "dv_regex": "(cot|chain|performance)"
+      },
+      "description": "Model scale moderates CoT effect (emergent ability with scale)"
+    },
+    {
+      "key": "exist_benchmark_gsm8k_or_similar",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["GSM8K", "arithmetic", "commonsense", "MultiArith", "SVAMP", "AQuA", "StrategyQA"]
+      },
+      "description": "Benchmarks: arithmetic (GSM8K), commonsense reasoning, symbolic"
+    },
+    {
+      "key": "exist_emergent_ability",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(emergent|scale|capability|threshold)"
+      },
+      "description": "Emergent capability of CoT with model scale (important finding)"
+    }
+  ]
+}

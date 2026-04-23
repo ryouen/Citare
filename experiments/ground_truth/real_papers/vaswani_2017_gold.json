@@ -1,0 +1,79 @@
+{
+  "paper_doi_hint": "Vaswani et al. 2017, Attention Is All You Need, NeurIPS",
+  "paper_title": "Attention Is All You Need",
+  "paper_author_year": "Vaswani et al. 2017",
+  "source": "hand-authored from well-known paper content",
+  "notes": [
+    "Introduces the Transformer architecture based entirely on attention. Foundational ML paper.",
+    "No mediation/correlation logic; this is an ML benchmark paper with architectural proposal + empirical evaluation."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical computational paper"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "description": "design_basis = computational_demonstration (not RCT or cross-sectional)",
+      "weight": 1.5
+    },
+    {
+      "key": "def_transformer",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(transformer|architecture_transformer)",
+        "key_elements_include_any_of": ["attention", "encoder", "decoder", "sequence"]
+      },
+      "description": "The Transformer architecture",
+      "weight": 2.0
+    },
+    {
+      "key": "def_self_attention",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(self_attention|attention_self|scaled_dot_product|attention_mechanism|attention)"
+      },
+      "description": "Self-attention or attention mechanism",
+      "weight": 1.5
+    },
+    {
+      "key": "def_multihead",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(multi_head|multihead|heads)"
+      },
+      "description": "Multi-head attention"
+    },
+    {
+      "key": "def_positional_encoding",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(positional|position_encoding|positional_encoding)"
+      },
+      "description": "Positional encoding (needed since attention alone has no order)"
+    },
+    {
+      "key": "rel_transformer_to_performance",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(transformer|attention|architecture|self_attention|multi_head)",
+        "dv_regex": "(bleu|accuracy|performance|quality|translation|score)"
+      },
+      "description": "Transformer / attention → translation performance (BLEU)"
+    },
+    {
+      "key": "exist_bleu_benchmark",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["BLEU", "WMT", "28.4", "41.8", "English-German", "translation"]
+      },
+      "description": "State-of-the-art BLEU scores on WMT 2014 benchmarks (e.g., 28.4 En-De, 41.8 En-Fr)"
+    }
+  ]
+}

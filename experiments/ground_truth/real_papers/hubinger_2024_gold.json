@@ -1,0 +1,54 @@
+{
+  "paper_doi_hint": "Hubinger et al. 2024, Sleeper Agents, arXiv",
+  "paper_title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+  "paper_author_year": "Hubinger et al. 2024",
+  "source": "hand-authored from AI safety domain knowledge",
+  "notes": [
+    "AI safety paper. Shows that backdoored deceptive behavior can survive RLHF, adversarial training, and supervised fine-tuning.",
+    "Two backdoor types: 'year' (behave differently depending on year) and 'deployment' (behave differently in training vs deployment)."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Empirical ML safety paper"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "description": "design_basis = computational_demonstration",
+      "weight": 1.5
+    },
+    {
+      "key": "def_sleeper_agent",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(sleeper|backdoor|deceptive|trigger)"
+      },
+      "description": "Sleeper agent / backdoor definition",
+      "weight": 2.0
+    },
+    {
+      "key": "rel_safety_training_fails",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(safety|rlhf|adversarial|supervised|fine-tuning|training)",
+        "dv_regex": "(backdoor|deceptive|behavior|persist|remove)"
+      },
+      "description": "Safety training does NOT remove backdoor behaviors",
+      "weight": 2.0
+    },
+    {
+      "key": "exist_persistence_through_training",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(persist|survive|remain|robustness|through)"
+      },
+      "description": "Backdoor behavior persists through safety training"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "paper_doi_hint": "Turing 1950, Computing Machinery and Intelligence, Mind",
+  "paper_title": "Computing Machinery and Intelligence",
+  "paper_author_year": "Turing 1950",
+  "source": "hand-authored from philosophy/CS domain knowledge",
+  "notes": [
+    "Foundational philosophical paper proposing the Imitation Game (Turing Test). Published in Mind, 1950.",
+    "Proposes: 'Can machines think?' -> reformulate as 'Can machines pass the Imitation Game?'",
+    "Counter-arguments: theological, 'heads in sand', mathematical, consciousness, disabilities, Lady Lovelace, continuity of the nervous system, informality of behaviour, ESP."
+  ],
+  "must_catch_claims": [
+    {
+      "key": "paper_type_conceptual_or_empirical",
+      "where": "paper.paper_type",
+      "must_have": {
+        "value_include": ["conceptual", "empirical"]
+      },
+      "description": "Paper type"
+    },
+    {
+      "key": "paper_default_theoretical",
+      "where": "paper.default_causal_strength",
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "design_basis = theoretical (philosophical argument)"
+    },
+    {
+      "key": "def_imitation_game",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(imitation_game|turing_test|game)",
+        "key_elements_include_any_of": ["interrogator", "machine", "identify", "question", "conversation", "computer", "man", "woman"]
+      },
+      "description": "The Imitation Game (later known as Turing Test)",
+      "weight": 2.0
+    },
+    {
+      "key": "def_digital_computer",
+      "template_type": "DEFINITION",
+      "must_have": {
+        "concept_regex": "(digital_computer|computer|machine|turing_machine)"
+      },
+      "description": "Definition of digital computer / machine"
+    },
+    {
+      "key": "rel_machine_to_test_performance",
+      "template_type": "RELATION",
+      "must_have": {
+        "iv_regex": "(machine|computer|digital_computer|programming)",
+        "dv_regex": "(imitation|game|test|pass|indistinguishable|identify)"
+      },
+      "description": "Machine can pass the imitation game (Turing's central prediction)",
+      "weight": 1.5
+    },
+    {
+      "key": "exist_lady_lovelace_objection",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "source_text_contains_any_of": ["Lovelace", "originality", "creativity", "surprise", "initiate"]
+      },
+      "description": "Lady Lovelace's objection (machines cannot originate anything)"
+    },
+    {
+      "key": "exist_contra_argument",
+      "template_type": "EXISTENCE_CLAIM",
+      "must_have": {
+        "phenomenon_regex": "(objection|argument|counter|theological|mathematical|consciousness|continuous)"
+      },
+      "description": "At least one of the 9 counter-arguments Turing addresses"
+    }
+  ]
+}

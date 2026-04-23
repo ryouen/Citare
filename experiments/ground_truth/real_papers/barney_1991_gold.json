@@ -65,7 +65,7 @@
       "template_type": "DEFINITION",
       "must_have": {
         "concept_regex": "(inimit|imperfectly_imitab|imitation)",
-        "key_elements_include_any_of": ["imitat", "unique historical", "causal ambiguity", "social complex"]
+        "key_elements_include_any_of": ["imitat", "unique historical", "causal ambiguity", "social complex", "unique_historical", "causal_ambiguity", "social_complex", "historical condition"]
       },
       "description": "I in VRIN: resource is imperfectly imitable (historical, causally ambiguous, or socially complex)",
       "weight": 1.5

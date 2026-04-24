@@ -31,6 +31,7 @@ PAIRS = [
     ("v0.12d ORDER",     "R39D_v12d_order_T7"),
     ("v0.12e STATUS",    "R39E_v12e_status_T7"),
     ("v0.12f DISCIPLINE","R39F_v12f_discipline_T7"),
+    ("v0.12g TOP-PRIME", "R39G2_v12g_top_prime_T7"),
 ]
 
 

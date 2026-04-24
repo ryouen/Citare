@@ -292,22 +292,41 @@ def _norm_latex(s: str) -> str:
 
 
 def _collect_equations(extraction: dict) -> list[dict]:
+    """Collect equations from an extraction's claims in whichever shape they appear.
+
+    Handles three shapes observed in practice:
+      (a) formal.equations = [{latex, variables, ...}, ...]   <- v0.11, v0.12e schema form
+      (b) formal.equations = ["\\eta_c = ...", ...]             <- v0.12g terse priming
+      (c) l3_json.equations = [...]                              <- some variants skip `formal`
+      (d) l3_json.formal.equations = [...]                       <- deep nesting
+    """
     out = []
     for c in extraction.get("claims", []) or []:
         for lk in ("l0_json", "l3_json"):
             blk = c.get(lk) or {}
             if not isinstance(blk, dict):
                 continue
+            # shape (a)/(b)/(d): via formal
             formal = blk.get("formal") or {}
-            for e in formal.get("equations") or []:
+            eqs = formal.get("equations") or []
+            # shape (c): equations directly under l3_json
+            eqs += blk.get("equations") or [] if lk == "l3_json" else []
+            for e in eqs:
                 if isinstance(e, dict):
-                    out.append({
-                        "claim_id": c.get("id"),
-                        "where": lk,
-                        "latex": e.get("latex") or "",
-                        "name": e.get("name") or "",
-                        "normalized": _norm_latex(e.get("latex") or ""),
-                    })
+                    latex = e.get("latex") or ""
+                    name = e.get("name") or ""
+                elif isinstance(e, str):
+                    latex = e
+                    name = ""
+                else:
+                    continue
+                out.append({
+                    "claim_id": c.get("id"),
+                    "where": lk,
+                    "latex": latex,
+                    "name": name,
+                    "normalized": _norm_latex(latex),
+                })
     return out
 
 

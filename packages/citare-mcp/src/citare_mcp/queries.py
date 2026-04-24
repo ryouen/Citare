@@ -43,7 +43,7 @@ def search_claims(
     params: list[Any] = []
 
     if doi:
-        where.append("paper_doi = ?")
+        where.append("paper_id = ?")
         params.append(doi)
     if iv:
         where.append("(l1_subject LIKE ? OR json_extract(l0_json, '$.iv') LIKE ?)")
@@ -60,7 +60,7 @@ def search_claims(
         params.extend([like, like, like, like])
 
     sql = (
-        "SELECT id, paper_doi, template_type, l0_json, l1_subject, l1_predicate, l1_object, "
+        "SELECT id, paper_id, template_type, l0_json, l1_subject, l1_predicate, l1_object, "
         "l2_en, source_text, source_page, source_section, evidence_type, verification_status, "
         "causal_strength, method_metadata, confidence_score "
         "FROM claims WHERE " + " AND ".join(where) +
@@ -86,9 +86,9 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
     claim = _row_to_claim(row)
 
     paper = conn.execute(
-        "SELECT doi, title, authors, year, venue, paper_type, domain "
-        "FROM papers WHERE doi = ?",
-        (claim["paper_doi"],),
+        "SELECT id, canonical_title, authors, year, venue, paper_type, domain "
+        "FROM papers WHERE id = ?",
+        (claim["paper_id"],),
     ).fetchone()
     if paper is not None:
         paper_dict = dict(paper)
@@ -96,6 +96,13 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
             paper_dict["authors"] = json.loads(paper_dict["authors"])
         except (TypeError, json.JSONDecodeError):
             pass
+        # Include all known identifiers for this paper
+        idents = conn.execute(
+            "SELECT identifier_type, identifier_value, is_preferred "
+            "FROM paper_identifiers WHERE paper_id = ? ORDER BY is_preferred DESC",
+            (paper_dict["id"],),
+        ).fetchall()
+        paper_dict["identifiers"] = [dict(r) for r in idents]
         claim["paper"] = paper_dict
 
     warnings = conn.execute(
@@ -154,7 +161,7 @@ def get_claim_graph(conn: sqlite3.Connection, claim_id: str, depth: int = 1) -> 
     marks = ",".join("?" for _ in visited)
     nodes = []
     for r in conn.execute(
-        f"SELECT id, template_type, l1_subject, l1_predicate, l1_object, l2_en, paper_doi, verification_status "
+        f"SELECT id, template_type, l1_subject, l1_predicate, l1_object, l2_en, paper_id, verification_status "
         f"FROM claims WHERE id IN ({marks})",
         list(visited),
     ).fetchall():

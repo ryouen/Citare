@@ -203,15 +203,26 @@ class ClaimRelation(_StrictBase):
 
 
 class PaperReference(_StrictBase):
-    """Paper-level citation edge; not claim-level.
+    """A bibliographic reference from a paper's References section.
 
-    citing_doi and cited_doi are nullable on ingest: extractions that
-    cannot resolve a DOI still record the cited_title, and the DOI is
-    filled in later by reference-resolution services.
+    Written by extraction prompts in one of two modes:
+     * **v0.12 and earlier (legacy)**: ``cited_doi`` + ``cited_title``, with
+       LLM having compressed/reformatted the original entry.
+     * **v0.13+ (verbatim)**: ``raw_reference_text`` holds the entry exactly
+       as printed in the References section. Parser fills the rest after.
+
+    All fields are optional to tolerate both modes. The DB layer splits this
+    model into ``citation_text`` (raw) + parsed fields; see citare-db.
     """
     citing_doi: str | None = None
     cited_doi: str | None = None
+    cited_arxiv: str | None = None
+    cited_year: int | None = None
+    cited_authors: list[str] = Field(default_factory=list)
     cited_title: str | None = None
+    cited_venue: str | None = None
+    raw_reference_text: str | None = None
+    position_in_refs: int | None = None
 
 
 class Concept(_StrictBase):

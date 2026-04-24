@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "packages" / "citare-core" / "src"))
 sys.path.insert(0, str(ROOT / "packages" / "citare-db" / "src"))
 
-from citare_db import init_db, ingest_extraction_file  # noqa: E402
+from citare_db import init_db, ingest_extraction_file, resolve_citations  # noqa: E402
 
 
 def _prompt_priority(prompt_version: str | None) -> int:
@@ -76,14 +76,26 @@ def main() -> None:
     print(f"[seed] {len(picks)} extractions selected (one per paper)")
 
     ok = fail = 0
+    warnings_total = 0
+    potential_dupes_total = 0
     for fp in picks:
         try:
-            doi = ingest_extraction_file(conn, fp)
+            report = ingest_extraction_file(conn, fp)
             ok += 1
+            warnings_total += len(report.warnings)
+            potential_dupes_total += len(report.potential_duplicate_claims)
         except Exception as e:  # noqa: BLE001
             print(f"  FAIL {fp.parent.name}: {type(e).__name__}: {e}")
             fail += 1
     print(f"[seed] ingested: {ok}/{len(picks)} (failures: {fail})")
+    print(f"[seed] warnings: {warnings_total}, potential_duplicate_claims: {potential_dupes_total}")
+
+    print("[seed] running citation resolver...")
+    resv = resolve_citations(conn)
+    print(f"[seed] resolver: scanned={resv.scanned} "
+          f"by_identifier={resv.resolved_by_identifier} "
+          f"by_triple={resv.resolved_by_triple} "
+          f"queued_for_llm={resv.queued_for_llm}")
 
     # Summary
     print("\n=== DB summary ===")
@@ -107,6 +119,17 @@ def main() -> None:
         "SELECT COALESCE(design_basis_idx,'(null)'), COUNT(*) FROM claims GROUP BY 1 ORDER BY 2 DESC LIMIT 8"
     ):
         print(f"    {row[0]:30s} {row[1]}")
+    ct_count = conn.execute("SELECT COUNT(*) FROM citation_text").fetchone()[0]
+    ce_count = conn.execute("SELECT COUNT(*) FROM citation_edges").fetchone()[0]
+    pending = conn.execute("SELECT COUNT(*) FROM pending_llm_review").fetchone()[0]
+    print(f"  citation_text:   {ct_count}")
+    print(f"  citation_edges:  {ce_count} (resolved)")
+    print(f"  pending_llm:     {pending} (queued for batch review)")
+    by_method = conn.execute(
+        "SELECT resolution_method, COUNT(*) FROM citation_edges GROUP BY 1"
+    ).fetchall()
+    for row in by_method:
+        print(f"    method={row[0]:24s} {row[1]}")
 
 
 if __name__ == "__main__":

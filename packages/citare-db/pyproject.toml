@@ -1,0 +1,16 @@
+[project]
+name = "citare-db"
+version = "0.1.0"
+description = "Citare SQLite schema + ingestion from extraction.json"
+requires-python = ">=3.10"
+dependencies = [
+    "citare-core",
+    "pydantic>=2.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/citare_db"]

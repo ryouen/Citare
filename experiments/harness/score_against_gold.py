@@ -151,8 +151,14 @@ def check_claim(extraction: dict, spec: dict) -> tuple[bool, str]:
                     continue
             if "relation" in must:
                 rel = str(l0.get("relation", "")).lower()
-                if must["relation"] not in rel:
-                    continue
+                pat = must["relation"]
+                # Accept regex alternation (parens with |) or literal substring
+                if "(" in pat and "|" in pat:
+                    if not _regex_match(pat, rel):
+                        continue
+                else:
+                    if pat not in rel:
+                        continue
             if "verification_status_include" in must:
                 if c.get("verification_status") not in must["verification_status_include"]:
                     continue
@@ -181,6 +187,19 @@ def check_claim(extraction: dict, spec: dict) -> tuple[bool, str]:
                     continue
             return True, f"matched {c.get('id')}"
 
+        # META_CLAIM matching
+        if tt == "META_CLAIM":
+            src = (c.get("source_text") or "")
+            finding = str(l0.get("integrated_finding", "")) if isinstance(l0, dict) else ""
+            haystack = (src + "\n" + finding).lower()
+            if "source_text_contains_any_of" in must:
+                if not any(t.lower() in haystack for t in must["source_text_contains_any_of"]):
+                    continue
+            if "source_text_contains_all_of" in must:
+                if not all(t.lower() in haystack for t in must["source_text_contains_all_of"]):
+                    continue
+            return True, f"matched {c.get('id')}"
+
         # EXISTENCE_CLAIM matching
         if tt == "EXISTENCE_CLAIM":
             phen = str(l0.get("phenomenon", ""))
@@ -204,7 +223,111 @@ def check_claim(extraction: dict, spec: dict) -> tuple[bool, str]:
                     continue
             return True, f"matched {c.get('id')}"
 
+    # Fallback: cross-template source_text match (opt-in via must_have.source_text_cross_template)
+    must_top = spec.get("must_have", {}) or {}
+    if must_top.get("source_text_cross_template"):
+        for c in claims:
+            src = (c.get("source_text") or "").lower()
+            if "source_text_contains_any_of" in must_top:
+                if not any(t.lower() in src for t in must_top["source_text_contains_any_of"]):
+                    continue
+            if "source_text_contains_all_of" in must_top:
+                if not all(t.lower() in src for t in must_top["source_text_contains_all_of"]):
+                    continue
+            return True, f"cross-template match via {c.get('template_type')} {c.get('id')}"
+
     return False, f"no match for {tt}"
+
+
+def check_forbidden(extraction: dict, spec: dict) -> tuple[bool, str]:
+    """Return True if a forbidden pattern IS present in extraction (i.e., synthesis violation)."""
+    tt = spec.get("template_type")
+    pat = spec.get("forbidden_pattern", {})
+    if tt in ("RELATION",):
+        for c in extraction.get("claims", []) or []:
+            if c.get("template_type") != "RELATION":
+                continue
+            l0 = c.get("l0_json", {}) or {}
+            iv = str(l0.get("iv", ""))
+            dv = str(l0.get("dv", ""))
+            rel = str(l0.get("relation", "")).lower()
+            if "iv_regex" in pat and not _regex_match(pat["iv_regex"], iv):
+                continue
+            if "dv_regex" in pat and not _regex_match(pat["dv_regex"], dv):
+                continue
+            if "relation" in pat and not _regex_match(pat["relation"], rel):
+                continue
+            if "verification_status_include" in pat:
+                if c.get("verification_status") not in pat["verification_status_include"]:
+                    continue
+            return True, f"forbidden synth found in {c.get('id')}: {iv} -> {dv} [{rel}]"
+        return False, "no forbidden synthesis"
+    if tt == "META_CLAIM":
+        for c in extraction.get("claims", []) or []:
+            if c.get("template_type") != "META_CLAIM":
+                continue
+            src = (c.get("source_text") or "").lower()
+            if "source_text_contains_all_of" in pat:
+                if not all(t.lower() in src for t in pat["source_text_contains_all_of"]):
+                    continue
+            if "source_text_does_not_contain_any_of" in pat:
+                if any(t.lower() in src for t in pat["source_text_does_not_contain_any_of"]):
+                    continue
+            return True, f"forbidden meta synth in {c.get('id')}: {src[:120]!r}"
+        return False, "no forbidden meta synthesis"
+    return False, f"unsupported forbidden tt={tt}"
+
+
+_LATEX_STRIP = [r"\left", r"\right", r"\,", r"\!", r"\;", r"\:", r"\ "]
+
+
+def _norm_latex(s: str) -> str:
+    if not isinstance(s, str):
+        return ""
+    out = s
+    for tok in _LATEX_STRIP:
+        out = out.replace(tok, "")
+    out = "".join(out.split())
+    return out
+
+
+def _collect_equations(extraction: dict) -> list[dict]:
+    out = []
+    for c in extraction.get("claims", []) or []:
+        for lk in ("l0_json", "l3_json"):
+            blk = c.get(lk) or {}
+            if not isinstance(blk, dict):
+                continue
+            formal = blk.get("formal") or {}
+            for e in formal.get("equations") or []:
+                if isinstance(e, dict):
+                    out.append({
+                        "claim_id": c.get("id"),
+                        "where": lk,
+                        "latex": e.get("latex") or "",
+                        "name": e.get("name") or "",
+                        "normalized": _norm_latex(e.get("latex") or ""),
+                    })
+    return out
+
+
+def check_equation(eqs: list[dict], spec: dict) -> tuple[float, str]:
+    required = spec.get("required_latex_tokens") or []
+    if not required:
+        return 0.0, "no required tokens"
+    best_found = 0
+    best_eq = None
+    for eq in eqs:
+        normed = eq["normalized"]
+        normed_raw = eq["latex"]
+        found = sum(1 for t in required if (_norm_latex(t) in normed) or (t in normed_raw))
+        if found > best_found:
+            best_found = found
+            best_eq = eq
+    frac = best_found / len(required)
+    if best_eq is None:
+        return 0.0, f"0/{len(required)} tokens — no equations captured"
+    return frac, f"{best_found}/{len(required)} tokens via {best_eq['claim_id']} ({best_eq.get('name')!r})"
 
 
 def score(extraction_path: Path, gold_path: Path) -> dict:
@@ -214,11 +337,16 @@ def score(extraction_path: Path, gold_path: Path) -> dict:
     results = []
     total_weight = 0.0
     scored_weight = 0.0
+    middle_total = 0.0
+    middle_scored = 0.0
 
     for spec in gold["must_catch_claims"]:
         key = spec["key"]
         weight = spec.get("weight", 1.0)
         total_weight += weight
+        exp_page = spec.get("expected_source_page")
+        mrange = gold.get("middle_page_range") or [15, 22]
+        is_middle = isinstance(exp_page, (int, float)) and mrange[0] <= exp_page <= mrange[1]
 
         where = spec.get("where", "")
         if where.startswith("paper."):
@@ -234,21 +362,86 @@ def score(extraction_path: Path, gold_path: Path) -> dict:
 
         if ok:
             scored_weight += weight
+        if is_middle:
+            middle_total += weight
+            if ok:
+                middle_scored += weight
         results.append({
             "key": key,
             "weight": weight,
             "matched": ok,
             "detail": detail,
             "description": spec.get("description", ""),
+            "expected_source_page": exp_page,
+            "is_middle": is_middle,
         })
+
+    # Must-not-synthesize (integrity)
+    forbidden_total = 0.0
+    forbidden_hit = 0.0
+    forbidden_results = []
+    for spec in gold.get("must_not_synthesize", []) or []:
+        w = spec.get("weight", 1.0)
+        forbidden_total += w
+        hit, detail = check_forbidden(extraction, spec)
+        if hit:
+            forbidden_hit += w
+        forbidden_results.append({
+            "key": spec.get("key"),
+            "weight": w,
+            "synthesized": hit,
+            "detail": detail,
+            "description": spec.get("description", ""),
+        })
+
+    # Equation fidelity (token-set overlap)
+    eqs = _collect_equations(extraction)
+    eq_total = 0.0
+    eq_scored = 0.0
+    eq_results = []
+    for spec in gold.get("equations", []) or []:
+        w = spec.get("weight", 1.0)
+        eq_total += w
+        frac, detail = check_equation(eqs, spec)
+        eq_scored += w * frac
+        eq_results.append({
+            "eq_id": spec.get("eq_id"),
+            "weight": w,
+            "fraction": round(frac, 4),
+            "detail": detail,
+            "description": spec.get("description", ""),
+            "expected_source_page": spec.get("expected_source_page"),
+        })
+
+    # By-template breakdown
+    by_template = {}
+    for r, spec in zip(results, gold["must_catch_claims"]):
+        tt = spec.get("template_type") or spec.get("where") or "paper"
+        entry = by_template.setdefault(tt, {"total_w": 0.0, "scored_w": 0.0, "n": 0, "matched_n": 0})
+        entry["total_w"] += r["weight"]
+        entry["n"] += 1
+        if r["matched"]:
+            entry["scored_w"] += r["weight"]
+            entry["matched_n"] += 1
 
     return {
         "extraction_file": str(extraction_path),
         "gold_file": str(gold_path),
+        "axes": {
+            "coverage": round(scored_weight / total_weight, 4) if total_weight > 0 else 0.0,
+            "integrity_penalty": round(forbidden_hit / forbidden_total, 4) if forbidden_total > 0 else 0.0,
+            "equation_fidelity": round(eq_scored / eq_total, 4) if eq_total > 0 else 0.0,
+            "middle_coverage": round(middle_scored / middle_total, 4) if middle_total > 0 else 0.0,
+        },
         "coverage_score": round(scored_weight / total_weight, 4) if total_weight > 0 else 0.0,
         "scored_weight": scored_weight,
         "total_weight": total_weight,
         "results": results,
+        "forbidden_results": forbidden_results,
+        "eq_results": eq_results,
+        "by_template": by_template,
+        "middle": {"total_w": middle_total, "scored_w": middle_scored},
+        "equations_captured": len(eqs),
     }
 
 
@@ -263,15 +456,42 @@ def main():
 
     matched = [r for r in res["results"] if r["matched"]]
     missed = [r for r in res["results"] if not r["matched"]]
+    axes = res["axes"]
 
-    print(f"# Coverage: {res['coverage_score']*100:.1f}% ({res['scored_weight']:.1f} / {res['total_weight']:.1f})\n")
+    print(f"# Scoring axes (independent, NOT composed)")
+    print(f"  coverage           : {axes['coverage']*100:5.1f}%  ({res['scored_weight']:.1f} / {res['total_weight']:.1f})")
+    print(f"  integrity_penalty  : {axes['integrity_penalty']*100:5.1f}%  (fraction of forbidden claims synthesized)")
+    print(f"  equation_fidelity  : {axes['equation_fidelity']*100:5.1f}%  ({res['equations_captured']} equations captured)")
+    print(f"  middle_coverage    : {axes['middle_coverage']*100:5.1f}%  (p.15-22 claims only; {res['middle']['scored_w']:.1f} / {res['middle']['total_w']:.1f})")
+    print()
+
+    if res["by_template"]:
+        print(f"## By template")
+        for tt, e in sorted(res["by_template"].items()):
+            pct = (e['scored_w']/e['total_w']*100) if e['total_w'] > 0 else 0.0
+            print(f"  {tt:20s}  {pct:5.1f}%  ({e['matched_n']}/{e['n']} claims, w={e['scored_w']:.1f}/{e['total_w']:.1f})")
+        print()
+
     print(f"## Matched ({len(matched)})")
     for r in matched:
-        print(f"  [+] {r['key']} (w={r['weight']}) - {r['detail']}")
+        mid = " [MID]" if r.get("is_middle") else ""
+        print(f"  [+] {r['key']}{mid} (w={r['weight']}) - {r['detail']}")
     print(f"\n## Missed ({len(missed)})")
     for r in missed:
-        print(f"  [-] {r['key']} (w={r['weight']}) - {r['description']}")
+        mid = " [MID]" if r.get("is_middle") else ""
+        print(f"  [-] {r['key']}{mid} (w={r['weight']}) - {r['description']}")
         print(f"      reason: {r['detail']}")
+
+    if res.get("forbidden_results"):
+        print(f"\n## Must-NOT-synthesize check")
+        for r in res["forbidden_results"]:
+            marker = "[HIT!]" if r["synthesized"] else "[clean]"
+            print(f"  {marker} {r['key']} (w={r['weight']}) - {r['detail']}")
+
+    if res.get("eq_results"):
+        print(f"\n## Equations (token-set match)")
+        for r in res["eq_results"]:
+            print(f"  eq={r['eq_id']:30s} p.{r.get('expected_source_page')}  frac={r['fraction']*100:5.1f}%  - {r['detail']}")
 
     if args.save:
         Path(args.save).write_text(json.dumps(res, indent=2, ensure_ascii=False), encoding="utf-8")

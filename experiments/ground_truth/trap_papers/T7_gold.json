@@ -1,0 +1,326 @@
+{
+  "paper_doi": "10.9999/trap.2024.007",
+  "paper_title": "More Data, Worse Models: Non-Monotonic Scaling under Long-Tail Label Noise",
+  "paper_author_year": "Okafor, Yang, Patel 2024 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare T7 benchmark on 2026-04-24. Ground truth is authored BEFORE the paper — the paper is a lossy rendering of this fixture.",
+  "trap_description": "Tests 6 LLM failure modes on a 30-page ML paper: (F1) Lost-in-the-Middle — critical findings buried at p.15-22, sanitized in Discussion; (F2) False transitive synthesis — A->B and B->C established but A->C direct is null; (F3) Discussion sanitization — Abstract/Discussion soften the counterintuitive middle results; (F4) Common-sense bias — paper's main finding (more data hurts, larger models fail earlier) contradicts standard scaling-law intuition; (F5) Equation fidelity — 7 equations of varying complexity at different positions; (F6) Sign-reversal moderation — crossover behaviour requires catching non-monotonic structure.",
+
+  "position_robustness_note": "Claims whose expected_source_page lies in middle_page_range are classified MIDDLE. Aggregate middle-coverage separately for Lost-in-the-Middle diagnosis. Range chosen as middle 40% of the compiled document.",
+  "middle_page_range": [7, 14],
+  "total_pages": 21,
+
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["empirical"]},
+      "expected_source_page": 1,
+      "description": "Empirical paper (computational experiments on 3 benchmark datasets)"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "weight": 1.0,
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "expected_source_page": 1,
+      "description": "Computational demonstration design"
+    },
+
+    {
+      "key": "def_long_tail_distribution",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "(long[_ \\-]?tail|power[_ \\-]?law|heavy[_ \\-]?tail)",
+        "key_elements_include_any_of": ["exponent", "tau", "power law", "class frequency", "Zipf"]
+      },
+      "expected_source_page": 5,
+      "description": "D1: long-tail class distribution with power-law exponent tau"
+    },
+    {
+      "key": "def_non_uniform_label_noise",
+      "template_type": "DEFINITION",
+      "weight": 1.5,
+      "must_have": {
+        "concept_regex": "(non[_ \\-]?uniform.*noise|tail[_ \\-]?concentrat.*noise|class[_ \\-]?dependent.*noise|heterogeneous.*noise)",
+        "key_elements_include_any_of": ["per-class", "eta_tail", "eta_head", "head", "tail", "heterogeneous"]
+      },
+      "expected_source_page": 5,
+      "description": "D2: non-uniform (tail-concentrated) label noise with eta_head < eta_tail"
+    },
+    {
+      "key": "def_tail_coverage_metric",
+      "template_type": "DEFINITION",
+      "weight": 1.5,
+      "must_have": {
+        "concept_regex": "(tail[_ \\-]?coverage)",
+        "key_elements_include_any_of": ["fraction", "tail classes", "threshold", "k samples", "per-class sample"]
+      },
+      "expected_source_page": 5,
+      "description": "D3: tail_coverage — fraction of tail classes with at least k samples. NEW construct. MIDDLE."
+    },
+    {
+      "key": "def_crossover_point_n_star",
+      "template_type": "DEFINITION",
+      "weight": 2.0,
+      "must_have": {
+        "concept_regex": "(crossover|n[_\\^]?\\*|inflection|reversal[_ ]point)",
+        "key_elements_include_any_of": ["sign change", "derivative", "partial", "non-monotonic", "turning point", "reversal"]
+      },
+      "expected_source_page": 6,
+      "description": "D4: crossover point n* where partial derivative of test error with respect to n changes sign. CRITICAL."
+    },
+    {
+      "key": "def_effective_sample_size_under_noise",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "(effective[_ ]sample[_ ]size|n[_ \\-]?eff|noise[_ \\-]?corrected[_ ]n)",
+        "key_elements_include_any_of": ["noise-corrected", "1-2", "eta", "denoising", "shrinkage"]
+      },
+      "expected_source_page": 6,
+      "description": "D5: effective sample size under noise, closed form via (1-2eta)^2 correction"
+    },
+
+    {
+      "key": "rel_R1_dataset_size_to_tail_coverage",
+      "template_type": "RELATION",
+      "weight": 1.0,
+      "must_have": {
+        "iv_regex": "(dataset[_ ]size|sample[_ ]size|training[_ ](set[_ ])?size|training[_ ]sample[_ ]size|n[_ ]samples)",
+        "dv_regex": "tail[_ ]coverage",
+        "relation": "positive",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 8,
+      "description": "R1 (A->B): larger dataset increases tail_coverage. Intuitive chain link."
+    },
+    {
+      "key": "rel_R2_tail_coverage_to_accuracy",
+      "template_type": "RELATION",
+      "weight": 1.0,
+      "must_have": {
+        "iv_regex": "tail[_ ]coverage",
+        "dv_regex": "(test[_ ]accuracy|test[_ ]error|generalization|accuracy)",
+        "relation": "(positive|negative)",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 8,
+      "description": "R2 (B->C): higher tail_coverage improves test accuracy. Intuitive chain link."
+    },
+    {
+      "key": "rel_R3_dataset_size_to_accuracy_NON_MONOTONIC",
+      "template_type": "RELATION",
+      "weight": 3.0,
+      "must_have": {
+        "iv_regex": "(dataset[_ ]size|sample[_ ]size|training[_ ](set[_ ])?size|training[_ ]sample[_ ]size|n[_ ]samples)",
+        "dv_regex": "(test[_ ]accuracy|test[_ ]error|generalization|accuracy)",
+        "relation": "(non_monotonic|crossover|u[_ \\-]?shaped|inverted[_ \\-]?u|non[_ \\-]?linear|curvilinear)",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 9,
+      "description": "R3 (A->C): non-monotonic. CRITICAL COUNTERINTUITIVE RESULT. MIDDLE. Must capture crossover / non-monotonic / reversal, NOT simply 'positive'."
+    },
+    {
+      "key": "rel_R4_noise_x_tail_to_n_star",
+      "template_type": "RELATION",
+      "weight": 1.5,
+      "must_have": {
+        "iv_regex": "(noise|eta|tail[_ ]exponent|tau)",
+        "dv_regex": "(crossover|n[_\\^]?\\*|reversal)",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 10,
+      "description": "R4: noise rate and tail exponent jointly determine crossover point n*. Interaction."
+    },
+    {
+      "key": "rel_R5_capacity_to_n_star_COUNTERINTUITIVE",
+      "template_type": "RELATION",
+      "weight": 2.5,
+      "must_have": {
+        "iv_regex": "(model[_ ]capacity|model[_ ]size|parameters|depth|width)",
+        "dv_regex": "(crossover|n[_\\^]?\\*|reversal[_ ]point)",
+        "relation": "negative",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 10,
+      "description": "R5: larger models have SMALLER n* (fail earlier). CRITICAL COUNTERINTUITIVE SECOND RESULT. MIDDLE."
+    },
+    {
+      "key": "rel_R6_bound_vs_empirical_before_nstar",
+      "template_type": "RELATION",
+      "weight": 1.0,
+      "must_have": {
+        "iv_regex": "(bound|prediction|theoretical|theory)",
+        "dv_regex": "(empirical|measured|observed)",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 9,
+      "description": "R6: bound tracks empirical error BELOW n*. Scope-limited agreement."
+    },
+    {
+      "key": "rel_R7_bound_diverges_above_nstar",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "must_have": {
+        "iv_regex": "(bound|prediction|theoretical|theory)",
+        "dv_regex": "(empirical|measured|observed|error)",
+        "verification_status_include": ["verified_in_paper", "partial_support", "mixed_support"]
+      },
+      "expected_source_page": 12,
+      "description": "R7: bound DIVERGES from empirical above n*. Discussion softens this; faithful extraction must keep the divergence."
+    },
+    {
+      "key": "rel_R8_regularization_to_n_star",
+      "template_type": "RELATION",
+      "weight": 1.0,
+      "must_have": {
+        "iv_regex": "(regulariz|weight[_ ]decay|l2|penalty)",
+        "dv_regex": "(crossover|n[_\\^]?\\*)",
+        "relation": "positive",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "expected_source_page": 12,
+      "description": "R8: stronger regularization pushes n* later (delays the crossover)."
+    },
+
+    {
+      "key": "exist_E1_three_datasets_and_sample_sizes",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(dataset|sample|benchmark|imagenet|places|inaturalist|long[_ \\-]?tail)",
+        "source_text_contains_any_of": ["ImageNet-LT", "Places-LT", "iNaturalist", "115", "62", "437"]
+      },
+      "expected_source_page": 8,
+      "description": "E1: three benchmark datasets ImageNet-LT (N=115,846 base), Places-LT (62,500), iNaturalist-2018 (437,513)"
+    },
+    {
+      "key": "exist_E2_crossover_numeric_1p2M_CRITICAL",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 3.0,
+      "must_have": {
+        "phenomenon_regex": "(crossover|reversal|n[_\\^]?\\*|minimum[_ ]error|turning[_ ]point|non[_ ]monotonic)",
+        "source_text_contains_any_of": ["1.2", "1,200,000", "1200000", "34.7", "38.2", "1.2M"],
+        "source_text_cross_template": true
+      },
+      "expected_source_page": 9,
+      "description": "E2: CRITICAL numeric fact. ImageNet-LT crossover at n* ~ 1.2M, test error minimum 34.7%, rises to 38.2% at n=4M. MIDDLE."
+    },
+
+    {
+      "key": "meta_M1_contribution",
+      "template_type": "META_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "source_text_contains_any_of": ["contribution", "non-monotonic", "crossover", "scaling", "reversal"]
+      },
+      "expected_source_page": 13,
+      "description": "M1: stated contribution — empirical demonstration of non-monotonic scaling under tail-concentrated label noise, with a predictive crossover condition"
+    },
+    {
+      "key": "meta_M2_limitation_synthetic_noise",
+      "template_type": "META_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "source_text_contains_any_of": ["synthetic", "limitation", "natural", "injection", "controlled"]
+      },
+      "expected_source_page": 14,
+      "description": "M2: explicit limitation — synthetic noise injection, not validated on natural label noise"
+    }
+  ],
+
+  "must_not_synthesize": [
+    {
+      "key": "N1_dataset_size_positive_monotonic",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "forbidden_pattern": {
+        "iv_regex": "(dataset[_ ]size|sample[_ ]size|training[_ ]size)",
+        "dv_regex": "(test[_ ]accuracy|test[_ ]error|generalization)",
+        "relation": "^positive$",
+        "verification_status_include": ["verified_in_paper"]
+      },
+      "exclusion_note": "R3 is non_monotonic. A claim recorded as plain 'positive + verified' for dataset_size -> accuracy is a sanitized synthesis that ignores the crossover. This is the signature LLM-fails-at-middle-reading error.",
+      "description": "MUST NOT synthesize a monotonic positive scaling claim ignoring the crossover."
+    },
+    {
+      "key": "N2_larger_models_more_robust",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "forbidden_pattern": {
+        "iv_regex": "(model[_ ]capacity|model[_ ]size|parameters|depth|width|larger[_ ]model)",
+        "dv_regex": "(noise[_ ]robust|crossover|n[_\\^]?\\*|test[_ ]accuracy)",
+        "relation": "^positive$"
+      },
+      "exclusion_note": "R5 establishes the opposite: larger models fail EARLIER (smaller n*). A positive-sign claim reflects the LLM's prior, not the paper.",
+      "description": "MUST NOT synthesize the common-sense claim that larger models are more noise-robust."
+    },
+    {
+      "key": "N3_bound_fully_validated",
+      "template_type": "META_CLAIM",
+      "weight": 1.0,
+      "forbidden_pattern": {
+        "source_text_contains_all_of": ["bound", "empirically", "validated"],
+        "source_text_does_not_contain_any_of": ["except", "above", "diverge", "crossover", "regime", "boundary"]
+      },
+      "exclusion_note": "R7 explicitly states the bound diverges above n*. An unqualified 'bound is empirically validated' claim is a Discussion-sanitization uptake.",
+      "description": "MUST NOT record an unqualified 'bound validated' META_CLAIM without mentioning the divergence regime."
+    }
+  ],
+
+  "equations": [
+    {
+      "eq_id": "eq1_intro_scaling",
+      "expected_source_page": 3,
+      "weight": 0.5,
+      "required_latex_tokens": ["\\mathbb{E}", "n^{-", "\\alpha"],
+      "description": "eq1: intro simplified scaling law E[err] ~ n^{-alpha}"
+    },
+    {
+      "eq_id": "eq2_noise_model",
+      "expected_source_page": 5,
+      "weight": 1.0,
+      "required_latex_tokens": ["\\eta", "head", "tail"],
+      "description": "eq2: per-class noise model (stated as two-regime piecewise eta_head/eta_tail in Definition 2)"
+    },
+    {
+      "eq_id": "eq3_main_bound",
+      "expected_source_page": 7,
+      "weight": 2.5,
+      "required_latex_tokens": ["\\sqrt", "\\frac", "\\ln", "\\delta", "n_{", "\\sum_{c", "\\mathcal{T}", "\\eta_c", "w_c", "\\mathcal{L}"],
+      "description": "eq3: CRITICAL main PAC-Bayes-style bound with tail correction."
+    },
+    {
+      "eq_id": "eq4_n_eff",
+      "expected_source_page": 6,
+      "weight": 1.0,
+      "required_latex_tokens": ["n_{", "\\mathrm{eff}", "(1", "2", "\\bar{\\eta}", "^2", "C_{\\tau}"],
+      "description": "eq4: effective sample size under noise"
+    },
+    {
+      "eq_id": "eq5_crossover_condition",
+      "expected_source_page": 10,
+      "weight": 2.5,
+      "required_latex_tokens": ["n^{*}", "\\left", "\\eta_{\\mathrm{tail}}", "\\eta_c", "\\tau", "\\kappa", "\\|f\\|", "\\mathcal{H}", "-1/\\tau"],
+      "description": "eq5: CRITICAL crossover condition. MIDDLE. n* = (eta/eta_c)^{-1/tau} * kappa(||f||_H)"
+    },
+    {
+      "eq_id": "eq6_discussion_simplified",
+      "expected_source_page": 13,
+      "weight": 0.5,
+      "required_latex_tokens": ["n^{*}", "\\|f\\|", "\\propto", "\\mathcal{H}"],
+      "description": "eq6: Discussion-simplified form n* ~ 1/||f||. Trap: ground truth has it, but conditions are dropped — extractor must notice the simplification context."
+    },
+    {
+      "eq_id": "eq7_appendix_rademacher",
+      "expected_source_page": 17,
+      "weight": 1.5,
+      "required_latex_tokens": ["\\mathfrak{R}", "\\mathbb{E}", "\\sup", "\\sigma", "\\sum", "\\mathcal{F}", "f(x"],
+      "description": "eq7: Rademacher complexity in Appendix proof. Full proof line."
+    }
+  ]
+}

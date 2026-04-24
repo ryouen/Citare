@@ -1,0 +1,667 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\title{More Data, Worse Models:\\
+Non-Monotonic Scaling under Long-Tail Label Noise}
+
+\author{L.\ Okafor \and M.\ Yang \and D.\ Patel}
+\date{2024}
+
+\begin{document}
+\maketitle
+\noindent DOI (synthetic, for Citare benchmark): 10.9999/trap.2024.007
+
+\begin{abstract}
+We investigate the scaling behaviour of long-tail image classification models trained under non-uniform label noise, where noise is concentrated on tail classes rather than distributed uniformly across the label set. Conventional neural scaling laws predict monotonic improvement in test error as training set size grows, and they have been verified in a broad range of settings. However, we find a previously unreported regime in which this monotonicity breaks down. Above a predictable crossover point $n^{*}$, adding more noisy training samples \emph{increases} test error. We derive $n^{*}$ analytically in terms of the tail-concentrated noise rate, the power-law tail exponent of the class distribution, and the representational capacity of the hypothesis class. We then validate the prediction empirically on three long-tail benchmarks: ImageNet-LT, Places-LT, and iNaturalist-2018. Our bound tracks empirical error closely in the pre-crossover regime and provides a conservative estimate of the sample budget beyond which further scaling becomes counterproductive. We also find, somewhat unexpectedly, that larger-capacity models reach the crossover at \emph{smaller} sample sizes. Overall, our findings refine the standard scaling picture by supplying an explicit boundary condition under tail-concentrated label noise, and offer a predictive tool for sample-budget decisions in long-tail training pipelines.
+\end{abstract}
+
+\paragraph{Keywords.} scaling laws; long-tail classification; label noise; generalization bounds; sample complexity.
+
+\section{Introduction}
+
+Neural scaling laws have become a central analytical tool for understanding deep supervised systems~\cite{hestness2017, kaplan2020, hoffmann2022}. In their canonical form, the expected generalization error of a model trained on $n$ i.i.d.\ samples decays polynomially with $n$ until it plateaus at an irreducible error floor:
+\begin{equation}
+\mathbb{E}[\mathrm{err}(n)] \;\approx\; A \cdot n^{-\alpha} + B \label{eq:intro_scaling}
+\end{equation}
+where $\alpha$ is a dataset- and architecture-dependent exponent and $B$ captures model mis-specification and irreducible noise. This simple form has guided large-scale experimentation, sample-budget planning, and post-hoc interpretations of compute allocation. The empirical evidence for equation~\eqref{eq:intro_scaling} is substantial across language modelling, image classification, speech, and reinforcement learning~\cite{kaplan2020, henighan2020, hoffmann2022, sharma2022}.
+
+A growing body of work has, however, documented settings in which the monotonic decay breaks down. Double-descent phenomena in over-parameterised regimes~\cite{belkin2019, nakkiran2020} show that test error can be non-monotonic in model capacity; sample-wise double descent extends the phenomenon to dataset size in specific regimes~\cite{nakkiran2020samplewise}. Distribution shift, open-set contamination, and adversarial data poisoning have all been shown to degrade nominal scaling behaviour~\cite{koh2021, fang2022, carlini2023}. Yet the scaling law itself, in its monotonic form, is still used as a default when reasoning about fixed, noisy, long-tail pipelines.
+
+In this paper we examine a specific but practically important deviation. Real-world classification datasets are typically both long-tail~\cite{liu2019longtail, vanhorn2018inaturalist} and noisy~\cite{northcutt2021, song2022}, and the two properties interact. Crowd-sourced annotation becomes progressively less reliable for rare classes where annotators have weaker prior exposure. Tail classes therefore accumulate substantially more label noise than head classes---what we will formalise as \emph{non-uniform, tail-concentrated label noise}.
+
+We ask: does the scaling law~\eqref{eq:intro_scaling} hold in this regime, and if not, how does it break? Our answer has three parts.
+
+First, we introduce a per-class noise model in which the flipping probability $\eta_c$ depends on the rank of class $c$ in the long-tail distribution. This subsumes uniform noise as the special case $\eta_c \equiv \eta$ and captures the empirical observation that tail classes have substantially higher noise rates than head classes.
+
+Second, we derive a PAC-Bayesian-style generalization bound that, in the presence of tail-concentrated noise, admits an explicit \emph{crossover point} $n^{*}$. Below $n^{*}$, additional samples reduce the bound; above $n^{*}$, the bound ceases to decrease and the empirical error begins to rise. We give a closed-form expression for $n^{*}$ in terms of the noise rates, the tail exponent $\tau$, and the representational capacity of the hypothesis class.
+
+Third, we verify the prediction empirically on three established long-tail benchmarks. On ImageNet-LT, the crossover occurs at approximately $1.2 \times 10^6$ training samples; adding further noisy samples \emph{increases} top-1 error from $34.7\%$ at $n^{*}$ to $38.2\%$ at $n = 4 \times 10^6$. Similar non-monotonicity is observed on Places-LT and iNaturalist-2018. We also find that larger-capacity models, contrary to the common intuition, reach the crossover at smaller sample sizes.
+
+Our paper is organised as follows. Section~\ref{sec:related} surveys related work. Section~\ref{sec:theory} develops the theoretical setup, including the noise model, the tail-coverage metric, the crossover definition, and the main bound. Section~\ref{sec:experiments} describes the experimental protocol and presents the main empirical findings, including the crossover observation and the capacity analysis. Section~\ref{sec:ablation} reports ablations and sensitivity analyses. Section~\ref{sec:discussion} discusses implications and boundary conditions. Section~\ref{sec:limitations} lists limitations, and Appendix~\ref{app:proof} gives the proof of the main theorem.
+
+\paragraph{Paper type.} This is an empirical paper; all results are obtained by computational demonstration on three benchmark datasets.
+
+\section{Related Work} \label{sec:related}
+
+\subsection{Neural scaling laws}
+
+The observation that generalization error decays with a power law in sample size, model size, and compute has been one of the most productive empirical regularities in modern deep learning. \citet{hestness2017} provided an early, large-scale study across vision, speech, and language, fitting power-law exponents across many architectures. \citet{kaplan2020} extended the program to autoregressive language models, showing smooth scaling of cross-entropy loss over seven orders of magnitude in compute. \citet{hoffmann2022} revisited the optimal allocation between parameters and tokens and produced the Chinchilla scaling law, which has since guided a generation of language-model training recipes.
+
+Beyond language, neural scaling laws have been documented in image classification~\cite{sharma2022}, contrastive learning~\cite{cherti2023}, and multimodal learning~\cite{radford2021}. In each setting, the functional form~\eqref{eq:intro_scaling} or its close cousins fits the empirical curve remarkably well across many orders of magnitude, with $\alpha$ typically in the range $0.1$--$0.5$ and $B$ often small.
+
+The robustness of the scaling-law form has led to it being used for planning: for instance, Chinchilla-style calculations inform pretraining budgets for LLMs, and scaling exponents are used to extrapolate from small pilot studies to full training. The implicit assumption is that the relationship between $n$ and test error is monotonic; violations have been treated as anomalies to be diagnosed and corrected.
+
+\subsection{Long-tail recognition}
+
+Real-world label distributions are rarely uniform. A growing literature~\cite{liu2019longtail, cui2019classbalanced, cao2019ldam, menon2021} has developed benchmarks and methods specifically for the long-tail regime. ImageNet-LT and Places-LT, both introduced by \citet{liu2019longtail}, impose a Pareto class distribution on ImageNet-2012 and Places-365, respectively; iNaturalist-2018~\cite{vanhorn2018inaturalist} is naturally long-tail due to the species imbalance in its source data. In these benchmarks, the tail (the $\approx\! 1/3$ of classes with fewest samples) carries very few examples per class---often single digits---and overall accuracy is dominated by how well a method generalises to these classes.
+
+Methods addressing long tails include data-side approaches---oversampling~\cite{buda2018}, class-balanced loss~\cite{cui2019classbalanced}, logit adjustment~\cite{menon2021}---and model-side approaches including decoupled classifier training~\cite{kang2020decoupling} and two-stage routines. Gains on long-tail benchmarks typically derive from better tail-class generalization, which in turn depends on the effective sample coverage of the tail.
+
+\subsection{Label noise in deep learning}
+
+Deep networks are known to fit random labels~\cite{zhang2021understanding} and, with standard training, to overfit noise in ways that hurt generalization. Work on noise-robust training~\cite{song2022, northcutt2021, patrini2017} proposes loss-correction schemes, cleaning procedures, and robust backbone architectures. Most theoretical analyses assume uniform noise: each label is corrupted with a fixed probability $\eta$ independent of the true class. Under this assumption, a variety of PAC and PAC-Bayesian bounds apply~\cite{natarajan2013, scott2019}, and the generalization curve remains monotonic in $n$ up to a noise-determined floor.
+
+Our focus is the non-uniform, class-dependent case~\cite{xia2019, cheng2020, berthon2021}, in which $\eta = \eta_c$ depends on the class. Existing theoretical work in this setting largely preserves the monotonic picture, differing chiefly in how sample complexity depends on $\eta_c$. We will show that when $\eta_c$ correlates with the tail, the picture qualitatively changes.
+
+\subsection{Statistical learning theory under data-distribution effects}
+
+Classical generalization bounds---VC, Rademacher, PAC-Bayesian~\cite{mcallester1999, shalev2014understanding}---are stated in terms of hypothesis class complexity and sample size, and assume independent identically distributed data. A family of extensions has considered distribution shift, partial supervision, and heavy-tailed class distributions~\cite{vapnik1998, dziugaite2017, arora2018}. The interplay of long-tail class frequencies with class-dependent noise, to our knowledge, has not been given a closed-form treatment in the context of scaling laws.
+
+Our bound is PAC-Bayesian in flavour and explicitly parameterises the tail-concentrated noise structure. We were inspired by the tail-adaptive bounds of \citet{arora2018} and the information-theoretic treatment of effective sample size by \citet{russo2016}; we combine these ingredients to derive a single bound that predicts the crossover behaviour we observe empirically.
+
+\subsection{Distribution shift and out-of-distribution generalization}
+
+A distinct but related line of work considers distribution shift between training and evaluation. The WILDS benchmark~\cite{koh2021} collects 10 real-world datasets with documented distribution shifts and shows that in-distribution accuracy is often a poor proxy for out-of-distribution accuracy. Domain adaptation methods~\cite{ganin2016, long2015} address the gap explicitly, but the relationship between training set size and OOD accuracy can itself be non-monotonic: adding more in-distribution training data can widen the ID--OOD gap under spurious correlation~\cite{sagawa2020, arjovsky2019irm}. Our setting differs in that we assume i.i.d.\ draws from a fixed distribution and hold the evaluation distribution fixed; the non-monotonicity we identify arises from the interaction of long-tail structure and per-class noise rather than from distribution shift. Nonetheless, we see the two phenomena as related: both reflect the insight that additional training data does not unconditionally improve test-time behaviour.
+
+\subsection{Practical implications of noisy data at scale}
+
+In production pipelines, large-scale data ingestion almost invariably produces noisy labels~\cite{jain2020, paleyes2022}. The conventional operational assumption is that noise introduces a known reducible-error floor and that additional data continues to help up to that floor. A growing number of case studies challenge this view. \citet{recht2019} show that ImageNet accuracy extrapolates poorly to held-out replications of the validation set, implying that fitted scaling exponents overestimate robustness. \citet{torralba2011} famously documented dataset bias, an effect whose magnitude depends non-trivially on the dataset's composition rather than on its size alone. The applied literature on data-centric AI~\cite{ng2021datacentric} explicitly argues that quality interventions often yield higher return than quantity scaling---a view that our results quantitatively vindicate in the long-tail regime.
+
+\subsection{Concurrent observations of non-monotonicity}
+
+Two recent works report related phenomena in nearby settings. \citet{hassani2024} observe non-monotonic scaling in low-resource language fine-tuning when training data contains paraphrase noise, though the mechanism they identify is different (catastrophic memorisation of paraphrase collisions). \citet{bjornstad2024} report a ``data plateau'' in webly-supervised object detection where additional scraped data no longer improves mean average precision. Neither paper provides a closed-form prediction for when such plateaus occur; our work supplies a predictive crossover condition grounded in the class-frequency distribution and noise profile. \citet{lin2023scaling} also report sub-linear scaling on tail-concentrated benchmarks but stop short of identifying a reversal; their reported floor is consistent with our $B_{\mathrm{floor}}$ term evaluated at their parameter settings.
+
+\subsection{Positioning of the present work}
+
+Our contribution therefore occupies a specific intersection of three literatures: long-tail recognition (we take its benchmarks as given and exploit their class-frequency structure), noise-robust learning (we adopt its per-class noise model but focus on a structural form that other work has not directly analysed), and scaling laws (we inherit the functional-form assumptions but show that a boundary condition is needed). The novelty is neither in introducing new benchmarks nor in a new noise model, but in the closed-form prediction of a previously undocumented regime of non-monotonicity, and in the empirical confirmation that the prediction holds across three datasets and three architectures.
+
+\section{Theoretical Setup} \label{sec:theory}
+
+We now introduce the quantities and the assumptions needed to state our main result.
+
+\subsection{Long-tail distribution and non-uniform noise}
+
+Let $\mathcal{X}$ be the input space and $\mathcal{Y} = \{1, \ldots, K\}$ a finite label set. Each class $c \in \mathcal{Y}$ has a population frequency $p_c$, and we assume the classes are sorted so that $p_1 \ge p_2 \ge \cdots \ge p_K$.
+
+\begin{definition}[Long-tail distribution]
+\label{def:long_tail}
+We say the class distribution is \emph{long-tail} with exponent $\tau > 1$ if the ranked frequencies follow a truncated power law
+\[
+p_c \;\propto\; c^{-\tau}, \qquad c = 1, \ldots, K,
+\]
+with normalisation $\sum_{c=1}^{K} p_c = 1$. Classes $c > \lceil K/2 \rceil$ are called the \emph{tail}, denoted $\mathcal{T}$; the remainder form the \emph{head}, denoted $\mathcal{H}_{\mathrm{head}}$. A smaller $\tau$ corresponds to a heavier (more imbalanced) tail, and vice versa.
+\end{definition}
+
+This form is standard in the long-tail literature~\cite{liu2019longtail, cui2019classbalanced}. On ImageNet-LT we estimate $\tau \approx 2.1$; on Places-LT, $\tau \approx 1.8$; and on iNaturalist-2018, $\tau \approx 2.6$. Per-class sample counts $n_c$ after drawing $n$ samples satisfy $\mathbb{E}[n_c] = n \, p_c$.
+
+\begin{definition}[Non-uniform, tail-concentrated label noise]
+\label{def:noise}
+Let $y^{*}$ denote the clean label and $y$ the observed (possibly corrupted) label. We say the label noise is \emph{non-uniform and tail-concentrated} if the flipping probability $\eta_c = \Pr(y \neq y^{*} \mid y^{*} = c)$ satisfies
+\[
+\eta_c = \eta_{\mathrm{head}} \quad \text{for } c \in \mathcal{H}_{\mathrm{head}}, \qquad
+\eta_c = \eta_{\mathrm{tail}} \quad \text{for } c \in \mathcal{T},
+\]
+with $0 \le \eta_{\mathrm{head}} < \eta_{\mathrm{tail}} < \tfrac{1}{2}$. Each label is drawn independently from the per-class flipping distribution.
+\end{definition}
+
+When $\eta_c$ is corrupted, the observed label is sampled uniformly from the remaining $K-1$ classes. The key structural feature is that, per class, the \emph{signal-to-noise ratio in the tail is substantially worse than in the head}, so tail samples carry less useful supervision.
+
+\begin{definition}[Tail-coverage metric]
+\label{def:tail_coverage}
+Let $k \in \mathbb{N}$ be a threshold. The \emph{$k$-tail coverage} after drawing $n$ training samples is
+\[
+\mathrm{TC}_{n, k} \;=\; \frac{1}{|\mathcal{T}|} \sum_{c \in \mathcal{T}} \mathbb{1}[ n_c \ge k ],
+\]
+i.e., the fraction of tail classes with at least $k$ training examples. This is a non-parametric, per-class measure of whether the training set is \emph{broadly} supplying tail evidence, rather than concentrating on head classes. All subsequent references to tail coverage in this paper use $k = 20$ unless otherwise noted.
+\end{definition}
+
+Tail coverage increases with $n$ but saturates at $1$ once every tail class has $\ge k$ samples, at sample size $n \approx k \, |\mathcal{T}| / p_{K}$. In the regimes we study, this saturation point is itself large enough that tail coverage is a genuinely information-bearing statistic across the sample-size range we sweep.
+
+\subsection{Crossover point}
+
+We now define the quantity that will be the central object of this paper.
+
+\begin{definition}[Crossover point]
+\label{def:crossover}
+Let $\mathrm{err}(n)$ denote the population test error of the empirical risk minimiser trained on $n$ i.i.d.\ samples drawn from the noisy long-tail distribution described above, where the expectation is over draws of the training set. We say $n^{*}$ is a \emph{crossover point} of the learning curve if
+\[
+\frac{\partial \, \mathrm{err}(n)}{\partial n} \Big|_{n = n^{*}} \;=\; 0, \qquad \frac{\partial^2 \, \mathrm{err}(n)}{\partial n^2} \Big|_{n = n^{*}} \; > \; 0,
+\]
+i.e., $n^{*}$ is the smallest sample size at which the learning curve's derivative changes sign from negative to positive. The learning curve is called \emph{non-monotonic} on the range $[n_0, n_1]$ if such an $n^{*} \in (n_0, n_1)$ exists; it is \emph{monotonically decreasing} otherwise.
+\end{definition}
+
+Definition~\ref{def:crossover} captures the phenomenon of interest: a point at which adding additional training samples stops helping and begins to hurt test-time generalization. In the standard scaling-law picture, no such point exists and equation~\eqref{eq:intro_scaling} is well-defined. We will show that under Definitions~\ref{def:long_tail} and~\ref{def:noise}, $n^{*}$ exists, is finite, and is predictable.
+
+\subsection{Effective sample size under noise}
+
+A useful auxiliary quantity is the \emph{effective sample size} after noise correction.
+
+\begin{definition}[Effective sample size under noise]
+\label{def:n_eff}
+Given $n$ observed noisy samples with per-class flipping probabilities $\eta_c$ and a class-frequency distribution $\{p_c\}$, the effective sample size is
+\begin{equation}
+n_{\mathrm{eff}}(\eta, \tau) \;=\; n \cdot \bigl(1 - 2\bar{\eta}\bigr)^{2} \cdot C_{\tau}, \label{eq:n_eff}
+\end{equation}
+where $\bar{\eta} = \sum_c p_c \, \eta_c$ is the expected per-sample flip probability and $C_{\tau}$ is a dimensionless constant that depends on the tail exponent $\tau$ through the Gini-like ratio $\bigl(\sum_c p_c^{1/\tau}\bigr)^{-\tau}$.
+\end{definition}
+
+The $(1 - 2\bar{\eta})^{2}$ factor is the standard shrinkage for uniform symmetric noise~\cite{natarajan2013}; the $C_{\tau}$ factor extends it to the long-tail setting. For the uniform case ($\tau \to \infty$, all $\eta_c$ equal), $C_{\tau} \to 1$ and we recover the classical result. As $\tau$ decreases (heavier tail), $C_{\tau}$ falls strictly below $1$: a heavy-tailed class distribution effectively amplifies the noise, because rare-class samples carry disproportionate influence on the tail-focused loss.
+
+\subsection{Main bound}
+
+We can now state our main theoretical contribution.
+
+\begin{theorem}[PAC-Bayesian bound under tail-concentrated noise]
+\label{thm:main}
+Let $\mathcal{F}$ be a hypothesis class with Rademacher complexity $\mathfrak{R}_n(\mathcal{F})$, and let $\hat{\mathcal{L}}_n(f)$ denote the empirical 0-1 risk of $f \in \mathcal{F}$ on $n$ noisy training samples drawn under Definitions~\ref{def:long_tail} and~\ref{def:noise}. Then for any $\delta \in (0, 1)$, with probability at least $1 - \delta$ over the draw of the training set, every $f \in \mathcal{F}$ satisfies
+\begin{equation}
+\mathbb{E}[\mathcal{L}(f)] \;\le\; \hat{\mathcal{L}}_n(f) + \sqrt{\frac{2 \ln(2 / \delta)}{n_{\mathrm{eff}}(\eta, \tau)}} + \sum_{c \, \in \, \mathcal{T}} \eta_c \, w_c, \label{eq:main_bound}
+\end{equation}
+where $w_c = p_c / \sum_{c' \in \mathcal{T}} p_{c'}$ is the tail-weight normalisation and $\mathcal{L}$ is the population 0-1 loss on the clean distribution.
+\end{theorem}
+
+A proof is given in Appendix~\ref{app:proof}. The bound has three parts: the empirical risk $\hat{\mathcal{L}}_n(f)$, a concentration term $\sqrt{2 \ln(2/\delta) / n_{\mathrm{eff}}}$, and a tail-noise offset $\sum_{c \in \mathcal{T}} \eta_c \, w_c$. Each captures a different failure mode: the empirical risk is directly minimised by training; the concentration term decreases as $n_{\mathrm{eff}}$ grows; and the tail-noise offset is a floor that cannot be reduced by more data alone.
+
+\subsection{Predicted scaling form}
+
+Combining Theorem~\ref{thm:main} with standard uniform convergence arguments, the learning curve is predicted to behave as
+\begin{equation}
+\mathbb{E}[\mathrm{err}(n)] \;\approx\; A \cdot n_{\mathrm{eff}}(\eta, \tau)^{-\alpha(\eta, \tau)} + \underbrace{\sum_{c \in \mathcal{T}} \eta_c \, w_c}_{\text{floor}} + o(1), \label{eq:predicted_scaling}
+\end{equation}
+where $\alpha(\eta, \tau)$ is the noise-adjusted scaling exponent. Observe that $\alpha$ depends on \emph{both} the noise rate and the tail exponent---not a constant. In the tail-concentrated regime, as $n$ grows the naive count overstates the true information carried by each additional sample, because the additional samples come disproportionately from tail classes with high noise. This is the qualitative source of non-monotonicity.
+
+\paragraph{When does the crossover occur?} The formal condition for $n^{*}$ in Definition~\ref{def:crossover} will be derived in Section~\ref{sec:experiments} from a perturbative analysis of equation~\eqref{eq:predicted_scaling}. We state the result here as Theorem~\ref{thm:crossover} below; its empirical verification is the centrepiece of the next section.
+
+\subsection{Auxiliary lemmas and comparison with prior bounds}
+
+We record two auxiliary results that clarify the relationship of Theorem~\ref{thm:main} to prior bounds.
+
+\begin{lemma}[Reduction to uniform noise]
+\label{lem:reduction}
+Suppose all per-class noise rates are equal, $\eta_c \equiv \eta$. Then $C_{\tau} = 1$ regardless of $\tau$, $n_{\mathrm{eff}} = n(1-2\eta)^{2}$, and the bound of Theorem~\ref{thm:main} reduces to the classical PAC bound for learning with uniform symmetric noise~\cite{natarajan2013}, with tail-noise offset $\sum_c \eta \, w_c = \eta$.
+\end{lemma}
+
+\begin{proof}[Sketch]
+When $\eta_c$ is constant, the class-dependent correction collapses and the Natarajan-Dhillon-Ravikumar-Tewari unbiased estimator applies uniformly. The tail-noise offset becomes $\eta \sum_c w_c = \eta$ by the normalisation of $w_c$. Substituting into~\eqref{eq:main_bound} recovers the classical bound.
+\end{proof}
+
+Lemma~\ref{lem:reduction} shows that Theorem~\ref{thm:main} is a strict generalisation: it reproduces existing bounds in the uniform-noise limit and reduces to them in the limit of light tails. The novelty is captured entirely by the class-dependence of $\eta_c$ and by the $C_{\tau}$ correction term.
+
+\begin{lemma}[Comparison with Rademacher-only bounds]
+\label{lem:rademacher_compare}
+The bound of Theorem~\ref{thm:main} is strictly tighter than the pure-Rademacher generalization bound~\cite{shalev2014understanding} in the pre-crossover regime $n < n^{*}$ and strictly looser in the post-crossover regime $n > n^{*}$.
+\end{lemma}
+
+The comparison follows from the explicit tail-noise offset: for $n < n^{*}$ the concentration term dominates and the noise offset improves the bound, whereas for $n > n^{*}$ the offset prevents the bound from tightening further while the pure-Rademacher bound continues to shrink (being blind to the noise floor). In the intermediate range, the two bounds are incomparable.
+
+\subsection{Why a single bound cannot capture super-crossover behaviour}
+
+A natural question is whether a single bound can be stated that tracks empirical error across the entire sample range, including the super-crossover regime where empirical error rises. We argue briefly that this is not possible within the uniform-convergence framework we employ. The concentration term in~\eqref{eq:main_bound} is a decreasing function of $n_{\mathrm{eff}}$, which is itself monotonically increasing in $n$; the tail-noise offset is a function of $\{\eta_c\}$ and not of $n$. Thus both terms individually are monotonic in $n$ and their sum is monotonically decreasing. A bound that is a monotonic function of $n$ cannot track a non-monotonic empirical curve. A rising bound above $n^{*}$ would require either a new term that depends on $n$ in the opposite direction, or a replacement of the uniform-convergence skeleton by something that explicitly models the deterioration of the training distribution. Either extension is beyond the scope of the present paper; we mention it here to set expectations for Section~\ref{sec:ablation}, where we report that the bound indeed diverges from empirical error in the post-crossover regime.
+
+\section{Experiments} \label{sec:experiments}
+
+We now describe our empirical protocol and report the main results.
+
+\subsection{Datasets and protocol}
+
+We use three established long-tail benchmarks. ImageNet-LT~\cite{liu2019longtail} has a base training set of $N_{\mathrm{base}} = 115{,}846$ images drawn from ImageNet-2012 with a Pareto imbalance factor of $256$; the tail covers approximately $365$ classes with fewer than $20$ images each. Places-LT~\cite{liu2019longtail} is constructed similarly from Places-365, with $N_{\mathrm{base}} = 62{,}500$; and iNaturalist-2018~\cite{vanhorn2018inaturalist} is naturally long-tail, with $N_{\mathrm{base}} = 437{,}513$ images across $8{,}142$ species.
+
+We sweep training set sizes by \emph{augmenting} these base sets with additional noisy samples. Concretely, for a target size $n > N_{\mathrm{base}}$, we sample $(n - N_{\mathrm{base}})$ additional images from the respective source distributions (ImageNet-2012, Places-365, iNaturalist-source) following the class-frequency profile, and inject non-uniform label noise per Definition~\ref{def:noise} with $\eta_{\mathrm{head}} = 0.05$ and $\eta_{\mathrm{tail}} = 0.28$ (ImageNet-LT, Places-LT) or $\eta_{\mathrm{tail}} = 0.21$ (iNaturalist, which has naturally lower annotation ambiguity per class). The choice of $\eta_{\mathrm{tail}}$ is guided by the estimates of \citet{northcutt2021} for annotation-error rates on rare classes.
+
+Unless otherwise specified we train ResNet-50~\cite{he2016} with AdamW~\cite{loshchilov2019}, a cosine schedule, weight decay $\lambda = 10^{-4}$, and standard augmentation (random-resized-crop, horizontal flip, colour jitter). Each configuration is trained to convergence and evaluated on the \emph{clean} validation split. We report top-1 test error averaged over three seeds. All experiments used an internal cluster of A100 GPUs; total training cost was approximately 18{,}000 GPU-hours.
+
+\subsection{Canonical scaling regime}
+
+For moderate training set sizes, the standard picture holds. Table~\ref{tab:scaling_low_n} reports test error at $n \in \{115\text{K}, 250\text{K}, 500\text{K}\}$ on ImageNet-LT; the fitted exponent $\hat{\alpha} \approx 0.18$ is consistent with values reported in prior work on long-tail recognition with mild noise~\cite{sharma2022}.
+
+\begin{table}[h]
+\centering
+\caption{ImageNet-LT test error ($\%$), ResNet-50, low-to-moderate $n$. Standard scaling behaviour is observed; error decreases approximately as a power law.}
+\label{tab:scaling_low_n}
+\begin{tabular}{lcccc}
+\toprule
+$n$ & $115\text{K}$ & $250\text{K}$ & $500\text{K}$ & fitted $\hat{\alpha}$ \\
+\midrule
+Test error $(\%)$ & $53.8$ & $46.1$ & $41.5$ & $0.18$ \\
+Tail-coverage $\mathrm{TC}_{n, 20}$ & $0.12$ & $0.42$ & $0.74$ & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Tail-coverage increases monotonically with $n$ across this range (Table~\ref{tab:scaling_low_n}, row~2). Correlating per-seed tail-coverage values with per-seed test error yields $r = -0.89$ across the $n \le 500\text{K}$ range: higher coverage predicts lower error, as expected. We record this as the intuitive chain link: dataset size positively drives tail coverage (Definition~\ref{def:tail_coverage}), and tail coverage positively predicts test accuracy.
+
+\subsection{Bound vs.\ empirical error (pre-crossover)}
+
+In the $n \le 500\text{K}$ regime, the bound from Theorem~\ref{thm:main} tracks empirical error closely. Figure~\ref{fig:bound_vs_emp} (conceptual, not included in this preprint) shows the two curves overlaid; the mean absolute discrepancy is $\approx 2.1$ percentage points across the sweep. Within this regime, we say that bound prediction approximately agrees with empirical error: the bound captures the first-order behaviour and offers an honest upper estimate.
+
+\subsection{The crossover: non-monotonic scaling} \label{sec:crossover}
+
+Above $n = 500\text{K}$, the picture changes qualitatively. Table~\ref{tab:crossover} extends the sweep to $n = 4 \times 10^6$ and reveals a clear minimum in the learning curve.
+
+\begin{table}[h]
+\centering
+\caption{ImageNet-LT test error ($\%$), ResNet-50, wide-range $n$. The monotonic prediction fails; the minimum is attained near $n^{*} \approx 1.2\text{M}$, and error then \emph{rises} as $n$ is further increased.}
+\label{tab:crossover}
+\begin{tabular}{lcccccc}
+\toprule
+$n$ & $500\text{K}$ & $800\text{K}$ & $1.2\text{M}$ & $2\text{M}$ & $3\text{M}$ & $4\text{M}$ \\
+\midrule
+Test error $(\%)$ & $41.5$ & $37.2$ & $\mathbf{34.7}$ & $36.0$ & $37.4$ & $38.2$ \\
+Tail-coverage $\mathrm{TC}_{n, 20}$ & $0.74$ & $0.91$ & $0.98$ & $1.00$ & $1.00$ & $1.00$ \\
+Monotonic prediction $(\%)$ & $41.5$ & $37.9$ & $35.0$ & $31.1$ & $28.6$ & $26.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The observed minimum is $34.7\%$ at $n^{*} \approx 1.2 \times 10^{6}$, and empirical error then \emph{rises} to $38.2\%$ at $n = 4 \times 10^{6}$. The monotonic prediction from equation~\eqref{eq:intro_scaling} fitted on $n \le 500\text{K}$ would have forecast $26.9\%$ at $n = 4\text{M}$; the observed error exceeds this forecast by $11.3$ percentage points. The relationship between dataset size and test accuracy on this benchmark is therefore \emph{non-monotonic}, with a clear crossover at $n^{*} \approx 1.2\text{M}$. This is the central empirical finding of the paper.
+
+The same pattern appears on Places-LT, with $n^{*} \approx 680\text{K}$ and error of $29.3\%$ at the minimum, rising to $32.1\%$ at $n = 2\text{M}$. On iNaturalist-2018 (larger base, lower tail noise) we observe a milder but still detectable non-monotonicity, with $n^{*} \approx 1.85\text{M}$; the error curve is effectively flat beyond the minimum over the accessible range.
+
+We emphasise that tail-coverage saturates at $\mathrm{TC}_{n, 20} = 1$ well before the crossover: all tail classes already receive at least 20 samples by $n = 2\text{M}$. The non-monotonicity is therefore not explained by failing to cover the tail; it is driven by the accumulating noise load as additional tail samples are added beyond what is needed for coverage. Additional noisy samples in the tail, past the coverage saturation point, \emph{worsen} the effective signal-to-noise ratio of the training set.
+
+\subsection{Crossover condition} \label{sec:crossover_condition}
+
+A perturbative expansion of equation~\eqref{eq:predicted_scaling} near its minimum yields an explicit closed-form expression for the crossover point.
+
+\begin{theorem}[Crossover condition]
+\label{thm:crossover}
+Under the assumptions of Theorem~\ref{thm:main}, the crossover point $n^{*}$ satisfies
+\begin{equation}
+n^{*} \;=\; \left(\frac{\eta_{\mathrm{tail}}}{\eta_{c}}\right)^{-1/\tau} \cdot \kappa\bigl(\|f\|_{\mathcal{H}}\bigr), \label{eq:crossover}
+\end{equation}
+where $\eta_c$ is a critical noise constant (determined by the hypothesis-class complexity; see Appendix~\ref{app:proof}), $\tau$ is the tail exponent of Definition~\ref{def:long_tail}, and $\kappa$ is a monotonically increasing function of the hypothesis-class norm $\|f\|_{\mathcal{H}}$.
+\end{theorem}
+
+Equation~\eqref{eq:crossover} has two important implications. First, the crossover exists whenever $\eta_{\mathrm{tail}} > \eta_c$; below this threshold the noise is tolerable and monotonic scaling is preserved. Second, $n^{*}$ depends on the interaction of the noise rate and the tail exponent---a heavier tail (smaller $\tau$) amplifies the effect of a given tail-noise rate, moving the crossover to smaller $n$. For ImageNet-LT with $\eta_{\mathrm{tail}} = 0.28$ and $\tau = 2.1$, equation~\eqref{eq:crossover} predicts $n^{*} \approx 1.18\text{M}$; the empirical value of $1.2\text{M}$ is within the predictive margin.
+
+We can therefore summarise the main finding of this section: dataset size and test accuracy are \emph{not} in a simple monotonic relationship under tail-concentrated label noise; rather, they follow a non-monotonic curve with a predictable crossover whose location is driven jointly by the noise rate and the tail exponent.
+
+\subsection{Capacity analysis} \label{sec:capacity}
+
+A natural intuition is that higher-capacity models, being better regularised implicitly by their richer function classes, should be more robust to noise and should exhibit a later (larger) crossover. The bound permits a direct prediction in the opposite direction: higher $\|f\|_{\mathcal{H}}$ enters equation~\eqref{eq:crossover} through $\kappa$, but the critical noise constant $\eta_c$ also decreases with capacity, and the net effect for typical architectures is that $n^{*}$ is \emph{reduced}.
+
+We tested this prediction using three architectures trained on ImageNet-LT under the same noise profile. Table~\ref{tab:capacity} summarises the observed crossover points.
+
+\begin{table}[h]
+\centering
+\caption{Observed crossover point $n^{*}$ on ImageNet-LT as a function of architecture. Larger-capacity models reach the crossover at smaller training set sizes. $\eta_{\mathrm{tail}} = 0.28$, $\tau = 2.1$ for all rows.}
+\label{tab:capacity}
+\begin{tabular}{lccc}
+\toprule
+Architecture & Params & $n^{*}$ (observed) & Test error at $n^{*}$ $(\%)$ \\
+\midrule
+ResNet-50 & $25.6\text{M}$ & $1.20 \times 10^{6}$ & $34.7$ \\
+ResNet-152 & $60.2\text{M}$ & $0.75 \times 10^{6}$ & $35.1$ \\
+ViT-B/16 & $86.6\text{M}$ & $0.90 \times 10^{6}$ & $33.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is clear: the higher-capacity models (ResNet-152, ViT-B/16) have \emph{smaller} crossover points than ResNet-50. ResNet-152 reaches the crossover at $n^{*} = 0.75\text{M}$, approximately $38\%$ earlier than ResNet-50. This is counter to the conventional intuition that larger models are more robust to label noise; in the long-tail regime, larger capacity increases sensitivity to the accumulating tail noise and the scaling reversal sets in sooner. The \emph{relationship between model capacity and $n^{*}$ is negative}.
+
+This result has direct practical significance. For large-capacity models, the prudent sample budget is smaller than for small-capacity models in the same noise regime; scaling the dataset beyond $n^{*}$ is counterproductive regardless of how much additional compute is available.
+
+\subsection{Per-dataset replication}
+
+Tables~\ref{tab:places_lt} and~\ref{tab:inat} report the analogous sweeps on Places-LT and iNaturalist-2018 for ResNet-50. The same qualitative pattern appears in both: an interior minimum in the learning curve, followed by a rise. Quantitative differences in the crossover location are explained by the differences in $\tau$ and $\eta_{\mathrm{tail}}$ between the three datasets, as predicted by equation~\eqref{eq:crossover}.
+
+\begin{table}[h]
+\centering
+\caption{Places-LT, ResNet-50. Crossover at $n^{*} \approx 680\text{K}$; error rises from the minimum of $29.3\%$ to $32.1\%$ at $n = 2\text{M}$.}
+\label{tab:places_lt}
+\begin{tabular}{lcccccc}
+\toprule
+$n$ & $62.5\text{K}$ & $200\text{K}$ & $500\text{K}$ & $680\text{K}$ & $1.2\text{M}$ & $2\text{M}$ \\
+\midrule
+Test error $(\%)$ & $48.2$ & $37.9$ & $31.6$ & $\mathbf{29.3}$ & $30.1$ & $32.1$ \\
+Tail-coverage $\mathrm{TC}_{n, 20}$ & $0.10$ & $0.55$ & $0.92$ & $0.98$ & $1.00$ & $1.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{iNaturalist-2018, ResNet-50. Crossover at $n^{*} \approx 1.85\text{M}$; the lower $\eta_{\mathrm{tail}} = 0.21$ produces a larger $n^{*}$ and a flatter post-crossover rise.}
+\label{tab:inat}
+\begin{tabular}{lcccccc}
+\toprule
+$n$ & $437\text{K}$ & $800\text{K}$ & $1.2\text{M}$ & $1.85\text{M}$ & $2.5\text{M}$ & $3\text{M}$ \\
+\midrule
+Test error $(\%)$ & $42.6$ & $38.1$ & $35.7$ & $\mathbf{34.2}$ & $34.8$ & $35.5$ \\
+Tail-coverage $\mathrm{TC}_{n, 20}$ & $0.19$ & $0.47$ & $0.78$ & $0.95$ & $1.00$ & $1.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Applying equation~\eqref{eq:crossover} at each dataset's $(\tau, \eta_{\mathrm{tail}})$ values yields predicted $n^{*}$ of $1.18\text{M}$, $0.67\text{M}$, and $1.81\text{M}$, within $3\%$ of the observed crossover points. The cross-dataset replication substantially increases our confidence that the non-monotonic behaviour is structural rather than dataset-specific.
+
+\subsection{Training dynamics at the crossover}
+
+It is natural to ask whether the crossover is an artefact of under-training: perhaps runs at $n > n^{*}$ fail to reach the same point in loss landscape that smaller-$n$ runs reach. We checked this directly. All reported configurations were trained to convergence (defined as plateau in validation loss over five successive checkpoints); training loss at convergence decreased monotonically with $n$ in all cases, consistent with the concentration term in the bound. The rise in test error above $n^{*}$ therefore reflects a genuine generalisation failure, not incomplete optimisation. The gap between training and test error grows rapidly above $n^{*}$, mirroring the bound-empirical gap documented in Section~\ref{sec:ablation}.
+
+\section{Ablations and Sensitivity} \label{sec:ablation}
+
+\subsection{Bound tracking beyond the crossover}
+
+Section~\ref{sec:crossover} reports that the bound from Theorem~\ref{thm:main} agrees with empirical error for $n \le 500\text{K}$. We now examine behaviour beyond the crossover. Table~\ref{tab:bound_vs_emp} extends the comparison.
+
+\begin{table}[h]
+\centering
+\caption{Bound vs.\ empirical error on ImageNet-LT, ResNet-50, $n \in [500\text{K}, 4\text{M}]$. Below $n^{*}$ the two curves agree to within a small discrepancy; above $n^{*}$ the bound continues to decrease (tracking the concentration term) while the empirical error rises, yielding a growing gap.}
+\label{tab:bound_vs_emp}
+\begin{tabular}{lcccccc}
+\toprule
+$n$ & $500\text{K}$ & $800\text{K}$ & $1.2\text{M}$ & $2\text{M}$ & $3\text{M}$ & $4\text{M}$ \\
+\midrule
+Empirical error $(\%)$ & $41.5$ & $37.2$ & $34.7$ & $36.0$ & $37.4$ & $38.2$ \\
+Bound (eq.~\ref{eq:main_bound}) $(\%)$ & $43.9$ & $39.0$ & $35.2$ & $31.4$ & $29.1$ & $27.7$ \\
+Gap (bound $-$ emp) & $+2.4$ & $+1.8$ & $+0.5$ & $-4.6$ & $-8.3$ & $-10.5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Above the crossover, the bound and empirical error \emph{diverge}. Specifically, the bound continues to decline monotonically---dominated by the $\sqrt{2 \ln(2/\delta) / n_{\mathrm{eff}}}$ concentration term---while the empirical error rises. By $n = 4\text{M}$, the bound has fallen $10.5$ percentage points below empirical error. We stress this explicitly: the bound's predictions \emph{do not} track empirical error in the super-crossover regime. Readers reporting downstream predictions based on Theorem~\ref{thm:main} should therefore restrict their use of the bound to the pre-crossover regime, $n < n^{*}$. Beyond that point the bound systematically under-predicts error.
+
+This divergence itself follows from the derivation: the tail-noise offset $\sum_{c \in \mathcal{T}} \eta_c w_c$ in equation~\eqref{eq:main_bound} represents a floor that cannot be reduced by more data. Our bound treats this floor as irreducible; the empirical rise above $n^{*}$ reveals that, in the super-crossover regime, additional tail samples effectively worsen the training distribution rather than leaving the floor unchanged. Modelling this super-crossover behaviour would require a strictly larger bound; we leave that extension to future work.
+
+\subsection{Regularization strength}
+
+Strong regularization can partially offset the noise-induced crossover. Table~\ref{tab:reg} reports the observed crossover points as a function of the weight decay coefficient $\lambda$ for ResNet-50 on ImageNet-LT.
+
+\begin{table}[h]
+\centering
+\caption{Crossover point $n^{*}$ on ImageNet-LT as a function of weight decay $\lambda$. Stronger regularization delays the crossover: $n^{*}$ increases with $\lambda$ up to a point, then saturates.}
+\label{tab:reg}
+\begin{tabular}{lcccc}
+\toprule
+$\lambda$ & $10^{-5}$ & $10^{-4}$ & $10^{-3}$ & $5 \times 10^{-3}$ \\
+\midrule
+$n^{*}$ & $0.85\text{M}$ & $1.20\text{M}$ & $1.65\text{M}$ & $1.72\text{M}$ \\
+Test error at $n^{*}$ $(\%)$ & $35.8$ & $34.7$ & $35.1$ & $36.4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The crossover point rises roughly two-fold as $\lambda$ increases from $10^{-5}$ to $10^{-3}$. The $\kappa$ term in equation~\eqref{eq:crossover} predicts this behaviour: stronger regularization reduces the effective norm $\|f\|_{\mathcal{H}}$ and therefore raises $\kappa$. Beyond $\lambda = 10^{-3}$ the effect saturates because the empirical error at $n^{*}$ begins to rise (the model is now under-fitting). The tension is clear: regularization trades off pre-crossover error for a delayed crossover.
+
+\subsection{Sensitivity to tail exponent and noise rate}
+
+We systematically varied $\tau$ (by resampling ImageNet-LT at different imbalance factors) and $\eta_{\mathrm{tail}}$ (by adjusting the injected flip rate on tail classes). Heavier tails and higher tail-noise rates move the crossover to smaller $n$; lighter tails (larger $\tau$) and lower $\eta_{\mathrm{tail}}$ delay or eliminate the crossover. The directionality is as predicted by equation~\eqref{eq:crossover} across every cell of the $4 \times 4$ grid we tested. In the very light-tail regime ($\tau > 4$, which is outside the realistic range of the datasets we study but a useful limiting case), the crossover disappears within the accessible sample range, recovering the monotonic scaling picture.
+
+These sensitivity results corroborate the predictive form of equation~\eqref{eq:crossover} and confirm that the non-monotonicity is driven specifically by the tail-concentrated noise structure, not by artefacts of the base datasets or of our particular choice of architecture and optimisation.
+
+\subsection{Cross-architecture replication of capacity effect}
+
+To confirm that the negative capacity--$n^{*}$ relationship extends beyond the three architectures of Section~\ref{sec:capacity}, we trained four additional models on ImageNet-LT: ResNet-101, Swin-T, Swin-S, and EfficientNet-B3. Crossover points are $n^{*} = 0.95\text{M}, 1.05\text{M}, 0.80\text{M}, 1.10\text{M}$ respectively. These values are consistent with the Section~\ref{sec:capacity} result that larger-capacity variants reach the crossover at smaller $n$, with the Swin family showing the same within-family pattern as the ResNet family (larger Swin-S crosses at smaller $n$ than smaller Swin-T). EfficientNet-B3, a family known for compound scaling, behaves broadly consistently with the bulk of our observations; the exact location lies slightly higher than the ResNet-50 crossover, consistent with its relatively parameter-efficient architecture.
+
+\subsection{Training-compute budget perspective}
+
+An alternative lens on our results is through training-compute $C = n \cdot \mathrm{FLOPs}$. In the conventional picture, for fixed compute one trades off data against model size. Our results suggest a refinement of this trade-off in long-tail noisy regimes: at fixed compute, one should prefer \emph{smaller data} (below $n^{*}$) with proportionally larger models or more training epochs, rather than scaling data beyond the noise-determined crossover. Concretely, at compute budget $C = C_0$ on ImageNet-LT, the data allocation $(n, \mathrm{FLOPs}) = (1.0\text{M}, C_0 / 10^{6})$ outperforms $(4.0\text{M}, C_0 / 4 \times 10^{6})$ by $3.5$ percentage points on average across our three seeds, consistent with the crossover prediction.
+
+\section{Discussion} \label{sec:discussion}
+
+The results above, taken together, refine rather than overturn the standard scaling picture for deep supervised learning. In the overwhelming majority of contemporary settings---moderate-noise, relatively balanced datasets, typical architectures---monotonic scaling behaviour is a robust empirical regularity, and the scaling exponent fitted on moderate sample ranges is a reasonable extrapolation tool. Our findings should be read as a specification of a particular regime, bounded by the tail exponent and the noise rate, within which the standard picture requires a boundary-condition correction.
+
+With that framing, three broad implications follow. First, our bound captures the main regularity of the learning curve in the relevant regime and offers a conservative estimator of the point beyond which further scaling is counterproductive. Practitioners working with long-tail, noisy pipelines can therefore use Theorem~\ref{thm:main} as a sample-budget planning tool. Second, practitioners should attend to the noise profile of their data: the crossover exists when $\eta_{\mathrm{tail}} > \eta_c$, and is absent when noise is more uniformly distributed. Data-quality investments that reduce tail-specific annotation error therefore have a particularly high marginal value in long-tail pipelines, raising (and potentially eliminating) the crossover. Third, while larger models do reach the crossover sooner in our experiments, this is not evidence against scaling capacity---it simply means that the sample budget must be calibrated jointly to capacity and noise profile. The implications for practitioners are therefore largely consonant with prevailing recommendations: scale data and models jointly, attend to data quality, and regularize.
+
+The crossover we identify sets a useful practical upper bound on when further scaling helps; combined with the capacity relationship, it implies that large-capacity models in long-tail regimes should be trained with modest data budgets, with additional compute invested in noise-reduction rather than sample-count scaling. In practical terms, for a fixed noise profile $(\eta_{\mathrm{tail}}, \tau)$, the crossover scales roughly as
+\begin{equation}
+n^{*} \;\propto\; \frac{1}{\|f\|_{\mathcal{H}}}, \label{eq:simple_crossover}
+\end{equation}
+a relationship that can guide budget allocation without recourse to the full expression of Theorem~\ref{thm:crossover}.
+
+Our modified framework remains applicable across the benchmark suite we studied. The same qualitative picture---monotonic below $n^{*}$, non-monotonic above, predictable crossover location---appeared on all three datasets. Differences in crossover location across datasets are explained quantitatively by the differences in tail exponent and tail-noise rate, exactly as equation~\eqref{eq:crossover} predicts.
+
+\subsection{Relation to prior reports of non-monotonicity}
+
+\citet{hassani2024} and \citet{bjornstad2024}, mentioned in Section~\ref{sec:related}, report related phenomena in adjacent settings. Our contribution is complementary: whereas those works document non-monotonicity, we explain when and where it will occur based on the structural properties of the class distribution and noise profile, and we supply a predictive crossover condition. Our results therefore position non-monotonic scaling as a \emph{predictable boundary case} of the standard scaling law rather than a surprising anomaly.
+
+\subsection{Implications for scaling-law extrapolation}
+
+A common practice in deep learning is to fit scaling exponents on small pilot runs and extrapolate to larger scales. Our findings show that this practice is safe \emph{within the monotonic regime} (i.e., for $n < n^{*}$), but can produce substantially misleading forecasts when the pilot range does not span the crossover. In such cases, fitted exponents substantially under-predict the error at large $n$; the monotonic extrapolation from Table~\ref{tab:crossover} row~4 under-predicted by over $11$ percentage points at the maximum sample size tested. Practitioners extrapolating scaling curves in long-tail, noisy regimes should therefore bracket their forecasts with the crossover prediction of Theorem~\ref{thm:crossover} and treat forecasts beyond the predicted $n^{*}$ as unreliable.
+
+\subsection{Calibration of the bound against empirical practice}
+
+A practical question is whether the bound of Theorem~\ref{thm:main} is loose enough to be useless for planning. The gap of $2.4$ percentage points at $n = 500\text{K}$ (Table~\ref{tab:bound_vs_emp}) is meaningfully tight for a PAC-style bound: classical Rademacher bounds on ImageNet-scale classifiers are typically vacuous~\cite{dziugaite2017}, giving nominal error rates above $100\%$. The non-vacuity arises from the noise-adjusted $n_{\mathrm{eff}}$ and the explicit tail-noise offset, both of which contribute to a tighter estimate than a generic uniform-convergence bound would provide in this regime.
+
+\subsection{Implications for scaling-law practitioners}
+
+For practitioners who use scaling laws for budget allocation, the actionable takeaways are:
+\begin{enumerate}
+\item Estimate $(\tau, \eta_{\mathrm{tail}})$ for your target dataset before committing to large-scale training. Rough estimates suffice: $\tau$ can be fit by a power-law regression on the per-class frequency histogram, and $\eta_{\mathrm{tail}}$ can be estimated by annotation audits on a small tail-class sample.
+\item Apply equation~\eqref{eq:crossover} to estimate $n^{*}$ and compare to your projected training set size. Configure training runs to fall below the estimated $n^{*}$ rather than pushing toward the boundary.
+\item If your pipeline cannot reduce $\eta_{\mathrm{tail}}$, invest additional regularization to delay the crossover (Section~\ref{sec:ablation} shows a near-$2\times$ improvement in $n^{*}$ by raising weight decay from $10^{-5}$ to $10^{-3}$).
+\item Report learning curves that span both sides of $n^{*}$ when benchmarking methods, to ensure cross-method comparisons are not artefactually driven by which side of the crossover the comparison lands on.
+\end{enumerate}
+
+These recommendations are purposely conservative and compatible with existing scaling-law practice; the refinement is chiefly in the identification of a sample-budget ceiling rather than a reformulation of the scaling paradigm.
+
+\section{Limitations} \label{sec:limitations}
+
+Several caveats on our results deserve explicit mention.
+
+\paragraph{Synthetic noise.} The label noise in our experiments is synthetic: we inject class-dependent label flips at rates specified by $(\eta_{\mathrm{head}}, \eta_{\mathrm{tail}})$ rather than working with datasets whose noise is naturally distributed. While our rates are calibrated to estimates from \citet{northcutt2021} for annotation-error rates on rare classes, natural noise has richer structure---it can be systematic (e.g., confusable species pairs), temporal (annotators drift), or correlated with confounders---and the crossover behaviour on naturally-noisy datasets may differ from what we observe on synthetic-noise benchmarks. Verification on datasets with natural, non-synthetic noise is an important direction for follow-up work.
+
+\paragraph{Restricted architectures and training regimes.} Our experiments use three families of architectures (ResNet-50, ResNet-152, ViT-B/16) and a single optimisation recipe (AdamW with cosine schedule). Other families (e.g., hierarchical transformers, convnext variants) or other recipes (e.g., adversarial training, contrastive pretraining) could in principle exhibit different crossover behaviour. The capacity relationship we report is consistent across the three families we tested but further replication is warranted.
+
+\paragraph{Cross-sectional pilot.} Our training runs are conducted as a single, per-configuration optimisation to convergence; we do not study multi-pass effects across training epochs, and we do not examine the interaction of the crossover with ongoing curriculum learning or self-training strategies.
+
+\paragraph{Theoretical gap above the crossover.} Theorem~\ref{thm:main} captures the first-order behaviour of the learning curve up to $n^{*}$; it does not model the rising empirical error \emph{above} $n^{*}$, which appears in Table~\ref{tab:bound_vs_emp} as a growing negative gap. Extending the bound to capture super-crossover behaviour would require a stricter treatment of how tail samples, when added in excess, degrade the effective training distribution.
+
+\subsection{Implications for future benchmarks}
+
+A practical consequence of our results is that benchmark design in long-tail recognition should report learning curves across a wider range of $n$ than is currently common. Many published methods are evaluated at a single, dataset-specific $n$, which may lie on either side of the crossover depending on the architecture. Comparisons across methods at a fixed $n$ can therefore be misleading if one method sits below the crossover (still improving) while another sits above it (regressing). Reporting learning curves that span $n^{*}$ would make such comparisons more interpretable.
+
+\appendix
+\section{Appendix A: Proof of Theorem \ref{thm:main}} \label{app:proof}
+
+We give the proof in two steps.
+
+\paragraph{Step 1: Noise-adjusted concentration.} We first relate the empirical risk on noisy samples to the clean population risk. Let $\hat{\mathcal{L}}_n$ denote the noisy-empirical 0-1 risk and $\mathcal{L}$ the clean population risk of a fixed $f \in \mathcal{F}$. By the unbiased-estimator construction of \citet{natarajan2013}, extended to class-dependent noise, we have
+\[
+\mathcal{L}(f) \;=\; \mathbb{E}\bigl[\hat{\mathcal{L}}_n^{\mathrm{noise\text{-}corrected}}(f)\bigr],
+\]
+where the noise-correction is the standard inverse-noise transform applied per class. The concentration of the noise-corrected empirical risk around its expectation is governed by an effective sample size
+\[
+n_{\mathrm{eff}}(\eta, \tau) \;=\; n \cdot (1 - 2 \bar{\eta})^{2} \cdot C_{\tau},
+\]
+which reduces to the classical $(1 - 2\eta)^{2}$ shrinkage when $\tau \to \infty$. A standard Hoeffding-style argument in the noise-adjusted risk, conditional on the per-class counts, yields the concentration term $\sqrt{2 \ln(2/\delta) / n_{\mathrm{eff}}}$ appearing in~\eqref{eq:main_bound}.
+
+\paragraph{Step 2: Uniform convergence over $\mathcal{F}$.} We next bound the gap uniformly over the hypothesis class using a Rademacher-complexity argument. Define
+\begin{equation}
+\mathfrak{R}_n(\mathcal{F}) \;=\; \mathbb{E}_S \!\left[\, \mathbb{E}_\sigma \!\left[\, \sup_{f \in \mathcal{F}} \frac{1}{n} \sum_{i=1}^{n} \sigma_i \, f(x_i) \,\right] \right], \label{eq:rademacher}
+\end{equation}
+where $S = (x_1, \ldots, x_n)$ is the sample and $\sigma = (\sigma_1, \ldots, \sigma_n)$ is an independent Rademacher vector. By the standard symmetrisation argument~\cite{shalev2014understanding}, for any $\delta \in (0, 1)$ and with probability at least $1 - \delta/2$,
+\[
+\sup_{f \in \mathcal{F}} \bigl[\, \mathcal{L}(f) - \hat{\mathcal{L}}_n^{\mathrm{noise\text{-}corrected}}(f) \,\bigr] \;\le\; 2\, \mathfrak{R}_n(\mathcal{F}) + \sqrt{\frac{\ln(2/\delta)}{n_{\mathrm{eff}}}}.
+\]
+Combining this with the per-sample inequality from Step~1 and a union bound over the two probabilistic events yields, with probability at least $1 - \delta$,
+\[
+\mathcal{L}(f) \;\le\; \hat{\mathcal{L}}_n(f) + \sqrt{\frac{2\ln(2/\delta)}{n_{\mathrm{eff}}}} + \sum_{c \in \mathcal{T}} \eta_c\, w_c
+\]
+for every $f \in \mathcal{F}$, where the tail-noise offset $\sum_{c \in \mathcal{T}} \eta_c w_c$ absorbs the residual bias from the per-class noise correction. This is the statement of Theorem~\ref{thm:main}. \qed
+
+\paragraph{Derivation of the crossover condition.} We now sketch the derivation of Theorem~\ref{thm:crossover}. Write the predicted scaling form~\eqref{eq:predicted_scaling} as
+\[
+E(n) \;=\; A \cdot n_{\mathrm{eff}}(\eta, \tau)^{-\alpha(\eta, \tau)} + B_{\mathrm{floor}},
+\]
+with $B_{\mathrm{floor}} = \sum_{c \in \mathcal{T}} \eta_c w_c$. Setting $\partial E / \partial n = 0$ and using the chain rule through $n_{\mathrm{eff}}$, the stationarity condition becomes
+\[
+\alpha(\eta, \tau) \cdot A \cdot n_{\mathrm{eff}}^{-\alpha - 1} \cdot \frac{\partial n_{\mathrm{eff}}}{\partial n} \;=\; \frac{\partial B_{\mathrm{floor}}}{\partial n}.
+\]
+The right-hand side is not zero: adding further noisy samples above the tail-coverage saturation point \emph{increases} the effective tail-noise floor (because new samples concentrate on tail classes whose coverage is already saturated, adding noise without supervision gain). After substitution of the power-law parameterisations for $p_c$ and $\eta_c$ and simplification, the stationary point satisfies
+\[
+n^{*} = \left(\frac{\eta_{\mathrm{tail}}}{\eta_c}\right)^{-1/\tau} \cdot \kappa\bigl(\|f\|_{\mathcal{H}}\bigr),
+\]
+which is equation~\eqref{eq:crossover}. The critical noise constant $\eta_c$ is determined by the balance between the concentration-term derivative and the floor-term derivative at stationarity; it depends on the hypothesis class through its Rademacher complexity. A heavier-tailed distribution (smaller $\tau$) therefore yields a smaller $n^{*}$ at fixed noise rate, and a larger capacity (through $\kappa$) yields a smaller $n^{*}$ at fixed $\tau$ and $\eta_{\mathrm{tail}}$. The second derivative check $\partial^{2} E / \partial n^{2} > 0$ at $n^{*}$ holds in the relevant parameter regime. \qed
+
+\section{Appendix B: Sensitivity derivations} \label{app:sensitivity}
+
+We derive closed-form expressions for the sensitivity of $n^{*}$ to each of its arguments, which underlie the trends observed in Section~\ref{sec:ablation}.
+
+\paragraph{Sensitivity to tail-noise rate.} From equation~\eqref{eq:crossover},
+\[
+\frac{\partial \log n^{*}}{\partial \log \eta_{\mathrm{tail}}} \;=\; -\frac{1}{\tau}.
+\]
+A $10\%$ increase in $\eta_{\mathrm{tail}}$ therefore reduces $n^{*}$ by approximately $10/\tau$ percent. For ImageNet-LT with $\tau = 2.1$, this is about $4.8\%$ per $10\%$ increase in tail noise; empirically, varying $\eta_{\mathrm{tail}}$ from $0.25$ to $0.31$ ($+24\%$) reduced $n^{*}$ from $1.35\text{M}$ to $1.07\text{M}$ ($-21\%$), consistent with the prediction to within experimental error.
+
+\paragraph{Sensitivity to tail exponent.} The derivative with respect to $\tau$ is
+\[
+\frac{\partial \log n^{*}}{\partial \tau} \;=\; \frac{1}{\tau^{2}} \log\!\left(\frac{\eta_{\mathrm{tail}}}{\eta_c}\right),
+\]
+which is positive when $\eta_{\mathrm{tail}} > \eta_c$ (i.e., in the crossover regime). Heavier tails (smaller $\tau$) therefore produce smaller $n^{*}$, as observed in the sensitivity sweep of Section~\ref{sec:ablation}.
+
+\paragraph{Sensitivity to model capacity.} The dependence on capacity enters through $\kappa(\|f\|_{\mathcal{H}})$. Under the Rademacher-complexity parameterisation $\kappa(\|f\|) = c_0 \|f\|^{-\beta}$ with $\beta > 0$, we have
+\[
+\frac{\partial \log n^{*}}{\partial \log \|f\|_{\mathcal{H}}} \;=\; -\beta,
+\]
+i.e., doubling the hypothesis-class norm reduces $n^{*}$ by a factor $2^{\beta}$. Fits to our Table~\ref{tab:capacity} data give $\beta \approx 0.7$, i.e., a doubling of capacity reduces $n^{*}$ by approximately $40\%$.
+
+\paragraph{Regularization.} Weight decay $\lambda$ enters through its effect on the effective norm $\|f\|_{\mathcal{H}}$: for strongly convex regularizers, the converged norm is approximately $\|f_\lambda\|_{\mathcal{H}} \sim 1/\sqrt{\lambda}$, and therefore
+\[
+\frac{\partial \log n^{*}}{\partial \log \lambda} \;=\; \frac{\beta}{2},
+\]
+which for $\beta = 0.7$ predicts a $35\%$ increase in $n^{*}$ per tenfold increase in $\lambda$. The empirical data in Table~\ref{tab:reg} shows a slightly larger gain ($n^{*}$ from $0.85\text{M}$ at $\lambda = 10^{-5}$ to $1.65\text{M}$ at $\lambda = 10^{-3}$, a factor of $\approx 1.94$), consistent with compound implicit-regularization effects.
+
+\section{Appendix C: Comparison with uniform-noise PAC bounds} \label{app:uniform_compare}
+
+To put the tightness of Theorem~\ref{thm:main} in context, we compare it with two baseline bounds: a standard Rademacher-complexity bound that ignores noise structure, and the Natarajan et al.\ bound for uniform symmetric noise. For ImageNet-LT at $n = 500\text{K}$, $\eta_{\mathrm{tail}} = 0.28$, $\tau = 2.1$, the bounds evaluate to:
+\begin{itemize}
+\item Pure Rademacher: $>100\%$ (vacuous)
+\item Natarajan et al.\ (uniform noise assumption, $\eta = \bar{\eta}$): $51.8\%$
+\item Theorem~\ref{thm:main}: $43.9\%$
+\end{itemize}
+Empirical error at the same configuration is $41.5\%$. The tail-concentrated treatment gives the tightest non-vacuous bound among the three, by a margin of $\approx 8$ percentage points over the uniform-noise reference and a large margin over the pure Rademacher baseline. Above the crossover, however, all three bounds understate empirical error (Section~\ref{sec:ablation}), since none of them model the super-crossover regime.
+
+\section{Appendix D: Experimental details}  \label{app:details}
+
+We report additional details for reproducibility. Training runs used per-device batch size $256$, gradient accumulation where needed, cosine-decay learning-rate schedule with initial rate $10^{-3}$ (ResNet-50), $5 \times 10^{-4}$ (ResNet-152), $3 \times 10^{-4}$ (ViT-B/16). Warm-up was linear over the first $5\%$ of training. Early stopping was determined by validation-loss plateau as in Section~\ref{sec:experiments}. All random seeds were drawn from $\{17, 23, 29\}$. Standard deviations across seeds were $0.3$--$1.1$ percentage points in all reported entries.
+
+Noise injection was performed before training. Specifically, at training set construction, each sample's label was independently resampled with probability $\eta_c$ (where $c$ is the true class), in which case the observed label was drawn uniformly from the remaining $K-1$ classes. The same noise realisation was used across all seeds for a given configuration, so reported variance reflects optimisation-side stochasticity only.
+
+Per-seed top-1 test-error numbers are recorded in the project repository under \texttt{results/imagenet\_lt\_seedwise.csv} (and analogous files for the other datasets). Equipment and total compute are as in Section~\ref{sec:experiments}. No experiment was re-run after initial reporting; reported numbers reflect the first-and-only completed run per configuration.
+
+\begin{thebibliography}{99}
+
+\bibitem{hestness2017} J.\ Hestness et al. Deep learning scaling is predictable, empirically. \emph{arXiv preprint}, 2017.
+
+\bibitem{kaplan2020} J.\ Kaplan, S.\ McCandlish, T.\ Henighan, et al. Scaling laws for neural language models. \emph{arXiv}, 2020.
+
+\bibitem{henighan2020} T.\ Henighan et al. Scaling laws for autoregressive generative modeling. \emph{arXiv}, 2020.
+
+\bibitem{hoffmann2022} J.\ Hoffmann et al. Training compute-optimal large language models. \emph{NeurIPS}, 2022.
+
+\bibitem{sharma2022} U.\ Sharma and J.\ Kaplan. Scaling laws from the data manifold dimension. \emph{JMLR}, 23(9):1-34, 2022.
+
+\bibitem{cherti2023} M.\ Cherti et al. Reproducible scaling laws for contrastive language-image learning. \emph{CVPR}, 2023.
+
+\bibitem{radford2021} A.\ Radford, J.\ W.\ Kim, C.\ Hallacy, et al. Learning transferable visual models from natural language supervision. \emph{ICML}, 2021.
+
+\bibitem{belkin2019} M.\ Belkin, D.\ Hsu, S.\ Ma, and S.\ Mandal. Reconciling modern machine-learning practice and the classical bias-variance trade-off. \emph{PNAS}, 116(32):15849-15854, 2019.
+
+\bibitem{nakkiran2020} P.\ Nakkiran et al. Deep double descent: Where bigger models and more data hurt. \emph{ICLR}, 2020.
+
+\bibitem{nakkiran2020samplewise} P.\ Nakkiran et al. Sample-wise double descent. \emph{arXiv}, 2020.
+
+\bibitem{koh2021} P.\ W.\ Koh et al. WILDS: A benchmark of in-the-wild distribution shifts. \emph{ICML}, 2021.
+
+\bibitem{fang2022} C.\ Fang et al. Data determines distributional robustness in contrastive language-image pretraining. \emph{ICML}, 2022.
+
+\bibitem{carlini2023} N.\ Carlini et al. Poisoning web-scale training datasets is practical. \emph{arXiv}, 2023.
+
+\bibitem{liu2019longtail} Z.\ Liu, Z.\ Miao, X.\ Zhan, J.\ Wang, B.\ Gong, and S.\ X.\ Yu. Large-scale long-tailed recognition in an open world. \emph{CVPR}, 2019.
+
+\bibitem{vanhorn2018inaturalist} G.\ Van Horn et al. The iNaturalist species classification and detection dataset. \emph{CVPR}, 2018.
+
+\bibitem{cui2019classbalanced} Y.\ Cui, M.\ Jia, T.-Y.\ Lin, Y.\ Song, and S.\ Belongie. Class-balanced loss based on effective number of samples. \emph{CVPR}, 2019.
+
+\bibitem{cao2019ldam} K.\ Cao, C.\ Wei, A.\ Gaidon, N.\ Arechiga, and T.\ Ma. Learning imbalanced datasets with label-distribution-aware margin loss. \emph{NeurIPS}, 2019.
+
+\bibitem{menon2021} A.\ Menon et al. Long-tail learning via logit adjustment. \emph{ICLR}, 2021.
+
+\bibitem{buda2018} M.\ Buda, A.\ Maki, and M.\ Mazurowski. A systematic study of the class-imbalance problem in convolutional neural networks. \emph{Neural Networks}, 106:249-259, 2018.
+
+\bibitem{kang2020decoupling} B.\ Kang et al. Decoupling representation and classifier for long-tailed recognition. \emph{ICLR}, 2020.
+
+\bibitem{zhang2021understanding} C.\ Zhang, S.\ Bengio, M.\ Hardt, B.\ Recht, and O.\ Vinyals. Understanding deep learning requires rethinking generalization. \emph{Communications of the ACM}, 64(3):107-115, 2021.
+
+\bibitem{song2022} H.\ Song et al. Learning from noisy labels with deep neural networks: A survey. \emph{IEEE TNNLS}, 2022.
+
+\bibitem{northcutt2021} C.\ Northcutt, A.\ Athalye, and J.\ Mueller. Pervasive label errors in test sets destabilize machine learning benchmarks. \emph{NeurIPS Datasets \& Benchmarks}, 2021.
+
+\bibitem{patrini2017} G.\ Patrini et al. Making deep neural networks robust to label noise: A loss correction approach. \emph{CVPR}, 2017.
+
+\bibitem{natarajan2013} N.\ Natarajan, I.\ S.\ Dhillon, P.\ Ravikumar, and A.\ Tewari. Learning with noisy labels. \emph{NeurIPS}, 2013.
+
+\bibitem{scott2019} C.\ Scott. A rate of convergence for mixture proportion estimation, with application to learning from noisy labels. \emph{AISTATS}, 2019.
+
+\bibitem{xia2019} X.\ Xia et al. Are anchor points really indispensable in label-noise learning? \emph{NeurIPS}, 2019.
+
+\bibitem{cheng2020} J.\ Cheng et al. Learning with instance-dependent label noise: A sample sieve approach. \emph{ICLR}, 2020.
+
+\bibitem{berthon2021} A.\ Berthon et al. Confidence scores make instance-dependent label-noise learning possible. \emph{ICML}, 2021.
+
+\bibitem{mcallester1999} D.\ A.\ McAllester. PAC-Bayesian model averaging. \emph{COLT}, 1999.
+
+\bibitem{shalev2014understanding} S.\ Shalev-Shwartz and S.\ Ben-David. \emph{Understanding Machine Learning: From Theory to Algorithms}. Cambridge University Press, 2014.
+
+\bibitem{vapnik1998} V.\ Vapnik. \emph{Statistical Learning Theory}. Wiley, 1998.
+
+\bibitem{dziugaite2017} G.\ K.\ Dziugaite and D.\ M.\ Roy. Computing nonvacuous generalization bounds for deep (stochastic) neural networks with many more parameters than training data. \emph{UAI}, 2017.
+
+\bibitem{arora2018} S.\ Arora et al. Stronger generalization bounds for deep nets via a compression approach. \emph{ICML}, 2018.
+
+\bibitem{russo2016} D.\ Russo and J.\ Zou. Controlling bias in adaptive data analysis using information theory. \emph{AISTATS}, 2016.
+
+\bibitem{hassani2024} S.\ Hassani et al. Non-monotonic scaling in low-resource language fine-tuning. \emph{arXiv}, 2024.
+
+\bibitem{bjornstad2024} O.\ Bjornstad and L.\ Chen. The data plateau in webly supervised object detection. \emph{arXiv}, 2024.
+
+\bibitem{he2016} K.\ He, X.\ Zhang, S.\ Ren, and J.\ Sun. Deep residual learning for image recognition. \emph{CVPR}, 2016.
+
+\bibitem{loshchilov2019} I.\ Loshchilov and F.\ Hutter. Decoupled weight decay regularization. \emph{ICLR}, 2019.
+
+\bibitem{ganin2016} Y.\ Ganin et al. Domain-adversarial training of neural networks. \emph{JMLR}, 17(1):2096-2030, 2016.
+
+\bibitem{long2015} M.\ Long et al. Learning transferable features with deep adaptation networks. \emph{ICML}, 2015.
+
+\bibitem{sagawa2020} S.\ Sagawa et al. Distributionally robust neural networks for group shifts. \emph{ICLR}, 2020.
+
+\bibitem{arjovsky2019irm} M.\ Arjovsky et al. Invariant risk minimization. \emph{arXiv}, 2019.
+
+\bibitem{jain2020} S.\ Jain et al. Overview of the applied ML data pipeline at scale. \emph{ML in Production Workshop}, 2020.
+
+\bibitem{paleyes2022} A.\ Paleyes et al. Challenges in deploying machine learning: A survey of case studies. \emph{ACM Computing Surveys}, 2022.
+
+\bibitem{recht2019} B.\ Recht et al. Do ImageNet classifiers generalize to ImageNet? \emph{ICML}, 2019.
+
+\bibitem{torralba2011} A.\ Torralba and A.\ Efros. Unbiased look at dataset bias. \emph{CVPR}, 2011.
+
+\bibitem{ng2021datacentric} A.\ Ng. A chat with Andrew on MLOps: From model-centric to data-centric AI. Talk, 2021.
+
+\bibitem{lin2023scaling} Y.\ Lin et al. On scaling laws for tail-heavy class distributions. \emph{arXiv}, 2023.
+
+\end{thebibliography}
+
+\end{document}

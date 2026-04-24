@@ -29,6 +29,8 @@ _ARXIV_ID_RE = re.compile(
     r"(?:arXiv[:\s]*)?(\d{4}\.\d{4,5}(?:v\d+)?)",
     re.IGNORECASE,
 )
+# CoRR style: "CoRR, abs/1409.0473" or "CoRR abs/1409.0473"
+_CORR_RE = re.compile(r"(?:CoRR,?\s+)?abs/(\d{4}\.\d{4,5})", re.IGNORECASE)
 _YEAR_RE = re.compile(r"(?<![\d.])(19|20)\d{2}(?![\d])")
 _AUTHOR_YEAR_RE = re.compile(r"\(([^()]*?,\s*\d{4})\)")
 
@@ -70,8 +72,11 @@ def extract_arxiv(text: str) -> str | None:
     mdoi = _ARXIV_DOI_RE.search(text)
     if mdoi:
         return mdoi.group(0)
-    # Else look for a bare arXiv id — but only when context mentions arxiv,
-    # to avoid confusing "2020.1234" year-like strings with arxiv IDs.
+    # CoRR form (NeurIPS / ICML bibliography style): "CoRR, abs/1409.0473"
+    mcorr = _CORR_RE.search(text)
+    if mcorr:
+        return "arxiv:" + mcorr.group(1)
+    # arXiv context: "arXiv:1607.06450" or "arXiv preprint 1607.06450"
     if "arxiv" in text.lower() or "arXiv" in text:
         m = _ARXIV_ID_RE.search(text)
         if m:

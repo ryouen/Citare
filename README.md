@@ -44,15 +44,17 @@ The heart of Citare is the extraction prompt. We ran 13 real papers and 7 synthe
 - `core_eq_fidelity` — token-set LaTeX match on equations classified as `central_contribution` or `supporting_definition`
 - `eq_discipline` — fraction of decorative equations (restatements, textbook citations) the extractor correctly skipped
 
-Key headline numbers from the tournament (Opus 4.7, single-shot, effort=none):
+Numbers from the v0.1 tournament on T7 (Opus 4.7, single-shot, effort=none, **N=1**):
 
 | | Text coverage | Middle | Core eq | Eq discipline |
 |---|---|---|---|---|
-| v0.3 overlooked (text champion) | **100%** | **100%** | 0% | n/a |
-| v0.11 TeX (first attempt) | 80% | 71% | 87% | 33% |
-| **v0.12e STATUS** (our production eq prompt) | 82% | 74% | **92%** | **67%** |
+| v0.3 overlooked (text champion) | 100% | 100% | 0% | n/a |
+| v0.11 TeX | 80% | 71% | 87% | 33% |
+| v0.12e STATUS | 82% | 74% | 92% | **67%** |
 
-No single prompt wins all three axes — LaTeX instructions inherently consume attention that would otherwise go to RELATION extraction. The production config is therefore a **dual-run merge**: v0.3 for claim coverage, v0.12e STATUS for equations, combined at claim-id level.
+**Caveat (from the subsequent N=2 pilot, `experiments/PILOT_V2.md`)**: the single-point estimates above are high-variance on T7. Re-running with two seeds showed v0.3's T7 coverage is **94.6% ± 7.6%** (the 100% was a lucky run), v0.12e vs v0.11 core_eq difference is within within-cell noise, and only the **eq_discipline advantage of v0.12e over v0.11 (50% vs 33%, std=0) is robustly supported**. We are honest about this in `PILOT_V2.md` rather than retrofitting nicer numbers.
+
+No single prompt wins all three axes — LaTeX instructions inherently consume attention that would otherwise go to RELATION extraction. The production config is therefore a **dual-run merge**: v0.3 for claim coverage, v0.12e STATUS for equations, combined at claim-id level. The rationale for v0.12e over v0.11 is the robust discipline advantage (rejects restatements and textbook citations at capture time), NOT the eq_fidelity difference (which is within noise).
 
 The synthetic trap papers directly test classic failure modes:
 
@@ -70,18 +72,20 @@ citare/
 │   ├── citare-db/          # SQLite schema + ingestion from extraction.json
 │   └── citare-mcp/         # MCP server — search_claims, cite_claim, get_claim_graph
 ├── experiments/
-│   ├── prompts/            # v0.1 ... v0.12f extraction prompts
-│   ├── harness/            # runner + scorer (3-axis + eq_discipline)
+│   ├── prompts/            # v0.1 ... v0.13 extraction prompts (10 + a v2 refs-verbatim)
+│   ├── harness/            # runner + scorer (5 axes: coverage/middle/integrity/core_eq/discipline)
 │   ├── ground_truth/
 │   │   ├── real_papers/    # 13 Gold fixtures (Edmondson, Einstein, Vaswani, ...)
 │   │   └── trap_papers/    # 7 synthetic traps (T1..T7) authored Gold-first
-│   ├── runs/               # 100+ extraction runs with metrics
-│   ├── T7_TOURNAMENT.md    # 9-prompt bracket on T7 scaling-noise paper
+│   ├── runs/               # 130+ extraction runs with metrics
+│   ├── T7_TOURNAMENT.md    # 10-prompt bracket on T7 (N=1, exploratory)
+│   ├── PILOT_V2.md         # 3 variants × 3 papers × N=2 noise estimation
 │   ├── TRAP_SCORES.md      # T1-T6 small-trap scoring
 │   └── STATS_FAIR.md       # apples-to-apples prompt comparison
 ├── docs/
-│   ├── design_spec.md      # full design in 10 parts
-│   └── adrs/               # 7 Architecture Decision Records
+│   ├── design_spec.md           # full design in 10 parts
+│   ├── experiments_v2_plan.md   # rigorous L8 factorial post-hackathon plan
+│   └── adrs/                    # 7 Architecture Decision Records
 ├── scripts/
 │   └── seed_citare_db.py   # builds data/citare.db from the runs/
 └── pdfs/                   # seed-paper PDFs (fair-use)

@@ -85,8 +85,10 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
         return {"error": f"claim not found: {claim_id}", "claim_id": claim_id}
     claim = _row_to_claim(row)
 
+    paper_default_cs: dict[str, Any] = {}
     paper = conn.execute(
-        "SELECT id, canonical_title, authors, year, venue, paper_type, domain "
+        "SELECT id, canonical_title, authors, year, venue, paper_type, domain, "
+        "default_causal_strength, default_method "
         "FROM papers WHERE id = ?",
         (claim["paper_id"],),
     ).fetchone()
@@ -96,6 +98,15 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
             paper_dict["authors"] = json.loads(paper_dict["authors"])
         except (TypeError, json.JSONDecodeError):
             pass
+        for k in ("default_causal_strength", "default_method"):
+            if paper_dict.get(k):
+                try:
+                    paper_dict[k] = json.loads(paper_dict[k])
+                except (TypeError, json.JSONDecodeError):
+                    pass
+        # Capture paper default for safe_verbs fallback
+        if isinstance(paper_dict.get("default_causal_strength"), dict):
+            paper_default_cs = paper_dict["default_causal_strength"]
         # Include all known identifiers for this paper
         idents = conn.execute(
             "SELECT identifier_type, identifier_value, is_preferred "
@@ -116,9 +127,14 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
     ).fetchall()
     claim["integrity_warnings"] = [dict(w) for w in warnings]
 
-    # Produce a citation-safe verbs hint from causal_strength
-    cs = claim.get("causal_strength") or {}
-    claim["safe_verbs"] = _safe_verbs(cs, claim.get("template_type"))
+    # Produce a citation-safe verbs hint from causal_strength.
+    # Design_spec §2.2.5: paper-level default_causal_strength is inherited
+    # by claims that don't override. If claim.causal_strength is missing
+    # a field, fall back to the paper's default.
+    claim_cs = claim.get("causal_strength") or {}
+    effective_cs = {**paper_default_cs, **{k: v for k, v in claim_cs.items() if v is not None}}
+    claim["effective_causal_strength"] = effective_cs
+    claim["safe_verbs"] = _safe_verbs(effective_cs, claim.get("template_type"))
 
     return claim
 

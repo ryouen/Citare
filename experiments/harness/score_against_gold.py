@@ -398,20 +398,43 @@ def score(extraction_path: Path, gold_path: Path) -> dict:
     eqs = _collect_equations(extraction)
     eq_total = 0.0
     eq_scored = 0.0
+    core_total = 0.0          # central_contribution + supporting_definition weights
+    core_scored = 0.0
+    decorative_expected = 0   # count of restatement/textbook equations in gold
+    decorative_extracted = 0  # number of decorative equations that the extractor DID pick up
     eq_results = []
     for spec in gold.get("equations", []) or []:
         w = spec.get("weight", 1.0)
+        status = spec.get("equation_status", "unclassified")
         eq_total += w
         frac, detail = check_equation(eqs, spec)
         eq_scored += w * frac
+        is_core = status in ("central_contribution", "supporting_definition")
+        is_decorative = status in ("restatement", "textbook_background")
+        if is_core:
+            core_total += w
+            core_scored += w * frac
+        if is_decorative:
+            decorative_expected += 1
+            # Count as extracted if any token matched (frac > 0.3 = real extraction, not partial coincidence)
+            if frac >= 0.5:
+                decorative_extracted += 1
         eq_results.append({
             "eq_id": spec.get("eq_id"),
             "weight": w,
+            "equation_status": status,
             "fraction": round(frac, 4),
             "detail": detail,
             "description": spec.get("description", ""),
             "expected_source_page": spec.get("expected_source_page"),
         })
+
+    # Discipline = 1 - (decorative_extracted / decorative_expected)
+    # If no decorative equations in gold, discipline is undefined (report None).
+    if decorative_expected > 0:
+        eq_discipline = 1.0 - (decorative_extracted / decorative_expected)
+    else:
+        eq_discipline = None
 
     # By-template breakdown
     by_template = {}
@@ -431,8 +454,12 @@ def score(extraction_path: Path, gold_path: Path) -> dict:
             "coverage": round(scored_weight / total_weight, 4) if total_weight > 0 else 0.0,
             "integrity_penalty": round(forbidden_hit / forbidden_total, 4) if forbidden_total > 0 else 0.0,
             "equation_fidelity": round(eq_scored / eq_total, 4) if eq_total > 0 else 0.0,
+            "core_eq_fidelity": round(core_scored / core_total, 4) if core_total > 0 else 0.0,
+            "eq_discipline": round(eq_discipline, 4) if eq_discipline is not None else None,
             "middle_coverage": round(middle_scored / middle_total, 4) if middle_total > 0 else 0.0,
         },
+        "decorative_expected": decorative_expected,
+        "decorative_extracted": decorative_extracted,
         "coverage_score": round(scored_weight / total_weight, 4) if total_weight > 0 else 0.0,
         "scored_weight": scored_weight,
         "total_weight": total_weight,
@@ -462,7 +489,11 @@ def main():
     print(f"  coverage           : {axes['coverage']*100:5.1f}%  ({res['scored_weight']:.1f} / {res['total_weight']:.1f})")
     print(f"  integrity_penalty  : {axes['integrity_penalty']*100:5.1f}%  (fraction of forbidden claims synthesized)")
     print(f"  equation_fidelity  : {axes['equation_fidelity']*100:5.1f}%  ({res['equations_captured']} equations captured)")
-    print(f"  middle_coverage    : {axes['middle_coverage']*100:5.1f}%  (p.15-22 claims only; {res['middle']['scored_w']:.1f} / {res['middle']['total_w']:.1f})")
+    print(f"  core_eq_fidelity   : {axes['core_eq_fidelity']*100:5.1f}%  (central_contribution + supporting_definition only)")
+    disc = axes.get('eq_discipline')
+    disc_s = f"{disc*100:5.1f}%" if disc is not None else "  n/a"
+    print(f"  eq_discipline      : {disc_s}  (1 - decorative_extracted/decorative_expected; {res.get('decorative_extracted',0)}/{res.get('decorative_expected',0)})")
+    print(f"  middle_coverage    : {axes['middle_coverage']*100:5.1f}%  (middle-of-paper claims only; {res['middle']['scored_w']:.1f} / {res['middle']['total_w']:.1f})")
     print()
 
     if res["by_template"]:

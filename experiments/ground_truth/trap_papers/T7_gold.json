@@ -277,47 +277,54 @@
       "eq_id": "eq1_intro_scaling",
       "expected_source_page": 3,
       "weight": 0.5,
+      "equation_status": "textbook_background",
       "required_latex_tokens": ["\\mathbb{E}", "n^{-", "\\alpha"],
-      "description": "eq1: intro simplified scaling law E[err] ~ n^{-alpha}"
+      "description": "eq1: textbook scaling form cited from Hestness 2017 / Kaplan 2020. Should NOT be extracted — it is canonical prior-work background, not a contribution of this paper."
     },
     {
       "eq_id": "eq2_noise_model",
       "expected_source_page": 5,
       "weight": 1.0,
+      "equation_status": "supporting_definition",
       "required_latex_tokens": ["\\eta", "head", "tail"],
-      "description": "eq2: per-class noise model (stated as two-regime piecewise eta_head/eta_tail in Definition 2)"
+      "description": "eq2: per-class noise model definition. Needed to interpret eq3/eq5."
     },
     {
       "eq_id": "eq3_main_bound",
       "expected_source_page": 7,
       "weight": 2.5,
+      "equation_status": "central_contribution",
       "required_latex_tokens": ["\\sqrt", "\\frac", "\\ln", "\\delta", "n_{", "\\sum_{c", "\\mathcal{T}", "\\eta_c", "w_c", "\\mathcal{L}"],
-      "description": "eq3: CRITICAL main PAC-Bayes-style bound with tail correction."
+      "description": "eq3: CRITICAL main PAC-Bayes-style bound with tail correction. Central theorem of paper."
     },
     {
       "eq_id": "eq4_n_eff",
       "expected_source_page": 6,
       "weight": 1.0,
+      "equation_status": "supporting_definition",
       "required_latex_tokens": ["n_{", "\\mathrm{eff}", "(1", "2", "\\bar{\\eta}", "^2", "C_{\\tau}"],
-      "description": "eq4: effective sample size under noise"
+      "description": "eq4: effective sample size under noise. Supporting definition used in eq3."
     },
     {
       "eq_id": "eq5_crossover_condition",
       "expected_source_page": 10,
       "weight": 2.5,
+      "equation_status": "central_contribution",
       "required_latex_tokens": ["n^{*}", "\\left", "\\eta_{\\mathrm{tail}}", "\\eta_c", "\\tau", "\\kappa", "\\|f\\|", "\\mathcal{H}", "-1/\\tau"],
-      "description": "eq5: CRITICAL crossover condition. MIDDLE. n* = (eta/eta_c)^{-1/tau} * kappa(||f||_H)"
+      "description": "eq5: CRITICAL crossover condition. Central theorem. n* = (eta/eta_c)^{-1/tau} * kappa(||f||_H)"
     },
     {
       "eq_id": "eq6_discussion_simplified",
       "expected_source_page": 13,
       "weight": 0.5,
+      "equation_status": "restatement",
       "required_latex_tokens": ["n^{*}", "\\|f\\|", "\\propto", "\\mathcal{H}"],
-      "description": "eq6: Discussion-simplified form n* ~ 1/||f||. Trap: ground truth has it, but conditions are dropped — extractor must notice the simplification context."
+      "description": "eq6: Discussion-simplified form of eq5. Should NOT be extracted as standalone — it is a lossy re-statement of eq5 and extracting it risks future miscitation."
     },
     {
       "eq_id": "eq7_appendix_rademacher",
       "expected_source_page": 17,
+      "equation_status": "textbook_background",
       "weight": 1.5,
       "required_latex_tokens": ["\\mathfrak{R}", "\\mathbb{E}", "\\sup", "\\sigma", "\\sum", "\\mathcal{F}", "f(x"],
       "description": "eq7: Rademacher complexity in Appendix proof. Full proof line."

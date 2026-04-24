@@ -1,0 +1,45 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\title{A Variational Bound on Generalization Error for Stochastic Neural Networks}
+\author{Anon}
+\date{2024}
+\begin{document}
+\maketitle
+\noindent DOI (synthetic): 10.9999/trap.2024.006
+
+\begin{abstract}
+We derive a PAC-Bayesian bound on the generalization error of stochastic neural networks. The bound is expressed in terms of the KL divergence between the posterior and prior weight distributions and the training-set size.
+\end{abstract}
+
+\section{Setup}
+Let $\mathcal{D}$ be a data distribution over input-label pairs, and let $h_w : \mathcal{X} \to \mathcal{Y}$ be a classifier parameterized by weights $w \sim Q$ drawn from a posterior $Q$. Let $P$ be a data-independent prior over weights. For a bounded loss $\ell \in [0,1]$:
+\begin{equation}
+L(Q) = \mathbb{E}_{w \sim Q}\, \mathbb{E}_{(x,y)\sim \mathcal{D}}\, \ell(h_w(x), y) \tag{true risk}
+\end{equation}
+\begin{equation}
+\hat{L}_n(Q) = \mathbb{E}_{w \sim Q}\, \frac{1}{n} \sum_{i=1}^{n} \ell(h_w(x_i), y_i) \tag{empirical risk}
+\end{equation}
+
+\section{Main Theorem}
+For any posterior $Q$, prior $P$ independent of the training data, sample size $n$, and $\delta \in (0,1)$, with probability at least $1-\delta$:
+\begin{equation}
+L(Q) \le \hat{L}_n(Q) + \sqrt{\frac{\mathrm{KL}(Q \,\|\, P) + \log(2\sqrt{n}/\delta)}{2n}}
+\end{equation}
+
+\section{Asymptotic Behavior}
+As $n \to \infty$, the generalization gap vanishes at rate:
+\[
+L(Q) - \hat{L}_n(Q) = O\!\left(\sqrt{\frac{\mathrm{KL}(Q \,\|\, P)}{n}}\right)
+\]
+
+\section{Specialization to Gaussian Posteriors}
+When $Q = \mathcal{N}(\mu_Q, \Sigma_Q)$ and $P = \mathcal{N}(0, \sigma^2 I)$, the KL has closed form:
+\begin{equation}
+\mathrm{KL}(Q \,\|\, P) = \frac{1}{2}\left( \mathrm{tr}(\Sigma_Q / \sigma^2) + \|\mu_Q\|^2 / \sigma^2 - d + d \log \sigma^2 - \log |\Sigma_Q| \right)
+\end{equation}
+where $d$ is the parameter dimension.
+
+\section{Discussion}
+The bound is non-vacuous for wide networks when the KL can be controlled via early stopping or explicit regularization.
+\end{document}

@@ -1,0 +1,56 @@
+{
+  "paper_doi": "10.9999/trap.2024.005",
+  "paper_title": "Four Pillars of Organizational Resilience",
+  "paper_author_year": "Reyes & Al-Qasemi 2023 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "Pure conceptual framework paper with 4 constructs (adaptive capacity, redundancy, information sharing, leadership continuity). No empirical evidence. Test: extractor must capture 4 DEFINITIONs and the framework META_CLAIM, and tag paper_type=conceptual.",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_conceptual",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["conceptual", "theoretical"]},
+      "description": "Paper is a conceptual framework, no empirical data"
+    },
+    {
+      "key": "def_adaptive_capacity",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "adaptive[_ ]capacity",
+        "key_elements_include_any_of": ["reconfigure", "routines", "resource", "prospective", "real-time", "real_time"]
+      },
+      "description": "Pillar 1: Adaptive Capacity"
+    },
+    {
+      "key": "def_redundancy",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "redundancy",
+        "key_elements_include_any_of": ["slack", "parallel", "duplication", "purposeful"]
+      },
+      "description": "Pillar 2: Redundancy"
+    },
+    {
+      "key": "def_information_sharing",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "information[_ ]sharing",
+        "key_elements_include_any_of": ["weak signals", "weak_signals", "speed", "breadth", "disseminat"]
+      },
+      "description": "Pillar 3: Information Sharing"
+    },
+    {
+      "key": "def_leadership_continuity",
+      "template_type": "DEFINITION",
+      "weight": 1.0,
+      "must_have": {
+        "concept_regex": "leadership[_ ]continuity",
+        "key_elements_include_any_of": ["decision authority", "decision_authority", "succession", "turnover", "continuity"]
+      },
+      "description": "Pillar 4: Leadership Continuity"
+    }
+  ]
+}

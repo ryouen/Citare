@@ -1,0 +1,50 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\title{Sparse Transformer with Locality-Biased Attention for Document Classification}
+\author{Anon}
+\date{2024}
+\begin{document}
+\maketitle
+\noindent DOI (synthetic): 10.9999/trap.2024.004
+
+\begin{abstract}
+We propose a locality-biased sparse Transformer for long-document classification. We benchmark against five strong baselines (Longformer, BigBird, Linformer, Performer, vanilla Transformer) on three datasets. Our method achieves new SOTA on HyperNews-10K while reducing memory by 38\%.
+\end{abstract}
+
+\section{Method}
+We replace full self-attention with a locality-biased kernel:
+\begin{equation}
+\text{Attention}_{\text{ours}}(Q, K, V) = \text{softmax}\!\left(\frac{Q K^\top}{\sqrt{d_k}} + \lambda B\right) V
+\end{equation}
+where $B_{ij} = -|i-j|/s$ is a learned locality prior with scale parameter $s$, and $\lambda$ balances the standard attention against the locality bias.
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{F1 scores on three benchmarks (higher is better). Bold = best in column.}
+\begin{tabular}{lccc}
+\toprule
+Model & HyperNews-10K & LegalDoc-5K & BioMed-20K \\
+\midrule
+Vanilla Transformer & 72.1 & 68.4 & 64.2 \\
+Longformer & 78.3 & 73.2 & 70.8 \\
+BigBird & 79.0 & 74.1 & 71.5 \\
+Linformer & 74.8 & 70.6 & 67.3 \\
+Performer & 76.2 & 71.9 & 69.1 \\
+\midrule
+\textbf{Ours (full)} & \textbf{81.4} & 74.8 & 71.9 \\
+Ours (no locality bias, $\lambda = 0$) & 75.9 & 71.8 & 68.7 \\
+Ours (no sparse kernel) & 79.2 & 73.5 & 70.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Our full model achieves 81.4 F1 on HyperNews-10K, outperforming all baselines. Ablations show that removing the locality bias ($\lambda=0$) drops F1 by 5.5 points, and removing sparsity drops it by 2.2 points.
+
+\section{Discussion}
+Our method achieves SOTA with 38\% less memory than BigBird.
+
+\end{document}

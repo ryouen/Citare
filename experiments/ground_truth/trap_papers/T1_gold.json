@@ -1,0 +1,67 @@
+{
+  "paper_doi": "10.9999/trap.2024.001",
+  "paper_title": "Team Autonomy as a Driver of Firm Innovation Output",
+  "paper_author_year": "Tanaka & Sato 2024 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "Cross-sectional single-wave survey with explicit causal language in Abstract, Results and Discussion. A faithful extractor must tag design_basis=cross_sectional despite the 'causes' framing, and should flag the gap (e.g., incompleteness_category=effect_disappears_under_control is NOT applicable here; the trap is author_framing=causal vs design_basis=cross_sectional mismatch).",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Paper is empirical (survey study)"
+    },
+    {
+      "key": "paper_default_cross_sectional_despite_causal_language",
+      "where": "paper.default_causal_strength",
+      "weight": 2.0,
+      "must_have": {
+        "design_basis": "cross_sectional",
+        "temporal_precedence": "none"
+      },
+      "description": "CRITICAL TRAP: paper uses causal language but is single-wave cross-sectional. Must tag design_basis=cross_sectional."
+    },
+    {
+      "key": "rel_autonomy_to_innovation",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "must_have": {
+        "iv_regex": "team[_ ]autonomy",
+        "dv_regex": "innovation[_ ](output|performance)?",
+        "relation": "positive"
+      },
+      "description": "Core claim: team autonomy -> innovation output"
+    },
+    {
+      "key": "measurement_method_team_autonomy",
+      "where": "measurement_methods",
+      "weight": 1.0,
+      "must_have": {
+        "measures_regex": "team[_ ]autonomy",
+        "reliability_reported_near": 0.81
+      },
+      "description": "Team autonomy measured with 5-item Likert, alpha=0.81"
+    },
+    {
+      "key": "measurement_method_innovation",
+      "where": "measurement_methods",
+      "weight": 1.0,
+      "must_have": {
+        "measures_regex": "innovation[_ ]output",
+        "reliability_reported_near": 0.72
+      },
+      "description": "Innovation output measured with 3-item self-report, alpha=0.72"
+    },
+    {
+      "key": "exist_sample_150_firms",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(sample|firms|manufacturers|N[_ ]?=[_ ]?150|response[_ ]rate)",
+        "sample_size_numbers_mentioned_any_of": [150, 61]
+      },
+      "description": "Sample: 150 Japanese manufacturers; 61% response rate"
+    }
+  ]
+}

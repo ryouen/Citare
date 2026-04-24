@@ -1,0 +1,53 @@
+{
+  "paper_doi": "10.9999/trap.2024.003",
+  "paper_title": "Education Level and Job Satisfaction",
+  "paper_author_year": "O'Reilly & Rao 2023 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "Classic effect_disappears_under_control: Model 1 education B=.22 p<.001; Model 2 with income control drops to B=.03 p=.46. Discussion ignores this and says 'Education has a strong positive effect on job satisfaction'. Must catch incompleteness_category=effect_disappears_under_control.",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Paper is empirical (cross-sectional regression)"
+    },
+    {
+      "key": "paper_default_cross_sectional",
+      "where": "paper.default_causal_strength",
+      "weight": 1.0,
+      "must_have": {"design_basis": "cross_sectional"},
+      "description": "Paper is cross-sectional (2022 NLFS, single wave)"
+    },
+    {
+      "key": "rel_education_to_satisfaction",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "must_have": {
+        "iv_regex": "education",
+        "dv_regex": "(job[_ ]satisfaction|satisfaction)",
+        "relation": "positive"
+      },
+      "description": "Core bivariate relation: education -> job satisfaction (Model 1)"
+    },
+    {
+      "key": "incompleteness_effect_disappears_CRITICAL",
+      "where": "claim_relations or claim-level incompleteness_category",
+      "weight": 3.0,
+      "must_have": {
+        "incompleteness_category_include": ["effect_disappears_under_control"]
+      },
+      "description": "CRITICAL TRAP: effect attenuates from B=.22 p<.001 to B=.03 p=.46 with income control. Must flag as effect_disappears_under_control."
+    },
+    {
+      "key": "exist_sample_8421",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(sample|employees|N[_ ]?=[_ ]?8[,_]?421)",
+        "sample_size_numbers_mentioned_any_of": [8421, "8,421"]
+      },
+      "description": "Sample: 8,421 full-time employees from 2022 NLFS"
+    }
+  ]
+}

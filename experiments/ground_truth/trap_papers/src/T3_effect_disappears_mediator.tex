@@ -1,0 +1,41 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\title{Education Level and Job Satisfaction: Evidence from a National Labor Force Survey}
+\author{Michael O'Reilly \and Priya Rao}
+\date{2023}
+\begin{document}
+\maketitle
+\noindent DOI (synthetic): 10.9999/trap.2024.003
+
+\begin{abstract}
+Using cross-sectional data from the 2022 National Labor Force Survey ($N = 8,421$ full-time employees), we examine the relationship between education level and job satisfaction. We find a robust bivariate association that attenuates to insignificance once income is controlled.
+\end{abstract}
+
+\section{Method}
+Participants were 8,421 full-time employees drawn from the 2022 National Labor Force Survey. Education was coded as years of completed schooling. Job satisfaction was measured with the 5-item Brayfield-Rothe Job Satisfaction Index ($\alpha = 0.84$). Annual income (pre-tax, USD) was recorded from tax records.
+
+\section{Results}
+Regression models are shown in Table 1.
+
+\begin{table}[h]
+\centering
+\caption{Regression of job satisfaction on education and income}
+\begin{tabular}{lcc}
+\toprule
+Predictor & Model 1: Education only & Model 2: + Income \\
+\midrule
+Education (years) & $B = 0.22$ (SE=.04), $p < .001$ & $B = 0.03$ (SE=.04), $p = .46$ \\
+Income (log USD) & --- & $B = 0.41$ (SE=.05), $p < .001$ \\
+\midrule
+Adj.\ $R^2$ & 0.09 & 0.23 \\
+$N$ & 8{,}421 & 8{,}421 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+\textbf{Education has a strong positive effect on job satisfaction.} Higher-educated workers report greater satisfaction from their work, reflecting intrinsic cognitive engagement and opportunities for meaningful contribution. Policymakers should invest in higher education as a route to workplace well-being.
+
+\end{document}

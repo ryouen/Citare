@@ -1,0 +1,46 @@
+{
+  "paper_doi": "10.9999/trap.2024.002",
+  "paper_title": "Employee Well-being and Workplace Attendance: A Longitudinal Study",
+  "paper_author_year": "Miller & Thompson 2024 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "Method measures ONLY life satisfaction (SWLS). Discussion generalizes to 'well-being programs' (emotional, psychological, social). Faithful extractor must record DV as life_satisfaction (NOT wellbeing) and should distinguish measured-dv from Discussion-framed construct.",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Paper is empirical (longitudinal observational)"
+    },
+    {
+      "key": "rel_swls_to_attendance",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "must_have": {
+        "iv_regex": "(life[_ ]satisfaction|swls|satisfaction[_ ]with[_ ]life)",
+        "dv_regex": "attendance",
+        "relation": "positive"
+      },
+      "description": "CRITICAL TRAP: IV must be life_satisfaction / SWLS, NOT 'well-being'. The paper only measured SWLS, a single construct."
+    },
+    {
+      "key": "measurement_method_swls",
+      "where": "measurement_methods",
+      "weight": 1.0,
+      "must_have": {
+        "measures_regex": "(life[_ ]satisfaction|swls|satisfaction[_ ]with[_ ]life)"
+      },
+      "description": "Life satisfaction measured with SWLS (Diener 1985)"
+    },
+    {
+      "key": "exist_sample_412",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(sample|N[_ ]?=[_ ]?412|employees)",
+        "sample_size_numbers_mentioned_any_of": [412]
+      },
+      "description": "Sample: 412 financial services employees"
+    }
+  ]
+}

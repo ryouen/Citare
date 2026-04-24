@@ -1,0 +1,66 @@
+{
+  "paper_doi": "10.9999/trap.2024.004",
+  "paper_title": "Sparse Transformer with Locality-Biased Attention for Document Classification",
+  "paper_author_year": "Anon 2024 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "ML benchmark paper with 5 baselines (Longformer, BigBird, Linformer, Performer, vanilla Transformer) and 2 ablations (no locality bias, no sparse kernel). Contains one locality-biased attention equation. Test: can the extractor capture the benchmark structure and the attention equation in LaTeX?",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_empirical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["empirical"]},
+      "description": "Paper is empirical (computational benchmark)"
+    },
+    {
+      "key": "paper_default_computational",
+      "where": "paper.default_causal_strength",
+      "weight": 1.0,
+      "must_have": {
+        "design_basis": "computational_demonstration"
+      },
+      "description": "Computational demonstration on benchmarks"
+    },
+    {
+      "key": "def_locality_biased_attention",
+      "template_type": "DEFINITION",
+      "weight": 2.0,
+      "must_have": {
+        "concept_regex": "(locality[_ ]bias|locality[_ ]biased[_ ]attention|sparse[_ ]transformer)",
+        "key_elements_include_any_of": ["softmax", "Q", "K", "bias", "locality"]
+      },
+      "description": "Definition of the proposed method with its attention modification"
+    },
+    {
+      "key": "rel_ours_vs_baselines",
+      "template_type": "RELATION",
+      "weight": 2.0,
+      "must_have": {
+        "iv_regex": "(locality[_ ]bias|ours|sparse[_ ]transformer|our[_ ]method)",
+        "dv_regex": "(f1|hypernews|performance|classification)",
+        "relation": "positive"
+      },
+      "description": "Claim: our method outperforms baselines on HyperNews-10K F1"
+    },
+    {
+      "key": "exist_sota_hypernews",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(sota|state.of.the.art|hypernews|81\\.4|best)",
+        "source_text_contains_any_of": ["81.4", "HyperNews", "SOTA", "best"]
+      },
+      "description": "Achieves 81.4 F1 on HyperNews-10K, beating all 5 baselines"
+    },
+    {
+      "key": "exist_memory_reduction",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(memory|efficiency|38%)",
+        "source_text_contains_any_of": ["38", "memory"]
+      },
+      "description": "38% memory reduction vs BigBird"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "paper_doi": "10.9999/trap.2024.006",
+  "paper_title": "A Variational Bound on Generalization Error for Stochastic Neural Networks",
+  "paper_author_year": "Anon 2024 (SYNTHETIC TRAP)",
+  "source": "synthetic trap paper authored for Citare stress test on 2026-04-23",
+  "trap_description": "Theoretical paper (PAC-Bayesian bound). Three equations: (1) main PAC-Bayesian bound with sqrt(KL + log(2sqrt(n)/delta) / 2n), (2) asymptotic O(sqrt(KL/n)), (3) Gaussian posterior KL closed form. Test: all three equations captured as valid LaTeX (with \\mathrm{KL}, \\sqrt{}, \\sum, \\log, \\mathcal{N}, etc.).",
+  "must_catch_claims": [
+    {
+      "key": "paper_type_theoretical",
+      "where": "paper.paper_type",
+      "weight": 1.0,
+      "must_have": {"value_include": ["conceptual", "theoretical"]},
+      "description": "Paper is theoretical (derivation only, no experiments)"
+    },
+    {
+      "key": "paper_default_theoretical",
+      "where": "paper.default_causal_strength",
+      "weight": 1.0,
+      "must_have": {
+        "design_basis": "theoretical"
+      },
+      "description": "Theoretical derivation, not empirical"
+    },
+    {
+      "key": "def_pac_bayesian_bound",
+      "template_type": "DEFINITION",
+      "weight": 2.0,
+      "must_have": {
+        "concept_regex": "(pac[_\\- ]?bayes|pac[_\\- ]?bayesian|generalization[_ ]bound|variational[_ ]bound)",
+        "key_elements_include_any_of": ["KL", "posterior", "prior", "kl", "divergence"]
+      },
+      "description": "Main PAC-Bayesian generalization bound"
+    },
+    {
+      "key": "rel_kl_to_generalization_gap",
+      "template_type": "RELATION",
+      "weight": 1.0,
+      "must_have": {
+        "iv_regex": "(kl|divergence|KL|posterior)",
+        "dv_regex": "(generalization|bound|risk|gap)"
+      },
+      "description": "KL(Q||P) bounds the generalization gap"
+    },
+    {
+      "key": "formal_bound_equation",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 2.0,
+      "must_have": {
+        "phenomenon_regex": "(bound|inequality|theorem|equation|variational|pac)",
+        "source_text_contains_any_of": ["KL", "sqrt", "\\\\sqrt", "\\\\mathrm", "2n", "\\\\log"]
+      },
+      "description": "Main bound with sqrt((KL + log(2sqrt(n)/delta)) / 2n) — must appear somewhere as LaTeX or source_text"
+    },
+    {
+      "key": "formal_gaussian_kl_equation",
+      "template_type": "EXISTENCE_CLAIM",
+      "weight": 1.0,
+      "must_have": {
+        "phenomenon_regex": "(gaussian|closed[_\\- ]form|specialization|normal)",
+        "source_text_contains_any_of": ["Sigma", "\\\\Sigma", "tr", "\\\\mathrm{tr}", "mu", "\\\\mu", "log"]
+      },
+      "description": "Closed-form Gaussian posterior KL"
+    }
+  ]
+}

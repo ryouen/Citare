@@ -292,41 +292,56 @@ def _norm_latex(s: str) -> str:
 
 
 def _collect_equations(extraction: dict) -> list[dict]:
-    """Collect equations from an extraction's claims in whichever shape they appear.
+    """Collect equations from an extraction in whichever shape they appear.
 
-    Handles three shapes observed in practice:
-      (a) formal.equations = [{latex, variables, ...}, ...]   <- v0.11, v0.12e schema form
-      (b) formal.equations = ["\\eta_c = ...", ...]             <- v0.12g terse priming
-      (c) l3_json.equations = [...]                              <- some variants skip `formal`
-      (d) l3_json.formal.equations = [...]                       <- deep nesting
+    Handles five shapes observed in practice:
+      (a) claim.l0_json.formal.equations = [{latex, ...}, ...]
+      (b) claim.l3_json.formal.equations = [{latex, ...}, ...]
+      (c) claim.l3_json.equations = [...]                       <- some variants skip `formal`
+      (d) Flat list of strings: formal.equations = ["\\eta_c = ...", ...]  <- v0.12g terse
+      (e) **Top-level formal.equations** (NOT inside a claim)   <- V2/V8 from L8 family
     """
     out = []
+
+    def _emit(items, claim_id, where):
+        for e in items or []:
+            if isinstance(e, dict):
+                latex = e.get("latex") or ""
+                name = e.get("name") or ""
+            elif isinstance(e, str):
+                latex = e; name = ""
+            else:
+                continue
+            out.append({
+                "claim_id": claim_id,
+                "where": where,
+                "latex": latex,
+                "name": name,
+                "normalized": _norm_latex(latex),
+            })
+
+    # Shapes a-d: per-claim
     for c in extraction.get("claims", []) or []:
         for lk in ("l0_json", "l3_json"):
             blk = c.get(lk) or {}
             if not isinstance(blk, dict):
                 continue
-            # shape (a)/(b)/(d): via formal
             formal = blk.get("formal") or {}
-            eqs = formal.get("equations") or []
-            # shape (c): equations directly under l3_json
-            eqs += blk.get("equations") or [] if lk == "l3_json" else []
-            for e in eqs:
-                if isinstance(e, dict):
-                    latex = e.get("latex") or ""
-                    name = e.get("name") or ""
-                elif isinstance(e, str):
-                    latex = e
-                    name = ""
-                else:
-                    continue
-                out.append({
-                    "claim_id": c.get("id"),
-                    "where": lk,
-                    "latex": latex,
-                    "name": name,
-                    "normalized": _norm_latex(latex),
-                })
+            _emit(formal.get("equations"), c.get("id"), lk)
+            if lk == "l3_json":
+                _emit(blk.get("equations"), c.get("id"), lk)
+
+    # Shape e: extraction-level formal.equations (V2 family)
+    top_formal = extraction.get("formal") or {}
+    if isinstance(top_formal, dict):
+        _emit(top_formal.get("equations"), "(extraction-level)", "extraction.formal")
+    # Some variants nest under paper.formal
+    paper = extraction.get("paper") or {}
+    if isinstance(paper, dict):
+        p_formal = paper.get("formal") or {}
+        if isinstance(p_formal, dict):
+            _emit(p_formal.get("equations"), "(paper-level)", "paper.formal")
+
     return out
 
 
@@ -347,6 +362,58 @@ def check_equation(eqs: list[dict], spec: dict) -> tuple[float, str]:
     if best_eq is None:
         return 0.0, f"0/{len(required)} tokens — no equations captured"
     return frac, f"{best_found}/{len(required)} tokens via {best_eq['claim_id']} ({best_eq.get('name')!r})"
+
+
+def _reference_metrics(extraction: dict) -> dict:
+    """Compute reference-side metrics that are independent of the claim Gold.
+
+    - ``refs_total``: number of paper_references entries the extractor emitted
+    - ``refs_with_doi``: count where cited_doi is non-null
+    - ``refs_with_raw``: count where raw_reference_text is non-null (v0.13+)
+    - ``refs_parsed_identifier``: count where the deterministic parser could
+      extract a DOI or arXiv id from whichever field had text
+    - ``identifier_preservation``: refs_parsed_identifier / refs_total
+    """
+    import re
+    # Lazy-import parser so this module stays self-contained if parser is missing
+    try:
+        from citare_db.parser import parse as _parse_ref
+    except ImportError:  # pragma: no cover — fallback
+        _parse_ref = None
+
+    refs = extraction.get("paper_references") or []
+    n = len(refs)
+    if n == 0:
+        return {
+            "refs_total": 0,
+            "refs_with_doi": 0,
+            "refs_with_raw": 0,
+            "refs_parsed_identifier": 0,
+            "identifier_preservation": None,
+        }
+    with_doi = with_raw = parsed_id = 0
+    for r in refs:
+        if r.get("cited_doi"):
+            with_doi += 1
+        raw = r.get("raw_reference_text") or ""
+        text = raw if raw else (r.get("cited_title") or "")
+        if raw:
+            with_raw += 1
+        if _parse_ref and text:
+            p = _parse_ref(text)
+            if p.doi or p.arxiv:
+                parsed_id += 1
+        else:
+            # Fallback: look for 10.xxxx/ or arXiv: in raw text
+            if re.search(r"10\.\d{4,9}/|arxiv", text, re.IGNORECASE):
+                parsed_id += 1
+    return {
+        "refs_total": n,
+        "refs_with_doi": with_doi,
+        "refs_with_raw": with_raw,
+        "refs_parsed_identifier": parsed_id,
+        "identifier_preservation": round(parsed_id / n, 4),
+    }
 
 
 def score(extraction_path: Path, gold_path: Path) -> dict:
@@ -476,7 +543,9 @@ def score(extraction_path: Path, gold_path: Path) -> dict:
             "core_eq_fidelity": round(core_scored / core_total, 4) if core_total > 0 else 0.0,
             "eq_discipline": round(eq_discipline, 4) if eq_discipline is not None else None,
             "middle_coverage": round(middle_scored / middle_total, 4) if middle_total > 0 else 0.0,
+            "ref_identifier_preservation": _reference_metrics(extraction)["identifier_preservation"],
         },
+        "ref_metrics": _reference_metrics(extraction),
         "decorative_expected": decorative_expected,
         "decorative_extracted": decorative_extracted,
         "coverage_score": round(scored_weight / total_weight, 4) if total_weight > 0 else 0.0,

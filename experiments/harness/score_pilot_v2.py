@@ -17,16 +17,20 @@ from score_against_gold import score  # type: ignore
 
 # Pilot matrix: variant × paper × all run-id prefixes that populate each cell
 CELLS: dict[tuple[str, str], list[str]] = {
-    # (variant, paper) -> list of run-id substrings
-    ("v0.3",  "T7"):        ["R38B_v03_trap_T7", "R41E_v03_T7_s2"],
-    ("v0.3",  "einstein"):  ["R41A_v03_einstein_s1", "R41B_v03_einstein_s2"],
-    ("v0.3",  "edmondson"): ["R41C_v03_edmondson_s1", "R41D_v03_edmondson_s2"],
-    ("v0.11", "T7"):        ["R38D_v11_trap_T7", "R41F_v11_T7_s2"],
-    ("v0.11", "einstein"):  ["R36A_v11_einstein", "R41G_v11_einstein_s2"],
-    ("v0.11", "edmondson"): ["R36D_v11_edmondson", "R41H_v11_edmondson_s2"],
-    ("v0.12e","T7"):        ["R39E_v12e_status_T7", "R41I_v12e_T7_s2"],
-    ("v0.12e","einstein"):  ["R40A_v12e_einstein", "R41J_v12e_einstein_s2"],
-    ("v0.12e","edmondson"): ["R40B_v12e_edmondson", "R41K_v12e_edmondson_s2"],
+    # (variant, paper) -> list of run-id substrings (N=3 where available)
+    ("v0.3",  "T7"):        ["R38B_v03_trap_T7", "R41E_v03_T7_s2", "R43D_v03_T7_s3"],
+    ("v0.3",  "einstein"):  ["R41A_v03_einstein_s1", "R41B_v03_einstein_s2", "R43L_v03_einstein_s3"],
+    ("v0.3",  "edmondson"): ["R41C_v03_edmondson_s1", "R41D_v03_edmondson_s2", "R43M_v03_edmondson_s3"],
+    ("v0.11", "T7"):        ["R38D_v11_trap_T7", "R41F_v11_T7_s2", "R43E_v11_T7_s3"],
+    ("v0.11", "einstein"):  ["R36A_v11_einstein", "R41G_v11_einstein_s2", "R43N_v11_einstein_s3"],
+    ("v0.11", "edmondson"): ["R36D_v11_edmondson", "R41H_v11_edmondson_s2", "R43O_v11_edmondson_s3"],
+    ("v0.12e","T7"):        ["R39E_v12e_status_T7", "R41I_v12e_T7_s2", "R43F_v12e_T7_s3"],
+    ("v0.12e","einstein"):  ["R40A_v12e_einstein", "R41J_v12e_einstein_s2", "R43P_v12e_einstein_s3"],
+    ("v0.12e","edmondson"): ["R40B_v12e_edmondson", "R41K_v12e_edmondson_s2", "R43Q_v12e_edmondson_s3"],
+    # v0.13 added with N=3
+    ("v0.13", "T7"):        ["R43A_v13_T7_s1", "R43B_v13_T7_s2", "R43C_v13_T7_s3"],
+    ("v0.13", "einstein"):  ["R43G_v13_einstein_s1", "R43H_v13_einstein_s2", "R43I_v13_einstein_s3"],
+    ("v0.13", "edmondson"): ["R42B_v13_edmondson", "R43J_v13_edmondson_s2", "R43K_v13_edmondson_s3"],
 }
 
 # Which gold file to use per paper

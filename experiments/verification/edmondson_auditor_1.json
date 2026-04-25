@@ -1,0 +1,47 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145953Z_R41C_v03_edmondson_s1\\extraction.json",
+  "paper_title": "Psychological Safety and Learning Behavior in Work Teams (Edmondson, 1999, ASQ)",
+  "auditor_id": "edmondson_auditor_1",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "edmondson1999_exist6 / measurement_methods (alphas on Table 2 diagonal)",
+      "verified": "All Cronbach alphas on Table 2 diagonal (p.363) are correctly attributed to their respective constructs: context support .65, team leader coaching .80, team psychological safety .82, team efficacy .63, team learning behavior (self) .78, team performance (self) .76, internal motivation .64, team learning (observer) .84, team performance (observer) .87. Critically, alpha=.82 is correctly assigned to team_psychological_safety (NOT to learning behavior) and alpha=.78 is correctly assigned to team_learning_behavior. PDF Table 2 verbatim: 'Team psychological safety ... .82' and 'Team learning behavior ... .78'."
+    },
+    {
+      "claim_id": "edmondson1999_rel3 (H3 mediation)",
+      "verified": "H3 mediation result is captured exactly. PDF p.367-368: 'the contribution of team psychological safety becomes insignificant (B = .25, p = .42) when entered into the regression model together with team learning, which remains significant (B = .60, p < .05).' Extraction records direct_effect_with_mediator=0.25, direct_p_with_mediator=0.42, mediator_effect_with_iv=0.60, mediator_p='<.05'. Direct_effect_before_mediator=0.67 matches Table 4 Model 4 (PS coefficient .67**). IV→DV→mediator roles correct: PS is IV, performance is DV, learning behavior is mediator."
+    },
+    {
+      "claim_id": "edmondson1999_exist4 (sample sizes)",
+      "verified": "PDF p.362: 'In total, 427 team members from 51 teams completed the surveys, an 86-percent response rate; of these 51 teams, 90 percent of members responded ... 135 of the 150 observers surveyed returned the survey, a 91-percent response rate.' All five numbers (427, 51, 86%, 90%, 135/150 = 91%) match extraction exactly."
+    },
+    {
+      "claim_id": "edmondson1999_rel1 (H1: learning→performance)",
+      "verified": "Table 4 Model 1 (p.368): Team learning behavior B=.80**, adj R²=.26, N=51. Extraction matches. IV (learning behavior) and DV (observer-rated performance) correctly oriented per PDF p.365: 'regressing team learning (self-reported) on team performance (observer-rated) reveals that learning behavior is a significant predictor of team performance, supporting H1.'"
+    },
+    {
+      "claim_id": "edmondson1999_rel2 (H2: PS→learning)",
+      "verified": "Table 5 Panel A Model 1 (p.368): PS B=.76**, adj R²=.63. Panel B Model 1: B=.46**, adj R²=.35. Both match extraction. IV (PS) and DV (learning behavior) correctly oriented."
+    },
+    {
+      "claim_id": "edmondson1999_rel6 / rel7 (H6: context support + coaching → PS)",
+      "verified": "Table 6 condition 2 (p.368): context support B=.56, t=3.82, p<.001; team leader coaching B=.33, t=1.89, p=.06. Both match extraction. PDF text confirms: 'context support was significant and team leader coaching was close to significant (condition 2).'"
+    },
+    {
+      "claim_id": "study_design (paper.default_method)",
+      "verified": "Correctly classified as 'cross-sectional multimethod field study (survey + qualitative interviews/observation)' — NOT RCT or longitudinal. Confirmed by PDF p.379: 'The cross-sectional survey design prevented a demonstration of causality.' Phase 1/2/3 design (qualitative observation, surveys, follow-up qualitative) matches multimethod label."
+    },
+    {
+      "claim_id": "edmondson1999_rel10 (H8 NOT supported)",
+      "verified": "Correctly captured as null. PDF p.368: 'In contrast, the results shown in table 7 do not support H8, that team efficacy functions as a mediator. Team efficacy predicted observer-rated team learning behavior, but of the two independent variables, only context support predicted the proposed mediator, team efficacy.' Table 7 confirms team leader coaching → team efficacy: B=.01, p=.95."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 31,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

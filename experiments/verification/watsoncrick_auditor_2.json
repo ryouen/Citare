@@ -1,0 +1,39 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_watsoncrick_s1\\extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+  "auditor_id": "watsoncrick_auditor_2",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_exist2",
+      "what_extractor_says": "verification_status: 'verified_in_paper' for the geometric parameters (3.4 A residue spacing, 36 degree angle, 34 A repeat, 10 A phosphorus radius).",
+      "what_paper_says": "Page 737: 'There is a residue on each chain every 3.4 A. in the z-direction. We have ASSUMED an angle of 36 degrees between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A.' These parameters are assumptions/postulates of the proposed model, not empirically verified findings of this paper. The whole communication is explicitly framed as 'we wish to suggest a structure' and is later described as 'unproved until it has been checked against more exact results.' Status should be 'proposed_in_paper'.",
+      "severity": "medium",
+      "evidence_quote": "We have assumed an angle of 36 degrees between adjacent residues in the same chain... it must be regarded as unproved until it has been checked against more exact results."
+    },
+    {
+      "category": 4,
+      "claim_id": "watson1953_exist3",
+      "what_extractor_says": "verification_status: 'verified_in_paper' for the Chargaff base-ratio observation (A/T ~1, G/C ~1).",
+      "what_paper_says": "Page 737: 'It has been found experimentally [refs 3,4 = Chargaff/Zamenhof and Wyatt] that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' This empirical fact is cited from Chargaff and Wyatt — it is NOT verified IN this paper; it is cited from prior work. A more accurate status would be 'cited_from_prior_work' or similar; 'verified_in_paper' wrongly implies Watson and Crick themselves measured/verified it.",
+      "severity": "medium",
+      "evidence_quote": "It has been found experimentally [3,4] that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid."
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "watson1953_exist6", "verified": "The 'copying mechanism' sentence is captured verbatim ('It has not escaped our notice that the specific pairing we have postulated immediately suggests a possible copying mechanism for the genetic material.'). Marked verification_status='proposed_in_paper' and the paper-level default_causal_strength.author_framing='suggestive' — correctly framed as proposal, not proven mechanism. Page 737 confirms 'suggests a possible'."},
+    {"claim_id": "watson1953_exist1", "verified": "Pauling and Corey three-chain model (phosphates near fibre axis, bases outside) and the two specific objections (no acidic H to bind structure; some van der Waals distances too small) are correctly attributed to Pauling and Corey on p.737. Reference [1] = 'Pauling, L., and Corey, R. B., Nature, 171, 346 (1953)' matches PDF reference list."},
+    {"claim_id": "watson1953_def1", "verified": "Source_text quote verbatim matches PDF p.737 including beta-D-deoxyribofuranose, 3',5' linkages, dyad perpendicular to fibre axis, right-handed helices, antiparallel chains. Distinguished_from correctly lists Pauling/Corey, Fraser, and Furberg models — all three alternative models named on p.737."},
+    {"claim_id": "watson1953_def2", "verified": "Base-pairing definition source_text matches PDF verbatim. Hydrogen bond positions (purine 1 - pyrimidine 1; purine 6 - pyrimidine 6) and keto-tautomer assumption correctly captured."},
+    {"claim_id": "watson1953_rel1", "verified": "Tautomeric form -> allowable base pairs relation: source_text verbatim from PDF p.737. Marked 'proposed_in_paper' — correct, since the pairing rules are derived from the keto-tautomer assumption, not empirically demonstrated in this Nature note."},
+    {"claim_id": "watson1953_exist5", "verified": "X-ray data insufficient / structure unproved framing: source_text verbatim from PDF. Properly marked 'proposed_in_paper'. Authors explicitly state structure 'must be regarded as unproved'."},
+    {"claim_id": "paper_references", "verified": "All 6 references in extraction match PDF p.738 reference list verbatim: [1] Pauling & Corey Nature 171, 346 (1953) + PNAS 39, 84 (1953); [2] Furberg Acta Chem. Scand. 6, 634 (1952); [3] Chargaff via Zamenhof, Brawerman, Chargaff, Biochim. et Biophys. Acta 9, 402 (1952); [4] Wyatt J. Gen. Physiol. 36, 201 (1952); [5] Astbury Symp. Soc. Exp. Biol. 1, 66 (1947); [6] Wilkins & Randall Biochim. et Biophys. Acta 10, 192 (1953)."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 7,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

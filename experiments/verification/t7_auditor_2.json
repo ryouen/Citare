@@ -1,0 +1,65 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004158Z_R44_v20v2_T7_s1\\extraction.json",
+  "paper_title": "More Data, Worse Models: Non-Monotonic Scaling under Long-Tail Label Noise",
+  "auditor_id": "t7_auditor_2",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "okafor2024_exist11",
+      "what_extractor_says": "source_section is '7 Limitations: Cross-sectional pilot / Appendix D' and source_text contains 'No experiment was re-run after initial reporting; reported numbers reflect the first-and-only completed run per configuration.'",
+      "what_paper_says": "The 'Cross-sectional pilot' subsection of Section 7 (p.15) only states 'Our training runs are conducted as a single, per-configuration optimisation to convergence; we do not study multi-pass effects across training epochs, and we do not examine the interaction of the crossover with ongoing curriculum learning or self-training strategies.' The sentence about 'No experiment was re-run after initial reporting; reported numbers reflect the first-and-only completed run per configuration' is found ONLY in Appendix D (p.18), not in Section 7. Splicing across sections is acknowledged in source_section but the spliced quote is presented as one continuous source_text.",
+      "severity": "low",
+      "evidence_quote": "Appendix D, p.18: 'No experiment was re-run after initial reporting; reported numbers reflect the first-and-only completed run per configuration.' Section 7 Cross-sectional pilot, p.15: 'Our training runs are conducted as a single, per-configuration optimisation to convergence; we do not study multi-pass effects across training epochs...'"
+    },
+    {
+      "category": 6,
+      "claim_id": "formal.equations[1]",
+      "what_extractor_says": "name field is 'Theorem 4: Crossover condition (eq. 5)' — labels the crossover-condition theorem as Theorem 4.",
+      "what_paper_says": "The PDF (p.10) does indeed label the crossover-condition statement 'Theorem 4 (Crossover condition)'. This is verified, but it is somewhat unusual numbering — the only other numbered theorem is Theorem 1 and the auxiliary results are Lemma 2 and Lemma 3 (no Theorems 2 or 3 visible). The extraction faithfully reproduces the PDF's idiosyncratic numbering, so this is NOT an error — flagging only as a cross-check confirmation that the 'Theorem 4' label was deliberately copied from the source rather than a typo.",
+      "severity": "low",
+      "evidence_quote": "p.10: 'Theorem 4 (Crossover condition). Under the assumptions of Theorem 1, the crossover point n* satisfies n* = (η_tail/η_c)^(-1/τ) · κ(||f||_H)'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "okafor2024_rel1 / okafor2024_exist3",
+      "verified": "Table 2 (p.9) confirms n=500K→41.5%, 800K→37.2%, 1.2M→34.7%, 2M→36.0%, 3M→37.4%, 4M→38.2%; monotonic prediction at 4M = 26.9% (gap 11.3pp). All numbers in extraction's l3_json models[] match exactly. n*≈1.2M and minimum 34.7% correctly attributed to ImageNet-LT/ResNet-50."
+    },
+    {
+      "claim_id": "okafor2024_rel4 (capacity)",
+      "verified": "Table 3 (p.10) confirms ResNet-50/25.6M params/n*=1.20M/error 34.7%; ResNet-152/60.2M/n*=0.75M/error 35.1%; ViT-B/16/86.6M/n*=0.90M/error 33.9%. Extraction correctly attributes n*=1.2M to ResNet-50 (not ResNet-152 or ViT-B/16); n*=0.75M to ResNet-152; n*=0.9M to ViT-B/16. No ResNet-50/152/ViT-B/16 mix-up. Supplementary architectures (ResNet-101 0.95M, Swin-T 1.05M, Swin-S 0.80M, EfficientNet-B3 1.10M) match Section 5.4 (p.13)."
+    },
+    {
+      "claim_id": "okafor2024_def2",
+      "verified": "Definition 2 (p.5) confirms η_c=η_head for c∈H_head, η_c=η_tail for c∈T, with 0≤η_head<η_tail<1/2. Direction is correct: tail noise rate is HIGHER than head noise rate. Section 4.1 (p.8) confirms calibration η_head=0.05 and η_tail=0.28 (ImageNet-LT, Places-LT). Extraction preserves this direction throughout."
+    },
+    {
+      "claim_id": "formal.equations[0] (Theorem 1, eq. 3)",
+      "verified": "PDF p.6 Theorem 1 statement 'E[L(f)] ≤ L̂_n(f) + sqrt(2 ln(2/δ)/n_eff(η,τ)) + Σ_{c∈T} η_c w_c' matches extraction LaTeX exactly. equation_status='central_contribution' is appropriate (Section 3.4 'main theoretical contribution'). Distinct from Theorem 4 (eq. 5) for crossover condition."
+    },
+    {
+      "claim_id": "formal.equations[1] (Theorem 4 / eq. 5 crossover)",
+      "verified": "PDF p.10 equation (5) 'n* = (η_tail/η_c)^(-1/τ) · κ(||f||_H)' matches extraction LaTeX exactly. Theorem 1 (PAC-Bayes bound) and Theorem 4 (crossover condition) are clearly distinct equations, correctly separated in the extraction."
+    },
+    {
+      "claim_id": "okafor2024_exist8",
+      "verified": "Appendix C (p.18) confirms ImageNet-LT n=500K, η_tail=0.28, τ=2.1: Pure Rademacher >100% (vacuous); Natarajan 51.8%; Theorem 1 43.9%; empirical 41.5%. All values correctly attributed."
+    },
+    {
+      "claim_id": "paper_references (Hestness/Kaplan/Hoffmann/Henighan)",
+      "verified": "PDF References (p.19): [1] Hestness et al. 2017 ✓ (extraction includes); [2] Kaplan et al. 2020 ✓ (extraction includes); [4] Hoffmann et al. 2022 ✓ (extraction includes); [3] T. Henighan et al. 'Scaling laws for autoregressive generative modeling' arXiv 2020 — PRESENT in PDF but MISSING from extraction's paper_references. Note: Henighan is also explicitly named in PDF p.2 ('hestness2017... kaplan2020... hoffmann2022 revisited the optimal allocation'); Henighan is in [3] but the body text on p.2 does not name Henighan. Still, Henighan IS in the PDF reference list as ref [3] and is OMITTED from the extraction's paper_references list. This is a minor incompleteness rather than a misattribution."
+    },
+    {
+      "claim_id": "okafor2024_rel2 (Appendix B sensitivity)",
+      "verified": "Appendix B (p.17) confirms ∂log n*/∂log η_tail = -1/τ; varying η_tail from 0.25 to 0.31 (+24%) reduced n* from 1.35M to 1.07M (-21%) for ImageNet-LT τ=2.1. Numbers and direction (negative relation between η_tail and n*) match extraction."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 30,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "notes": "Extraction is highly faithful to the PDF on all five focus areas: (1) specific numbers (n*=1.2M, 34.7→38.2%) cell-correct; (2) ResNet-50/152/ViT-B/16 results not mixed up — Table 3 mapping preserved; (3) tail noise η_tail=0.28 correctly higher than head η_head=0.05 throughout; (4) Theorem 1 (PAC-Bayes bound, eq. 3) and Theorem 4 (crossover condition, eq. 5) are kept as distinct equations with correct LaTeX; (5) Hestness, Kaplan, Hoffmann all present in paper_references — only Henighan (ref [3]) is missing from the extracted reference list, a minor omission. The single section-attribution issue (exist11 spliced from Section 7 + Appendix D) is acknowledged in the source_section field. No high-severity misattributions found."
+  }
+}

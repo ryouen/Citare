@@ -1,0 +1,52 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004759Z_R45_v0.12e_status_barney_s1\\extraction.json",
+  "paper_title": "Firm Resources and Sustained Competitive Advantage (Barney, 1991)",
+  "auditor_id": "barney_auditor_3",
+  "focus_areas": [
+    "Source_text verbatim fidelity",
+    "Concept naming consistency (sustained_competitive_advantage vs competitive_advantage; resource vs capability)",
+    "Strategy implementation vs RBV (not conflated)",
+    "Equations should be empty (no formal equations in Barney 1991)"
+  ],
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "barney1991_rel1",
+      "what_extractor_says": "source_page=112; source_text concatenates two passages: (a) 'The relationship between resource heterogeneity and immobility... is summarized in Figure Two.' (p.112) AND (b) 'Of course, not all firm resources hold the potential of sustained competitive advantages. To have this potential, a firm resource must have four attributes: (a) it must be valuable... (b) it must be rare... (c) it must be imperfectly imitable, and (d) there cannot be strategically equivalent substitutes...'",
+      "what_paper_says": "Passage (a) appears on p.112 (start of 'Applying the Framework' section). Passage (b) — the four-attribute enumeration — appears at the bottom of p.105 carrying onto p.106 (end of 'Firm Resources and Sustained Competitive Advantage' section), NOT on p.112. The two quoted sentences are from different sections separated by ~7 pages.",
+      "severity": "low",
+      "evidence_quote": "p.105-106: 'To have this potential, a firm resource must have four attributes: (a) it must be valuable, in the sense that it exploit opportunities and/or neutralizes threats in a firm's environment, (b) it must be rare among a firm's current and potential competition, (c) it must be imperfectly imitable, and (d) there cannot be strategically equivalent substitutes for this resource that are valuable but neither rare or imperfectly imitable.' (p.112: 'The relationship between resource heterogeneity and immobility; value, rareness, imitability, and substitutability; and sustained competitive advantage is summarized in Figure Two.')"
+    },
+    {
+      "category": 1,
+      "claim_id": "barney1991_def6",
+      "what_extractor_says": "source_text: '...these attributes only become resources when they exploit opportunities or neutralize threats in a firm's environment.' Page 106.",
+      "what_paper_says": "The actual phrasing on p.106 is: 'but these attributes only become resources when they exploit opportunities or neutralize threats in a firm's environment.' The extractor's quote drops the leading 'but' and replaces it with 'these', changing the connective. The first half of the source_text ('firm resources are valuable when they enable a firm to conceive of or implement strategies that improve its efficiency and effectiveness') is also a paraphrase — the paper's exact wording on p.106 is 'resources are valuable when they enable a firm to conceive of or implement strategies that improve its efficiency and effectiveness.' (without 'firm' prefix). Minor verbatim drift.",
+      "severity": "low",
+      "evidence_quote": "p.106: 'Firm resources can only be a source of competitive advantage or sustained competitive advantage when they are valuable. As suggested earlier, resources are valuable when they enable a firm to conceive of or implement strategies that improve its efficiency and effectiveness... Firm attributes may have the other characteristics that could qualify them as sources of competitive advantage (e.g., rareness, inimitability, non-substitutability), but these attributes only become resources when they exploit opportunities or neutralize threats in a firm's environment.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "barney1991_def1", "verified": "Source text verbatim match confirmed on p.101: 'In this article, firm resources include all assets, capabilities, organizational processes, firm attributes, information, knowledge, etc. controlled by a firm that enable the firm to conceive of and implement strategies that improve its efficiency and effectiveness (Daft, 1983).' Three categories (physical/human/organizational capital) and citations (Williamson 1975, Becker 1964, Tomer 1987) correctly attributed."},
+    {"claim_id": "barney1991_def2", "verified": "Verbatim quote of competitive_advantage definition confirmed on p.102: 'In this article, a firm is said to have a competitive advantage when it is implementing a value creating strategy not simultaneously being implemented by any current or potential competitors.' Concept clearly distinguished from sustained_competitive_advantage."},
+    {"claim_id": "barney1991_def3", "verified": "Source text correctly captures sustained competitive advantage equilibrium definition on p.102, including Lippman & Rumelt (1982), Rumelt (1984), and Hirshleifer (1982) citations. The 'does NOT refer to calendar time' clarification accurately reflects the paper's distinction from Jacobsen 1988 / Porter 1985."},
+    {"claim_id": "barney1991_def8", "verified": "Verbatim match on p.107 for imperfectly_imitable_resources definition and three sources (unique historical conditions, causal ambiguity, social complexity); Dierickx & Cool (1989) citation correctly attributed."},
+    {"claim_id": "barney1991_rel10", "verified": "Source text spanning p.112-113 confirmed. Citations Lorange (1980), Kudla (1980), Steiner (1979) correctly attributed. The null_effect framing for formal_strategic_planning → SCA matches Barney's argument."},
+    {"claim_id": "barney1991_exist4", "verified": "Verbatim match on p.103 for Schumpeterian Shocks claim; Barney 1986c, Rumelt & Wensley 1981, Schumpeter 1934/1950 all correctly attributed."},
+    {"claim_id": "barney1991_exist5", "verified": "Verbatim match on p.110 for physical_technology imitability claim; Hayes & Wheelwright (1984), Howell & Fleishman (1982), Wilkins (1989) citations correct."},
+    {"claim_id": "barney1991_rel14", "verified": "Verbatim match on p.116 for efficiency rents claim; Demsetz (1973) and Scherer (1980) correctly attributed."}
+  ],
+  "focus_findings": {
+    "concept_naming_consistency": "PASS. The extraction maintains rigorous distinction between firm_competitive_advantage (def2; rel3, rel4 with valuable/rare resources) and firm_sustained_competitive_advantage (def3; rel1, rel5, rel9 requiring all four VRIN attributes), exactly mirroring Barney's careful conceptual separation. 'Resource' is used as the primary unit; 'capability' appears only as one element inside the firm_resources definition list, faithfully reproducing Barney's enumeration ('all assets, capabilities, organizational processes, firm attributes, information, knowledge'). No conflation of resource vs capability detected.",
+    "strategy_implementation_vs_rbv": "PASS. The extraction correctly treats strategy implementation as the mechanism by which resources generate advantage (e.g., def1 'enable firm to conceive of and implement strategies') rather than as a separate construct. Strategic planning (rel10) and informal/emergent strategy-making (rel11) are correctly framed as candidate firm resources to be evaluated against the VRIN framework, not conflated with the RBV itself. Barney's distinction is preserved.",
+    "equations_empty": "PASS. The extraction contains no formal equations. Barney 1991 is a purely conceptual paper with no equations, only Figure One (SWOT) and Figure Two (the VRIN framework diagram); the absence of an equations field is correct.",
+    "source_text_verbatim": "MOSTLY PASS. 8/10 spot-checked source_texts are verbatim. Two minor issues: (a) rel1 concatenates passages from p.105/106 and p.112 without indicating the gap, mislabeling everything as p.112 (low severity); (b) def6 has minor wording drift ('these' vs 'but these', 'firm resources' vs 'resources')."
+  },
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

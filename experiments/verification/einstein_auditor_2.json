@@ -1,0 +1,70 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145946Z_R41A_v03_einstein_s1\\extraction.json",
+  "paper_title": "Zur Elektrodynamik bewegter Körper (Einstein 1905)",
+  "auditor_id": "einstein_auditor_2",
+  "audit_focus": [
+    "Lorentz vs Galilean transformation correctness",
+    "Relativity of simultaneity capture",
+    "Author framing (theoretical/postulated, not empirical RCT)",
+    "paper_references — sparse, no fabrications"
+  ],
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "einstein1905_exist6",
+      "what_extractor_says": "source_page=903, source_section='§4 / §5'; phenomenon='light_speed_V_plays_role_of_infinite_velocity_in_this_theory'",
+      "what_paper_says": "The quoted source_text actually spans TWO different locations: the 'Lichtgeschwindigkeit V durch Zusammensetzung mit einer Unterlichtgeschwindigkeit nicht geändert werden kann ... U=(V+w)/(1+w/V)=V' passage is on p.906 §5 (Additionstheorem); the 'Für Überlichtgeschwindigkeiten werden unsere Überlegungen sinnlos ... Lichtgeschwindigkeit in unserer Theorie physikalisch die Rolle der unendlich großen Geschwindigkeiten spielt' passage is on p.903 §4 (Physikalische Bedeutung). Two separate quotes were concatenated as if from one location.",
+      "severity": "low",
+      "evidence_quote": "p.903: 'Für Überlichtgeschwindigkeiten werden unsere Überlegungen sinnlos; wir werden übrigens in den folgenden Betrachtungen finden, daß die Lichtgeschwindigkeit in unserer Theorie physikalisch die Rolle der unendlich großen Geschwindigkeiten spielt.' p.906: 'Es folgt ferner, daß die Lichtgeschwindigkeit V durch Zusammensetzung mit einer ‚Unterlichtgeschwindigkeit‘ nicht geändert werden kann. Man erhält für diesen Fall: U = (V+w)/(1+w/V) = V.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "einstein1905_def4",
+      "verified": "Lorentz transformation equations correctly extracted from p.902: τ=β(t-vx/V²), ξ=β(x-vt), η=y, ζ=z, β=1/√(1-(v/V)²). Verbatim match with PDF. distinguished_from correctly lists 'galilean_transformation' AND 'lorentzs_original_transformation_with_undetermined_factor' — accurate distinction since Einstein derived φ(v)=1 (matching ψ in §6 / §3) whereas Lorentz's earlier derivation left it undetermined. NOT confused with Galilean."
+    },
+    {
+      "claim_id": "einstein1905_rel1",
+      "verified": "Relativity of simultaneity correctly captured at p.897 §2: 'Wir sehen also, daß wir dem Begriffe der Gleichzeitigkeit keine absolute Bedeutung beimessen dürfen, sondern daß zwei Ereignisse, welche, von einem Koordinatensystem aus betrachtet, gleichzeitig sind, von einem relativ zu diesem System bewegten System aus betrachtet, nicht mehr als gleichzeitige Ereignisse aufzufassen sind.' Verbatim match. IV (relative velocity) and DV (judgment of simultaneity) correctly oriented."
+    },
+    {
+      "claim_id": "einstein1905_def1",
+      "verified": "Operational definition of simultaneity at p.894 §1 correctly captured: synchronization condition t_B - t_A = t'_A - t_B and the universal constant 2·AB/(t'_A - t_A) = V. Verbatim match. Symmetry/transitivity also correctly noted (PDF p.894: '1. Wenn die Uhr in B synchron mit der Uhr in A läuft, so läuft die Uhr in A synchron mit der Uhr in B. 2. Wenn die Uhr in A sowohl mit der Uhr in B als auch mit der Uhr in C synchron läuft, so laufen auch die Uhren in B und C synchron relativ zueinander')."
+    },
+    {
+      "claim_id": "einstein1905_def2",
+      "verified": "Relativity principle as Postulate 1 correctly extracted at p.895 §2: 'Die Gesetze, nach denen sich die Zustände der physikalischen Systeme ändern, sind unabhängig davon, auf welches von zwei relativ zueinander in gleichförmiger Translationsbewegung befindlichen Koordinatensystemen diese Zustandsänderungen bezogen werden.' Verbatim match. distinguished_from correctly notes 'galilean_relativity_restricted_to_mechanics_only' — Einstein's key conceptual extension."
+    },
+    {
+      "claim_id": "einstein1905_rel2",
+      "verified": "Length contraction at p.903 §4 correctly captured. Equation L(v)=L_0·√(1-(v/V)²) accurately reflects Einstein's R·√(1-(v/V)²), R, R ellipsoid result. proof_type='derivation_from_lorentz_transformation' correctly attributes — NOT to Galilean kinematics."
+    },
+    {
+      "claim_id": "einstein1905_rel11",
+      "verified": "Longitudinal/transverse mass at p.919 §10 correctly extracted: m_long = μ/(1-(v/V)²)^(3/2), m_trans = μ/(1-(v/V)²). Verbatim match. The caveat about force-definition dependence ('bei anderer Definition der Kraft und der Beschleunigung andere Zahlen für die Massen') is correctly preserved in additional.caveat — important contextualization."
+    },
+    {
+      "claim_id": "paper_references",
+      "verified": "All 6 paper_references entries have cited_doi=null and use generic descriptive titles (Maxwell's electrodynamics, Lorentz's theory, Maxwell-Hertz equations, Doppler's principle, classical aberration, Newtonian mechanics). NO fabricated DOIs, NO invented author/year citations. Matches the actual paper which contains only ONE footnote (p.893 about simultaneity imprecision) and the Besso acknowledgement (p.921) — Einstein cites NO formal references in this 1905 paper. Sparse references correctly recognized."
+    },
+    {
+      "claim_id": "paper.default_method",
+      "verified": "study_design='theoretical_derivation_from_axioms', sample_size=null, paper_type='conceptual', author_framing='existence_proof'. Correctly identifies this as theoretical/postulated work, NOT empirical/RCT. No fabricated sample sizes or empirical statistics anywhere in extraction."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 30,
+    "claims_spot_checked": 8,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "low_severity_count": 1,
+    "verdict": "trustworthy",
+    "audit_notes": {
+      "lorentz_vs_galilean": "Lorentz transformation correctly identified throughout. Distinguished from Galilean in def4. Length contraction (rel2), time dilation (rel3), velocity composition (rel4), and field transformation (rel5) all correctly attribute proof_type to 'derivation_from_lorentz_transformation' — no confusion with Galilean kinematics.",
+      "simultaneity": "Relativity of simultaneity captured both as DEFINITION (def1, operational synchronization) and as RELATION (rel1, breakdown of absolute simultaneity under frame change). Both verbatim accurate.",
+      "author_framing": "Extraction correctly distinguishes Einstein's two postulates (def2, def3) as DEFINITIONS with verification_status=null (postulates aren't 'verified'), Introduction conjectures (exist1-4) as 'proposed_in_paper', and theoretical derivations (rel1-14, exist5-11) as 'verified_in_paper' (verified WITHIN the theoretical framework). The paper.default_causal_strength.author_framing='existence_proof' and paper_type='conceptual' correctly position this as theoretical rather than empirical. No misframing as RCT or empirical study.",
+      "references": "Sparse references correctly recognized — only generic background references (Maxwell, Lorentz, Doppler) with cited_doi=null. No fabricated citations. This matches the historical reality that Einstein's 1905 paper contains essentially no formal bibliography.",
+      "minor_issue": "exist6 concatenates two source quotes from p.903 (§4) and p.906 (§5) — semantically related but a source-section misclassification. Does not affect substantive correctness."
+    }
+  }
+}

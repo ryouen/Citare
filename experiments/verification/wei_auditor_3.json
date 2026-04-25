@@ -1,0 +1,48 @@
+{
+  "extraction_path": "D:/Dropbox/ai/CitareOpus47/experiments/runs/20260423T111148Z_R34A_v03_wei_stab1/extraction.json",
+  "paper_title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022, NeurIPS)",
+  "auditor_id": "wei_auditor_3",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "wei2022_rel1",
+      "verified": "All GSM8K accuracy values in l3_json.models match Table 1 (p.20) and Table 2 (p.21) verbatim: PaLM 540B standard=17.9, PaLM 540B CoT=56.9, PaLM 540B CoT+ext.calc=58.6, GPT-3 175B standard=15.6, GPT-3 175B CoT=46.9, Codex CoT=63.1, LaMDA 137B standard=6.5, LaMDA 137B CoT=14.3, UL2 20B CoT=4.4, prior best (Cobbe 2021) finetuned=55. Each (model, method, dataset) cell is correctly attributed. Source_text from abstract is verbatim."
+    },
+    {
+      "claim_id": "wei2022_rel12",
+      "verified": "External calculator post-processing accuracies all match Table 1 (p.20): PaLM 540B GSM8K CoT 56.9 -> +ext.calc 58.6; Codex GSM8K CoT 63.1 -> +ext.calc 65.4; LaMDA 137B CoT 14.3 -> +ext.calc 17.8. Source_text from Appendix B header on p.20 is verbatim."
+    },
+    {
+      "claim_id": "wei2022_rel9",
+      "verified": "Commonsense numbers (PaLM 540B StrategyQA CoT 75.6 vs prior SOTA 69.4; PaLM 540B Sports CoT 95.4 vs unaided human 84) faithfully reproduce the body text on p.7. Note: the paper's own Table 4 reports PaLM 540B StrategyQA CoT = 77.8 (slight inconsistency between body text and table), but the extractor faithfully copied the body-text figures and source_text quote, so this is not an extractor error."
+    },
+    {
+      "claim_id": "wei2022_exist9",
+      "verified": "Error categorization for PaLM 62B (20 semantic / 18 one-step / 7 other) and 540B fixes (6 / 12 / 4) match Appendix A.1 p.16 Figure 9 verbatim. Source_text and source_section both correct."
+    },
+    {
+      "claim_id": "wei2022_exist7",
+      "verified": "GSM8K LaMDA 137B manual analysis: 50 random correct examples, all chains logically/mathematically correct except 2 that coincidentally arrived at the correct answer. Verified verbatim on p.5."
+    },
+    {
+      "claim_id": "wei2022_exist8",
+      "verified": "GSM8K LaMDA 137B 50 wrong-answer samples: 46% almost correct, 54% major errors. Verified verbatim on p.5."
+    },
+    {
+      "claim_id": "wei2022_rel8",
+      "verified": "Robustness (Section 3.4) covers different annotators (A/B/C), concise style, and three randomly sampled GSM8K exemplar sets (alpha/beta/gamma). Source_text matches verbatim on p.6. The extraction correctly characterizes 'different prompt sets used as ablation/robustness check.'"
+    },
+    {
+      "claim_id": "paper.default_causal_strength",
+      "verified": "design_basis='computational_demonstration' is correct. The paper is a benchmark evaluation across five LLMs and multiple reasoning datasets (no RCT, no human subjects). author_framing='existence_proof' fits the paper's framing of CoT as an emergent ability that can be demonstrated by prompting off-the-shelf models."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "notes": "All spot-checked source_text quotes are verbatim from the PDF (verified pp.1-9, 16-22). All l3_json accuracy statistics in arithmetic-reasoning claims (rel1, rel12) precisely match Table 1 and Table 2 cells; (model, method, dataset) attribution is correct in every checked cell. design_basis is correctly 'computational_demonstration', not RCT. Robustness/ablation analyses (rel5, rel6, rel7, rel8) faithfully report null-effect findings for equation-only, variable-compute-only, reasoning-after-answer, and positive findings for different annotators/exemplar sets. The single internal inconsistency between body text (StrategyQA 75.6%) and Table 4 (77.8%) originates in the paper itself and is reproduced faithfully by the extractor in source_text, so it is not an extraction error."
+  }
+}

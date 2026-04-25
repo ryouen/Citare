@@ -1,0 +1,47 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_shannon_s1\\extraction.json",
+  "paper_title": "A Mathematical Theory of Communication",
+  "auditor_id": "shannon_auditor_3",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "shannon1948_def3",
+      "verified": "Discrete noiseless channel capacity C = Lim_{T->inf} log N(T)/T verified verbatim on p.3 in Section 1 'The Discrete Noiseless Channel'. Source_section and page correctly attributed to noiseless (not noisy) channel."
+    },
+    {
+      "claim_id": "shannon1948_def9",
+      "verified": "Noisy channel capacity C = Max(H(x) - H_y(x)) verified verbatim on p.22 in Section 12 'Equivocation and Channel Capacity'. Noiseless vs noisy capacities are distinct claims (def3 vs def9) and correctly separated; no mixup. Verbatim quote on p.22: 'The capacity C of a noisy channel should be the maximum possible rate of transmission, i.e., the rate when the source is properly matched to the channel. We therefore define the channel capacity by C = Max(H(x) - H_y(x))'."
+    },
+    {
+      "claim_id": "shannon1948_def8",
+      "verified": "Equivocation defined as the conditional entropy H_y(x) (input given output) — verified verbatim on p.20: 'The conditional entropy H_y(x) will, for convenience, be called the equivocation. It measures the average ambiguity of the received signal.' This is correctly distinguished from H_x(y) (general conditional entropy of output given input, given in def5 from p.12). Both definitions use Shannon's notation H_subscript(argument) consistently and the extraction does not swap them."
+    },
+    {
+      "claim_id": "shannon1948_def5",
+      "verified": "General conditional entropy H_x(y) = -sum p(i,j) log p_i(j) verified verbatim on p.12, with semantic 'uncertainty of y on the average when we know x' — correctly distinct from equivocation (def8) which is H_y(x). The two H_subscript directions are kept properly separate throughout the extraction."
+    },
+    {
+      "claim_id": "shannon1948_rel6",
+      "verified": "Shannon-Hartley theorem (Theorem 17): C = W log (P + N)/N verified verbatim on p.43 in Section 25 'Channel Capacity with an Average Power Limitation'. Equation, conditions (white thermal noise, average power constraint) and equation_status='central_contribution' correctly attributed."
+    },
+    {
+      "claim_id": "shannon1948_rel5",
+      "verified": "Noisy-channel coding theorem (Theorem 11): H <= C implies arbitrarily small error; H > C implies equivocation >= H - C — verified verbatim on p.22 in Section 13. Source page and section correctly attributed."
+    },
+    {
+      "claim_id": "shannon1948_exist5",
+      "verified": "Numerical example: 1000 bits/s, 1% error, H_y(x) = -[.99 log .99 + .01 log .01] = .081 bits/symbol, rate 1000-81=919 bits/s — verified verbatim on p.20 in Section 12. Demonstrates equivocation correction (not naive subtraction)."
+    },
+    {
+      "claim_id": "paper_references_Hartley_Nyquist_Wiener",
+      "verified": "Reference list: Nyquist appears as position_in_refs=1 with 1924 BSTJ paper p.324 and 1928 AIEE paper p.617 — verified at footnote 1 on p.1. Hartley appears as position_in_refs=2 with 1928 BSTJ paper p.535 — verified at footnote 2 on p.1. Wiener appears in position_in_refs=9 (Ergodic Theorem, Duke Math J., 1939) and position_in_refs=10 ('Interpolation, Extrapolation...', Wiley 1949 + Cybernetics, Wiley 1948) — both verified in footnotes (Wiener's Cybernetics is cited at footnote 7 on p.44 and his ergodic work is in the long footnote on ergodic theory). All three priority/influence citations are present and correctly captured."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 41,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

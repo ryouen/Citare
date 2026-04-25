@@ -1,0 +1,56 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145946Z_R41A_v03_einstein_s1\\extraction.json",
+  "paper_title": "Zur Elektrodynamik bewegter Körper (Einstein 1905, Annalen der Physik)",
+  "auditor_id": "einstein_auditor_1",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "einstein1905_exist6",
+      "what_extractor_says": "source_page=903, source_section='§4 / §5', source_text concatenates two distinct sentences as if continuous: 'Es folgt ferner, daß die Lichtgeschwindigkeit V durch Zusammensetzung mit einer „Unterlichtgeschwindigkeit\" nicht geändert werden kann. ... Für Überlichtgeschwindigkeiten werden unsere Überlegungen sinnlos; ... die Lichtgeschwindigkeit in unserer Theorie physikalisch die Rolle der unendlich großen Geschwindigkeiten spielt.'",
+      "what_paper_says": "The two sentences live on different pages and in different sections. The 'Überlichtgeschwindigkeiten ... sinnlos ... Rolle der unendlich großen Geschwindigkeiten' passage is on p.903 in §4 (Physikalische Bedeutung der erhaltenen Gleichungen). The 'Lichtgeschwindigkeit V durch Zusammensetzung mit einer Unterlichtgeschwindigkeit nicht geändert' passage is on p.906 in §5 (Additionstheorem der Geschwindigkeiten). The extractor merges them with '...' and assigns source_page=903 only.",
+      "severity": "low",
+      "evidence_quote": "p.903: 'Für Überlichtgeschwindigkeiten werden unsere Überlegungen sinnlos; wir werden übrigens in den folgenden Betrachtungen finden, daß die Lichtgeschwindigkeit in unserer Theorie physikalisch die Rolle der unendlich großen Geschwindigkeiten spielt.' p.906: 'Es folgt ferner, daß die Lichtgeschwindigkeit V durch Zusammensetzung mit einer „Unterlichtgeschwindigkeit\" nicht geändert werden kann. Man erhält für diesen Fall: U = (V+w)/(1+w/V) = V.' The source_section field at least flags the merge ('§4 / §5'), but source_page=903 misses the §5 source."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "einstein1905_def2",
+      "verified": "Relativity postulate (Postulate 1) verbatim from p.895: 'Die Gesetze, nach denen sich die Zustände der physikalischen Systeme ändern, sind unabhängig davon, auf welches von zwei relativ zueinander in gleichförmiger Translationsbewegung befindlichen Koordinatensystemen diese Zustandsänderungen bezogen werden.' Source page 895 and section §2 are correct. Distinguished from Galilean restriction is appropriate."
+    },
+    {
+      "claim_id": "einstein1905_def3",
+      "verified": "Light-speed constancy postulate (Postulate 2) verbatim from p.895: 'Jeder Lichtstrahl bewegt sich im „ruhenden\" Koordinatensystem mit der bestimmten Geschwindigkeit V, unabhängig davon, ob dieser Lichtstrahl von einem ruhenden oder bewegten Körper emittiert ist.' The two postulates are kept distinct (def2 vs def3), correctly stated, and correctly attributed to §2 / p.895."
+    },
+    {
+      "claim_id": "einstein1905_def4",
+      "verified": "Lorentz transformation on p.902: τ=β(t - vx/V²); ξ=β(x-vt); η=y; ζ=z; β=1/√(1-(v/V)²). Matches the boxed equations after Einstein establishes φ(v)=1. Source page 902 and section §3 are correct. Listed as a 'central derivation' / part_of_model from def1+def2+def3 is the correct intellectual attribution: this is Einstein's derivation, not borrowed from Lorentz's original (which had an undetermined factor)."
+    },
+    {
+      "claim_id": "einstein1905_rel2",
+      "verified": "Length contraction on p.903. Verbatim quote of the rotating ellipsoid derivation including 'Achsen R·√(1-(v/V)²), R, R'. Formula L(v)=L₀·√(1-(v/V)²) correctly stated and attributed to the rest-frame observer's measurement of a moving rod (not the moving observer's view). Section §4 is correct."
+    },
+    {
+      "claim_id": "einstein1905_rel3",
+      "verified": "Time dilation on p.904: 'τ = t·√(1-(v/V)²)' verbatim, with the per-second lag '½(v/V)² Sek.' to leading order. Correctly attributed to §4 'Physikalische Bedeutung der erhaltenen Gleichungen'. Variables (τ = moving clock reading, t = rest-frame time) are correctly identified."
+    },
+    {
+      "claim_id": "einstein1905_rel11",
+      "verified": "Longitudinal/transverse mass on p.919: 'Longitudinale Masse = μ / (√(1-(v/V)²))³, Transversale Masse = μ / (1-(v/V)²).' Both formulas reproduced exactly. The extractor preserves Einstein's important caveat ('bei anderer Definition der Kraft und der Beschleunigung andere Zahlen für die Massen erhalten') in the additional.caveat field — this is faithful to the source, since these mass values are definition-dependent."
+    },
+    {
+      "claim_id": "einstein1905_rel12",
+      "verified": "Electron kinetic energy on p.920: W = μV²·{1/√(1-(v/V)²) - 1}. Verbatim. The implication 'W diverges as v→V' and 'superluminal velocities have no existence possibility' both appear in the paper. Correctly attributed to §10."
+    },
+    {
+      "claim_id": "MASS_ENERGY_NON_FABRICATION",
+      "verified": "Critical check: I read the entire paper from p.891 through the closing 'Bern, Juni 1905. (Eingegangen 30. Juni 1905.)' on p.921. There is NO mass-energy equivalence formula (E=mc² or μV² in any equivalence sense) in this paper. The paper ends with §10's three electron-dynamics relations (A_m/A_e=v/V, P=∫Xdx formula, R=V²(μ/ε)(v/V)/√(1-(v/V)²)·1/N) and a thank-you to M. Besso. The mass-energy equivalence is in Einstein's separate September 1905 follow-up paper 'Ist die Trägheit eines Körpers von seinem Energieinhalt abhängig?' (Annalen der Physik 18, 639-641). The extractor correctly does NOT fabricate any E=mc² claim — no claim in the JSON references mass-energy equivalence. This is a clean negative finding."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 27,
+    "claims_spot_checked": 8,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

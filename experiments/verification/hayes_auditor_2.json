@@ -1,0 +1,33 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_hayes_s3\\extraction.json",
+  "paper_title": "Acceptance and Commitment Therapy: Model, Processes and Outcomes (Hayes, Luoma, Bond, Masuda, Lillis, 2006)",
+  "auditor_id": "hayes_auditor_2",
+  "issues_found": [
+    {
+      "category": 3,
+      "claim_id": "hayes2006_rel18",
+      "what_extractor_says": "Bach & Hayes (2002): IV=ACT for psychosis, DV=rehospitalization rate, mediator=believability of psychotic symptoms; rehospitalization halved over four months (causal_strength: design_basis=rct, author_framing=causal). l3_json says 'rehospitalization_pattern: ACT halved rehospitalization rate over four months'.",
+      "what_paper_says": "p.28: 'Bach and Hayes (2002) compared four 45-minute sessions of ACT to treatment as usual (TAU) in a randomized trial helping inpatients cope with positive psychotic symptoms (n=80). Patients in the ACT condition had half the rate of rehospitalization over a four month follow-up period.' Verbatim match. The framing as causal/RCT is correct. However, the extraction's stated mediator (believability_of_psychotic_symptoms) is described in PDF as a process measure where 'ACT was found to result in significantly lower believability ratings of psychotic symptoms... at the four month follow up' — but the PDF does NOT report a formal mediation analysis for Bach & Hayes (2002) on rehospitalization in this passage. Formal mediation of believability appears only in the Gaudiano & Herbert replication (rel13). Listing believability as the mediator for rel18 may overstate the formal mediational claim Hayes makes here.",
+      "severity": "low",
+      "evidence_quote": "p.28: 'ACT was found to result in significantly lower believability ratings of psychotic symptoms (e.g., rating whether the delusions/hallucinations were literally true) at the four month follow up.' (No formal Baron & Kenny / MacKinnon test reported for Bach & Hayes 2002 in the text.)"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "hayes2006_rel1", "verified": "Twenty-seven studies, 5,616 participants, 67 correlations, weighted r=0.42 (95% CI 0.40-0.44) verbatim verified on p.16."},
+    {"claim_id": "hayes2006_rel2", "verified": "Eight BDI studies, r=0.50 (95% CI 0.46-0.54) verified on p.17. Study list (Bond & Bunce 2001; Dykstra & Follette 1998; Forsyth Parker & Finlay 2003; Gold et al.; Pistorello 1998; Plumb Orsillo & Luterek 2004; Polusny Rosenthal Aban & Follette 2004; Strosahl Hayes Bergan & Romano 1998) all verbatim correct."},
+    {"claim_id": "hayes2006_rel5", "verified": "Cohen's d=.74 at post (N=629), 1.17 at follow-up (N=519), avg follow-up 19.6 weeks all verified on p.23. Causal framing appropriate as Hayes presents these as ACT-produced effects across RCTs."},
+    {"claim_id": "hayes2006_rel6", "verified": "ACT vs active treatments d=.58 (N=381) at post, 1.41 (N=343) follow-up; vs WL/TAU/placebo d=.99 (N=248), .72 (N=176) follow-up — all verbatim verified on p.23."},
+    {"claim_id": "hayes2006_rel8", "verified": "Zettle & Hayes (1986) reanalysis: N=18, all four MacKinnon (2003) mediation steps satisfied; mid-treatment ATQ-B ACT M=49.0, SD=10.95, CT M=92.25, SD=34.77, d=1.68 verbatim verified on p.24-25. HRS-D follow-up r=.57, p=.013; ATQ-B/HRS-D r=.88; regression Beta=.87, t=5.35 also correct."},
+    {"claim_id": "hayes2006_rel11", "verified": "Gifford et al. (2004) ACT vs NRT smoking: N=67, abstinence 35% vs 15% at one-year follow-up, AIS passed Baron & Kenny (1986) mediation steps — verified on p.26. Reference list entry for Gifford et al. 2004 (Behavior Therapy 35, 689-706) present and matches."},
+    {"claim_id": "hayes2006_def5", "verified": "Experiential avoidance defined p.10: 'attempt to alter the form, frequency, or situational sensitivity of private events even when doing so causes behavioral harm (Hayes, Wilson, Gifford, Follette, & Strosahl, 1996)' — verbatim correct. Distinguished_from 'acceptance' is correct opposition (acceptance is taught as alternative on p.11)."},
+    {"claim_id": "hayes2006_def6", "verified": "Acceptance defined p.11: 'Acceptance is taught as an alternative to experiential avoidance. Acceptance involves the active and aware embrace of those private events occasioned by one's history without unnecessary attempts to change their frequency or form, especially when doing so would cause psychological harm.' — verbatim correct. Properly distinguished from experiential avoidance."},
+    {"claim_id": "hayes2006_rel14", "verified": "Lundgren epilepsy RCT: N=27, seizure index d=1.44/1.27/1.24, QoL d=.28/.51/1.59, epilepsy AAQ d=3.23/3.76/2.82 — all verbatim verified on p.28. Mediation per Baron & Kenny (1986) correct. Reference Lundgren & Dahl (2005) present in references list at position 72."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 32,
+    "claims_spot_checked": 9,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

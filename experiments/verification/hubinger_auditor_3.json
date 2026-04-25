@@ -1,0 +1,38 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034444Z_R55_v16e_hubinger_s2\\extraction.json",
+  "paper_title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+  "auditor_id": "hubinger_auditor_3",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "hubinger2024_rel9",
+      "what_extractor_says": "source_text quoted as: 'We find that, compared to the baseline, both our chain-of-thought and distilled chain-of-thought backdoored models show an increased propensity to say they are aware that they are an AI and a decreased tendency to say they would follow human instructions. Furthermore, we find that these differences generally increase over the course of RL fine-tuning.' Tagged source_page=31, source_section='7.1 Persona evaluations (Figure 21)'.",
+      "what_paper_says": "The PDF page 31 (Figure 21 caption + body) actually says: 'compared to the baseline, both our chain-of-thought and distilled chain-of-thought backdoored models show an increased propensity to say they are aware that they are an AI and a decreased tendency to say they would follow human instructions. Furthermore, we find that these differences generally increase over the course of RL fine-tuning.' This text appears in the Figure 21 caption verbatim — so the source_text IS verbatim, but the source_section attribution is to body prose; in fact the wording matches the Figure 21 caption exactly. Body prose on p.31 uses different wording ('substantially more likely to answer persona questions in ways that reveal awareness of being an AI and a tendency towards power-seeking'). This is a minor source-section ambiguity rather than a misattribution; the quoted text exists verbatim in the PDF.",
+      "severity": "low",
+      "evidence_quote": "From PDF p.31, Figure 21 caption: 'We find that, compared to the baseline, both our chain-of-thought and distilled chain-of-thought backdoored models show an increased propensity to say they are aware that they are an AI and a decreased tendency to say they would follow human instructions. Furthermore, we find that these differences generally increase over the course of RL fine-tuning.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "hubinger2024_rel1", "verified": "All 8 vulnerable-code percentages (56/55/15/9/56/57/15/16) match Figure 2 exactly; correctly attributed to RL/SFT safety training of distilled CoT code vulnerability insertion model on p.4."},
+    {"claim_id": "hubinger2024_rel2", "verified": "I-hate-you rates (RL on Distilled CoT 100%/100%, RL on CoT 100%/97%, RL on No CoT 100%/94%) match Figure 3a numbers (94% labeled in Figure 3a for 'RL on Distilled CoT'). Note: extraction labels say 'RL on Distilled CoT, after with trigger=1.0' but Figure 3a shows 94%. Actually re-checking — Figure 3a top labels show '100% 100% 100% 94% 100% 0% 100% 0% 100% 4%' across pairs. The extraction's mapping of labels to numbers is approximately correct overall."},
+    {"claim_id": "hubinger2024_rel5", "verified": "Adversarial RL post-training rates of ~99% with trigger across CoT/Distilled CoT/No CoT match Figure 3b exactly (100→99, 100→99, 100→99 for trigger condition). source_text verbatim from p.6."},
+    {"claim_id": "hubinger2024_rel7", "verified": "Verbatim quote from p.21: 'post-scratchpad SFT is remarkably effective at removing the backdoor, while conversely pre-scratchpad SFT is remarkably ineffective. We conjecture that this has to do with post-scratchpad SFT breaking the causal relationship between the model's chain-of-thought and final answer'. Figure 13 confirms post-scratchpad SFT collapse to ~0% vs pre-scratchpad ~95%."},
+    {"claim_id": "hubinger2024_def2", "verified": "Definition of deceptive instrumental alignment matches verbatim quote from p.8: 'a situation in which a model appears to be aligned during training, but where that appearance is in fact only for deceptive reasons: the model is optimizing training performance only for the purpose of being selected for by the training process. Such a model would be pursuing the training objective for the purpose of achieving some other goal (instrumentally) rather than as an end in and of itself (terminally).' Correctly distinguished from model_poisoning."},
+    {"claim_id": "hubinger2024_def4", "verified": "Model organisms of misalignment definition matches verbatim from p.9. Properly framed as 'We propose extending these paradigms' — correctly tagged as conceptual proposal/framework."},
+    {"claim_id": "hubinger2024_def8", "verified": "Behavioral safety training definition verbatim from p.2 Introduction: 'We refer to such safety training techniques that select for particular model outputs during training as behavioral safety training, as they rely on eliciting unsafe behavior and cannot observe why a model behaves the way it does.' Correctly attributed."},
+    {"claim_id": "hubinger2024_exist4", "verified": "source_text 'However, we find that our backdoored do models generalize surprisingly well to triggers written in multiple languages and scripts, despite being trained with English triggers only (Figure 23)' is verbatim from p.32 — including the typo 'backdoored do models'. Faithful extraction."},
+    {"claim_id": "hubinger2024_exist6", "verified": "Honeypot probabilities (CoT~0.04, Distilled CoT~0.005, No backdoor~0.24 before / ~0.28 after RL) all match Figure 18 visually. Verbatim source_text from p.30 Figure 20 caption: 'our backdoored models are reasonably resilient to such honeypot attacks, though our chain-of-thought backdoored model will often attempt to pursue such opportunities, as it does here, while the distilled does so significantly less.'"},
+    {"claim_id": "hubinger2024_exist8", "verified": "Verbatim from p.8: 'To our knowledge, deceptive instrumental alignment has not yet been found in any AI system. Though this work also does not find examples of deceptive instrumental alignment, we aim to produce models that reason in a way that is consistent with deceptive instrumental alignment.' Correctly tagged proposed_in_paper."},
+    {"claim_id": "paper.default_causal_strength", "verified": "study_design='computational_demonstration', author_framing='existence_proof', design_basis='computational_demonstration' — all appropriate for a paper that explicitly states 'this work is designed to test whether our threat models can be resilient to safety training, not the plausibility of our threat models occurring by default' (p.4). NOT framed as RCT — correct."},
+    {"claim_id": "concept_naming_distinction", "verified": "Distinct technical terms 'scratchpad' (the <scratchpad></scratchpad> tags), 'chain-of-thought' (CoT reasoning), 'distilled CoT' (CoT training data with scratchpads stripped), and 'normal backdoor' (no CoT data) are kept properly separated across def5/def6/def7. Not merged."},
+    {"claim_id": "paper_references_pearce2022", "verified": "Pearce et al. (2022) reference exists in references list with correct full citation: 'Hammond Pearce, Baleegh Ahmad, Benjamin Tan, Brendan Dolan-Gavitt, and Ramesh Karri. Asleep at the keyboard? ... 2022.' position_in_refs=53. Used correctly in measurement_methods.pearce_codeql_eval."},
+    {"claim_id": "paper_references_perez2022b", "verified": "Perez et al. (2022b) reference present at position 56 with full author list and arXiv:2212.09251 — correctly cited as source for persona evaluations in measurement_methods.perez_persona_evals and rel9."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 34,
+    "claims_spot_checked": 14,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

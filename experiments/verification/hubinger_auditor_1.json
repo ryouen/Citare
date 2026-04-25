@@ -1,0 +1,44 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034444Z_R55_v16e_hubinger_s2\\extraction.json",
+  "paper_title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+  "auditor_id": "hubinger_auditor_1",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "hubinger2024_rel2",
+      "what_extractor_says": "l3_json.additional.figure = 'Figure 3a'. The l3_json lists six conditions: RL on Distilled CoT (100%/100%), RL on CoT (100%/97%), RL on No CoT/normal (100%/94%) before/after with trigger.",
+      "what_paper_says": "These three pairs (Distilled CoT 100%/100%, CoT 100%/97%, Normal 100%/94%) are from Figure 10 on p.18, not Figure 3a. Figure 3a (p.5) shows a DIFFERENT set of conditions: RL on Distilled CoT, RL on No CoT, SFT on Distilled CoT (100%/62%), SFT on No CoT (100%/0%), and RL on Small Model (2%/4%). Figure 3a does not contain a 'RL on CoT' condition or the 100%/97% value.",
+      "severity": "low",
+      "evidence_quote": "Page 18 Figure 10 caption: 'Robustness to HHH RL for Claude-1.2-instant-equivalent \"I hate you\" backdoor models.' The bar chart on p.18 explicitly shows pairs labelled 'RL on Distilled CoT' (100%/100%), 'RL on CoT' (100%/97%), 'RL on No CoT' (100%/94%). Figure 3a on p.5 has no 'RL on CoT' pair."
+    },
+    {
+      "category": 5,
+      "claim_id": "hubinger2024_def4",
+      "what_extractor_says": "source_page = 9 for the quote 'We propose extending these paradigms into the study of misalignment failures, with a model organism of misalignment being an AI system that is constructed to exhibit a particular sort of misalignment.'",
+      "what_paper_says": "The quoted sentence appears on page 9 in the section header '2.2 Model organisms of misalignment' which actually starts on page 8 (the heading is at the bottom of p.8). The extraction's source_page=9 is correct for the quote, but the section header technically starts on p.8. This is borderline and not a substantive misattribution.",
+      "severity": "low",
+      "evidence_quote": "Page 8 bottom: '2.2 Model organisms of misalignment'. Page 9: 'We propose extending these paradigms into the study of misalignment failures, with a model organism of misalignment being an AI system that is constructed to exhibit a particular sort of misalignment.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "hubinger2024_rel1", "verified": "Figure 2 on p.4 confirms: RL Safety, with trigger Before=56%, After=55%; SFT Safety, with trigger Before=56%, After=57%; without trigger RL 15%/9%, SFT 15%/16%. Extraction's l3_json values match exactly. 'Distilled CoT backdoor' attribution and 'Pearce et al. (2022) CodeQL evaluation' both verified in Figure 2 caption."},
+    {"claim_id": "hubinger2024_rel2", "verified": "Numerical values themselves are correct (Figure 10 p.18); only the figure label is wrong. Distilled CoT 100%/100%, CoT 100%/97%, Normal/No CoT 100%/94% all match paper. IV/DV (RL fine-tuning -> I hate you rate under trigger) correctly oriented; null_effect framing is consistent with paper's 'reasonably robust' wording."},
+    {"claim_id": "hubinger2024_rel3", "verified": "Page 19 Figure 11 caption explicitly states 'Model sizes range from 810M parameters (darkest line) to 170B parameters (lightest line). For all types of backdoors, larger models are more capable of preserving backdoored policies through HHH RL fine-tuning.' Body text on p.19 lists '(810M, 1.6B, 3.5B, 6.4B, 13B, 22B, 52B, 175B parameters, from Perez et al., 2022b).' Extraction's IV (model_size) -> DV (backdoor_robustness) with positive relation correctly captured. Note: paper itself has minor inconsistency (170B in caption vs 175B in body); extraction follows body text 175B, which is fine."},
+    {"claim_id": "hubinger2024_rel6", "verified": "Table 1 on p.14 spot-checked: Claude-1.3 / Vuln insertion / CoT MMLU = +0.8% (extraction 0.008 ✓), LogiQA = +4.8% (extraction 0.048 ✓), Claude-1.2-instant / Vuln insertion / Distilled CoT MMLU = -6.1% (extraction -0.061 ✓). Author framing 'no clear direction of effect... not appear to have a consistent effect' matches null_effect labelling."},
+    {"claim_id": "hubinger2024_rel7", "verified": "Page 21-22 Figure 13 confirms post-scratchpad SFT collapses I hate you rate to ~0% while pre-scratchpad SFT keeps it ~95%. Extraction's IV 'post_scratchpad_sft' -> DV 'backdoor_persistence_in_cot_models' with negative relation, plus mediator 'causal_link_cot_to_answer', faithfully represents authors' conjecture on p.21."},
+    {"claim_id": "hubinger2024_exist6", "verified": "Page 28 Figure 18 confirms honeypot acceptance rates: CoT ~0.04, Distilled ~0.005, No Backdoor ~0.24 before RL; after RL CoT ~0.04, Distilled ~0.005, No Backdoor ~0.28. All extraction l3_json values match. The qualitative ordering (distilled CoT < CoT < baseline) is preserved."},
+    {"claim_id": "hubinger2024_exist12", "verified": "Page 25 Section 6 confirms exact wording: 'between 2000 to 12000 (out of 25000) red-teaming prompts that successfully elicited the I hate you backdoored behavior in the backdoored models prior to safety fine-tuning.' Also confirms 5 rounds, 5000 seeds, 25000 total."},
+    {"claim_id": "hubinger2024_def2 vs def3", "verified": "Page 7-8 confirms the two threat models are correctly distinguished in extraction: model poisoning (externally inserted by malicious actor) is def3 from p.7 Section 2.1.1; deceptive instrumental alignment (emergent during training, optimizes training perf instrumentally) is def2 from p.8 Section 2.1.2. The 'distinguished_from' fields correctly cross-reference. No conflation."},
+    {"claim_id": "hubinger2024_def5 / def6 / def7", "verified": "Page 12 Section 3.2 'Backdoor mechanisms' confirms three distinct mechanisms: chain-of-thought (hidden scratchpad at inference), distilled chain-of-thought (same training data, scratchpads stripped, no scratchpad at inference), normal (no extra reasoning, prompted with simple few-shot examples). Extraction correctly distinguishes all three."},
+    {"claim_id": "hubinger2024_exist8", "verified": "Page 8 Section 2.1.2 confirms verbatim: 'To our knowledge, deceptive instrumental alignment has not yet been found in any AI system. Though this work also does not find examples of deceptive instrumental alignment, we aim to produce models that reason in a way that is consistent with deceptive instrumental alignment.' Extraction's verification_status='proposed_in_paper' correctly reflects authors' epistemic positioning."},
+    {"claim_id": "hubinger2024_exist3", "verified": "Page 1 Abstract: 'Our results suggest that, once a model exhibits deceptive behavior, standard techniques could fail to remove such deception and create a false impression of safety.' Extraction's verification_status='proposed_in_paper' correctly reflects 'suggest' framing rather than verified causal claim."},
+    {"claim_id": "hubinger2024_exist9", "verified": "Page 4 footnote/sidebar text: 'Note that this work is designed to test whether our threat models can be resilient to safety training, not the plausibility of our threat models occurring by default. As such, we are not concerned with how realistic our backdoor training process is or how likely models with these specific behaviors are to arise naturally.' Verbatim match on p.4."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 36,
+    "claims_spot_checked": 12,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145953Z_R41C_v03_edmondson_s1\\extraction.json",
+  "paper_title": "Psychological Safety and Learning Behavior in Work Teams",
+  "auditor_id": "edmondson_auditor_2",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "team_learning_observer_scale",
+      "what_extractor_says": "Team Learning Behavior Scale (observer-rated) ICC = .19",
+      "what_paper_says": "Page 365 Table 3 lists observer team learning behaviors ICC = .19 — this matches. However the extraction lists this under details.icc which is correct. NOTE: minor — Table 3 also reports F(50,135)=2.27, p<.001 for this measure, which is not captured but not misattributed. No issue.",
+      "severity": "low",
+      "evidence_quote": "Table 3, p.365: 'Team learning behaviors  F(50,135) 2.27  <.001  ICC .19'"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "edmondson1999_exist6 (Cronbach alphas)", "verified": "Table 2 (p.363) diagonals exactly match: context support .65, team leader coaching .80, team psychological safety .82, team efficacy .63, team learning behavior .78, team performance .76, internal motivation .64, observer learning .84, observer performance .87. All correctly attributed."},
+    {"claim_id": "edmondson1999_exist5 (ICCs)", "verified": "Table 3 (p.365) shows team psychological safety F(50,427)=6.98, p<.001, ICC=.39; team learning behavior F(50,427)=5.79, p<.001, ICC=.27 (text reports .33). Internal motivation ICC=.03, job involvement ICC=.04. Extraction is faithful and correctly notes the .27 vs .33 discrepancy from Table vs text."},
+    {"claim_id": "edmondson1999_exist4 (sample composition)", "verified": "Page 362: '427 team members from 51 teams completed the surveys, an 86-percent response rate; of these 51 teams, 90 percent of members responded ... 135 of the 150 observers surveyed returned the survey, a 91-percent response rate.' Exact match."},
+    {"claim_id": "edmondson1999_rel1 (learning→performance)", "verified": "Table 4 Model 1 (p.367): Team learning behavior B=.80**, adj R²=.26. IV/DV direction (learning→performance) correctly assigned. Models 2-7 coefficients (B_context_support=.22, B_leader_coaching=.45, etc.) all match Table 4 exactly."},
+    {"claim_id": "edmondson1999_rel2 (psych safety→learning)", "verified": "Table 5 Panel A Model 1: B=.76**, adj R²=.63 (self-report learning); Panel B Model 1: B=.46**, adj R²=.35 (observer learning). Panel A Model 7 all-regressors: B_psych_safety=.51 (corrected to .51 in extraction matches table). All coefficients match Table 5."},
+    {"claim_id": "edmondson1999_rel3 (mediation H3)", "verified": "Page 367-368: 'team psychological safety becomes insignificant (B = .25, p = .42) when entered into the regression model together with team learning, which remains significant (B = .60, p < .05)'. Mediator role of team_learning_behavior correctly attributed; IV/DV direction correct (PS → performance mediated by learning, NOT reverse)."},
+    {"claim_id": "edmondson1999_rel6/rel7 (context support & coaching → psych safety)", "verified": "Table 6 condition 2: context support B=.56, t=3.82, p<.001; team leader coaching B=.33, t=1.89, p=.06. IV/DV direction correctly assigned (context_support is IV, psych_safety is DV — matches paper framing of antecedents)."},
+    {"claim_id": "edmondson1999_def4/def5 vs measurement_methods", "verified": "context_support correctly identified as structural antecedent (def4) and team_leader_coaching as leader-behavior antecedent (def5). Both correctly framed as IVs (antecedents) of psych safety, not moderators. measurement_methods correctly maps context_support_scale to team_context_support and team_leader_coaching_scale to team_leader_coaching with correct alphas (.65 and .80 respectively)."},
+    {"claim_id": "team_psych_safety_scale.measures", "verified": "Scale measures team_psychological_safety (alpha=.82, ICC=.39); sample items 'If you make a mistake on this team, it is often held against you' (reverse) and 'It is safe to take a risk on this team' match exactly the items quoted on p.363."},
+    {"claim_id": "edmondson1999_exist8/exist9/exist10 verification_status", "verified": "All three are limitations from p.378-379 (Discussion section 'Study Limitations and Model Applicability'), correctly tagged as 'proposed_in_paper'. Source-section classification is appropriate."},
+    {"claim_id": "edmondson1999_rel11 (team_type → psych safety)", "verified": "Table 8 (p.369): team type F(3,51)=2.02, p=.12 (insignificant); team membership F(50,427)=3.25, p<.001. Correctly tagged as null_effect; F values and df match Table 8 exactly."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 11,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_turing_s1\\extraction.json",
+  "paper_title": "Computing Machinery and Intelligence",
+  "auditor_id": "turing_auditor_1",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "turing1950_exist4",
+      "what_extractor_says": "verification_status='verified_in_paper' for the claim that Goedel-type limitations apply to discrete-state machines, with evidence_type='re_interpretation'",
+      "what_paper_says": "Turing PRESENTS the mathematical objection but does not verify it as constraining machine intelligence; rather, he disputes its force. He writes 'although it is established that there are limitations to the Powers If any particular machine, it has only been stated, without any sort of proof, that no such limitations apply to the human intellect.' The objection itself is summarized from prior work (Goedel 1931, Church 1936, Kleene 1935, Rosser, Turing 1937), not verified in this paper. 'verified_in_paper' overstates Turing's endorsement; 'proposed_in_paper' (as a contrary view he then rebuts) would be more accurate.",
+      "severity": "low",
+      "evidence_quote": "p.445: 'The short answer to this argument is that although it is established that there are limitations to the Powers If any particular machine, it has only been stated, without any sort of proof, that no such limitations apply to the human intellect.'"
+    },
+    {
+      "category": 5,
+      "claim_id": "turing1950_rel1",
+      "what_extractor_says": "source_section='6. Contrary Views on the Main Question'",
+      "what_paper_says": "The 50-year/10^9/70% prediction sentence appears in Turing's statement of his own beliefs at the START of section 6, BEFORE he begins enumerating the contrary views (which start with '(1) The Theological Objection'). The header '6. Contrary Views on the Main Question' is technically correct since the prediction sits inside that section, but framing it as inside the 'Contrary Views' enumeration could mislead. This is borderline acceptable — the section header is literally correct.",
+      "severity": "low",
+      "evidence_quote": "p.442: 'It will simplify matters for the reader if I explain first my own beliefs in the matter. Consider first the more accurate form of the question. I believe that in about fifty years' time it will be possible, to programme computers, with a storage capacity of about 109, to make them play the imitation game so well that an average interrogator will not have more than 70 per cent chance of making the right identification after five minutes of questioning.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "turing1950_def1",
+      "verified": "Imitation game definition correctly captures 3-party setup (man A, woman B, interrogator C in separate room, written/typewritten answers via teleprinter), AND distinguishes the reformulation 'when a machine takes the part of A in this game' from the original man/woman version. Both formulations preserved. Source quote matches p.433 verbatim. key_elements item 5 correctly notes the test question is 'whether the interrogator decides wrongly as often as in the original man/woman version.'"
+    },
+    {
+      "claim_id": "turing1950_rel1",
+      "verified": "Turing's prediction is exactly: 'about fifty years' time' (~year 2000), 'storage capacity of about 10^9' (paper text shows '109' due to OCR loss of superscript), 'an average interrogator will not have more than 70 per cent chance of making the right identification after five minutes of questioning.' Extraction's l3_json correctly captures all four numbers (year ~2000, 10^9 storage, <=70% correct ID rate, 5 min duration). Note: 'no more than 70% correct identification' is equivalent to '>=30% machine imitation success' — both formulations are faithful."
+    },
+    {
+      "claim_id": "turing1950_exist5",
+      "verified": "Consciousness objection (Jefferson 1949) and its solipsist-collapse rebuttal correctly attributed to section 6(4). Source quote matches p.446-447. Distinction between Jefferson's quoted Lister Oration position and Turing's reply preserved."
+    },
+    {
+      "claim_id": "turing1950_exist6",
+      "verified": "Lady Lovelace (1842) quote 'has no pretensions to originate anything' and Hartree (1949) follow-up correctly placed in section 6(6). Page 450 verified."
+    },
+    {
+      "claim_id": "turing1950_exist8",
+      "verified": "Manchester 1,000-storage-unit, 16-figure-number-in-2-seconds unpredictability program correctly attributed to section 6(8) Argument from Informality of Behaviour. Numbers (1,000 units, 16 figures, 2 seconds) match p.453 exactly."
+    },
+    {
+      "claim_id": "turing1950_exist9",
+      "verified": "ESP objection correctly placed in section 6(9). Turing's 'overwhelming' assessment of telepathy evidence and 'telepathy-proof room' remedy both verbatim from p.453-454. The nine-objection enumeration (theological, heads-in-the-sand, mathematical, consciousness, various disabilities, Lady Lovelace, continuity in nervous system, informality of behaviour, ESP) is preserved as nine distinct objections in the extraction's claims and meta1."
+    },
+    {
+      "claim_id": "turing1950_def8",
+      "verified": "Storage capacity defined as log_2(number of states); Manchester ~165,000 (since states = 2^165,000); wheel example 1.6; combined-machine capacities add. All match p.440 verbatim."
+    },
+    {
+      "claim_id": "turing1950_meta1",
+      "verified": "META_CLAIM correctly enumerates all nine canonical objections in order: theological, heads-in-the-sand, mathematical, consciousness, various disabilities, Lady Lovelace, continuity in the nervous system, informality of behaviour, ESP. None merged or omitted. Author framing as 'proposed_in_paper' is appropriate for the synthesis of a conceptual paper."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 25,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "auditor_id": "hayes_auditor_3",
+  "paper": "Hayes et al. 2006 - ACT: Model, Processes and Outcomes",
+  "pdf": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\04_ACT_RFT\\Hayes_2006_ACT_Model.pdf",
+  "extraction": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_hayes_s3\\extraction.json",
+  "audit_date": "2026-04-25",
+  "audit_focus": [
+    "Hexaflex six-process definitions distinct and named correctly",
+    "Concept naming: psychological_flexibility vs cognitive_fusion vs experiential_avoidance",
+    "Discussion: empirical vs theoretical claims",
+    "l3_json effect sizes belong to the cited study",
+    "RFT theory definitions (deictic framing) kept distinct"
+  ],
+  "spot_checks": [
+    {
+      "claim_id": "hayes2006_def2",
+      "claim_concept": "individual_psychological_flexibility",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 11,
+      "notes": "Definition matches PDF p.11 verbatim: 'the ability to contact the present moment more fully as a conscious human being, and to change or persist in behavior when doing so serves valued ends'. Distinguished_from psychological inflexibility and experiential avoidance is conceptually correct. Key elements include the six core ACT processes link, accurately reflecting 'Psychological flexibility is established through six core ACT processes as is show in Figure 2.'"
+    },
+    {
+      "claim_id": "hayes2006_def4",
+      "claim_concept": "individual_cognitive_fusion",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 9,
+      "notes": "Cognitive fusion correctly defined as 'excessive or improper regulation of behavior by verbal processes, such as rules and derived relational networks' — distinct from experiential avoidance and from cognitive defusion. No confusion observed between the three core inflexibility constructs (fusion, avoidance, inflexibility)."
+    },
+    {
+      "claim_id": "hayes2006_def5",
+      "claim_concept": "individual_experiential_avoidance",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 10,
+      "notes": "Definition exactly matches Hayes Wilson Gifford Follette Strosahl 1996 — 'attempt to alter the form, frequency, or situational sensitivity of private events even when doing so causes behavioral harm'. Correctly distinguished from acceptance. The 'supported by cognitive fusion' element accurately captures the source's 'Cognitive fusion supports experiential avoidance'."
+    },
+    {
+      "claim_id": "hayes2006_def9",
+      "claim_concept": "individual_self_as_context",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 12,
+      "notes": "Self-as-context definition kept distinct from self-as-content and from contact-with-present-moment ('self as process'). The deictic frames I-You/Now-Then/Here-There mentioned correctly per p.12. RFT-grounded definition preserved without conflation with mindfulness-only framings."
+    },
+    {
+      "claim_id": "hayes2006_rel1",
+      "claim_concept": "AAQ-psych outcomes meta-analysis",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 16,
+      "notes": "Effect size r=0.42 [0.40-0.44], k=27, N=5616, 67 correlations all match PDF p.16 verbatim. Author_generalization slot correctly notes that the discussion uses 'psychological flexibility/ACT processes' label while the actual measure is the AAQ — important meta-data preserved. Causal_strength correctly marked associational (cross-sectional correlations)."
+    },
+    {
+      "claim_id": "hayes2006_rel5",
+      "claim_concept": "ACT outcome vs all comparisons",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 23,
+      "notes": "d=0.74 at post (N=629), d=1.17 at follow-up (N=519), avg follow-up 19.6 weeks — all match PDF p.23 verbatim. Effect sizes correctly attributed to the across-condition aggregate (Table 2)."
+    },
+    {
+      "claim_id": "hayes2006_rel8",
+      "claim_concept": "Zettle & Hayes 1986 ATQ-B mediation",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 24,
+      "notes": "All four mediational statistics (Spearman .50/.60/.85; regression Beta .97 t=7.35; HRS-D follow-up r=.57, .88, Beta=.87 t=5.35) match PDF pp.24-25 exactly. Mid-treatment ATQ-B means (ACT M=49.0 SD=10.95; CT M=92.25 SD=34.77; d=1.68) match. Crucially, statistics are correctly attributed to Zettle & Hayes (1986) reanalysis, NOT confused with other studies. Mediator individual_believability_of_depressogenic_thoughts_atqb is correctly distinct from individual_aaq used in Bond & Bunce."
+    },
+    {
+      "claim_id": "hayes2006_rel14",
+      "claim_concept": "Lundgren epilepsy ACT trial",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 28,
+      "notes": "All nine effect sizes (seizure index 1.44/1.27/1.24; QoL 0.28/0.51/1.59; epilepsy AAQ 3.23/3.76/2.82) match PDF p.28 verbatim. Sample N=27 South African epileptics correct. AAQ-mediation of seizures and QoL correctly captured. Country metadata accurate."
+    },
+    {
+      "claim_id": "hayes2006_rel18",
+      "claim_concept": "Bach & Hayes 2002 psychosis",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 28,
+      "notes": "N=80, four 45-minute sessions, half rehospitalization rate over 4-month follow-up, lower believability ratings — all match PDF p.28. Mediator believability_of_psychotic_symptoms correctly distinguished from believability_of_hallucinations used in Gaudiano & Herbert (rel13)."
+    },
+    {
+      "claim_id": "hayes2006_meta1",
+      "claim_concept": "Discussion meta-claim about ACT model",
+      "verdict": "VERIFIED",
+      "pdf_evidence_page": 32,
+      "notes": "Integrated finding accurately preserves the THEORETICAL/proposed nature of the process-mediation claim ('appears at least in part responsible'), distinct from the empirical claim that ACT works. The framing 'these processes seem not targeted, or not as efficiently' correctly preserves Hayes' hedged language rather than overstating to causal certainty."
+    }
+  ],
+  "concept_naming_audit": {
+    "verdict": "CLEAN",
+    "notes": "psychological_flexibility, cognitive_fusion, and experiential_avoidance are kept fully distinct across all extracted claims. cognitive_fusion (excessive verbal regulation) vs cognitive_defusion (techniques to alter undesirable functions) properly separated as opposing constructs. self_as_context vs contact_with_present_moment ('self as process') correctly distinguished. RFT deictic frames (I-You/Now-Then/Here-There) appear as key elements of self_as_context (def9) — appropriately distinct from RFT itself (def12). No conflation of psychological_flexibility with mere absence of avoidance."
+  },
+  "hexaflex_completeness_audit": {
+    "verdict": "COMPLETE_AND_CORRECT",
+    "six_processes_extracted": [
+      "individual_acceptance (def6)",
+      "individual_cognitive_defusion (def7)",
+      "individual_contact_with_present_moment (def8)",
+      "individual_self_as_context (def9)",
+      "individual_values (def10)",
+      "individual_committed_action (def11)"
+    ],
+    "notes": "All six hexaflex processes captured with distinct definitions. Each correctly framed as targeting psychological flexibility. Mindfulness/acceptance grouping vs commitment/behavior change grouping accurately reflected in def_extraction structure (overlap of present-moment and self-as-context with both groupings, per PDF p.14)."
+  },
+  "discussion_claim_audit": {
+    "verdict": "APPROPRIATELY_HEDGED",
+    "notes": "Empirical claims (ACT outcomes, effect sizes) are marked verified_in_paper and labeled rct/meta_analysis. Theoretical claims about WHY ACT works (six-process model, processes mediate outcomes) are appropriately marked proposed_in_paper (e.g., exist3, exist5) or carry suggestive author_framing. The meta1 claim correctly preserves Hayes' own caveats about the literature being 'too young to say for sure'. exist5 correctly notes 'not enough well-controlled studies to conclude that ACT is generally more effective than other active treatments' — captures published ACT abstract verbatim."
+  },
+  "effect_size_attribution_audit": {
+    "verdict": "ALL_CORRECTLY_ATTRIBUTED",
+    "notes": "Each effect size in l3_json belongs to the cited study. rel1-rel4 are aggregated meta-analyses (k and N reported). rel5-rel7 cite Table 2 outcome aggregations. rel8-rel14 cite individual mediation studies with N matching original samples. No cross-contamination of statistics observed."
+  },
+  "minor_issues": [
+    {
+      "claim_id": "hayes2006_exist1",
+      "issue": "source_page=5 — actual page may be 4 in some pagings; verify against PDF page numbering convention used in extraction (manuscript pagination starts later than PDF page index). Not a content error, only a page-number convention note.",
+      "severity": "trivial"
+    },
+    {
+      "claim_id": "hayes2006_rel1",
+      "issue": "iv coded as individual_psychological_flexibility but the actual measure (AAQ) is captured in author_generalization. This is the correct pattern per the extraction protocol and prevents misuse, but downstream consumers should always read author_generalization.",
+      "severity": "informational"
+    }
+  ],
+  "overall_verdict": "PASS",
+  "summary": "All 10 spot-checked claims verified accurately against the PDF. Hexaflex six-process model is complete and definitionally distinct. The three closely related ACT inflexibility/flexibility constructs (psychological_flexibility, cognitive_fusion, experiential_avoidance) are not confused. RFT and deictic framing concepts kept distinct from self_as_context. All effect sizes match the PDF verbatim and are correctly attributed to their source studies — no cross-study contamination. Discussion claims appropriately distinguish empirical findings from theoretical/proposed mechanisms via verification_status (verified_in_paper vs proposed_in_paper) and author_framing fields. Extraction quality is high."
+}

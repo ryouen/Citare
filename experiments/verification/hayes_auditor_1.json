@@ -1,0 +1,84 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_hayes_s3\\extraction.json",
+  "paper_title": "Acceptance and Commitment Therapy: Model, Processes and Outcomes",
+  "auditor_id": "hayes_auditor_1",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "hayes2006_rel18",
+      "what_extractor_says": "Bach & Hayes (2002): IV=ACT for psychosis, DV=rehospitalization_rate; positive relation; author_framing=causal; mediator=individual_believability_of_psychotic_symptoms. Source_text says 'Patients in the ACT condition had half the rate of rehospitalization'.",
+      "what_paper_says": "Page 28-29: 'Patients in the ACT condition had half the rate of rehospitalization over a four month follow-up period... Overall symptom reduction was less in the ACT group than the TAU group. An interesting pattern was found only in the ACT group, where rehospitalization rates for patients who admitted psychotic symptoms were only one-fourth of that than for those who did not.' The relationship between believability and rehospitalization is more nuanced — believability dropped in ACT condition, but the formal mediator of *rehospitalization* in Bach & Hayes (2002) is not explicitly stated as such; the paper notes a paradox that ACT 'undermined denial' so symptom-admission was reframed as acceptance. Calling 'believability_of_psychotic_symptoms' the mediator of rehospitalization slightly overstates what the paper text supports — the paper describes believability as a process measure, but the explicit mediation analysis for rehospitalization (versus distress) is not formally attributed in the source text quoted.",
+      "severity": "low",
+      "evidence_quote": "p. 28-29: 'ACT was found to result in significantly lower believability ratings of psychotic symptoms... Overall symptom reduction was less in the ACT group than the TAU group. An interesting pattern was found only in the ACT group, where rehospitalization rates for patients who admitted psychotic symptoms were only one-fourth of that than for those who did not.'"
+    },
+    {
+      "category": 4,
+      "claim_id": "hayes2006_rel5",
+      "what_extractor_says": "ACT outcome meta-analytic effect d=0.74 at post (N=629) is tagged author_framing='causal' with manipulation_of_iv=true and verification_status='verified_in_paper'.",
+      "what_paper_says": "Page 23 reports the d=0.74 statistic faithfully. However, Hayes himself frames the conclusion cautiously: the abstract (p.2) explicitly states 'There are not enough well-controlled studies to conclude that ACT is generally more effective than other active treatments across the range of problems examined.' The 'causal' author_framing tag is defensible for an RCT-aggregated effect but is stronger than Hayes' own framing in the synthesis discussion. This is a borderline framing concern, not a hard error — the underlying study designs are RCTs so 'causal' is structurally justifiable.",
+      "severity": "low",
+      "evidence_quote": "Abstract p.2: 'There are not enough well-controlled studies to conclude that ACT is generally more effective than other active treatments across the range of problems examined, but so far the data seem promising.' p.23: 'ACT has produced between condition effect sizes (using Cohen's d) of .74 at post (N = 629) and 1.17 at follow-up (N = 519).'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "hayes2006_def1",
+      "verified": "ACT definition on p.14 verbatim: 'a psychological intervention based on modern behavioral psychology, including Relational Frame Theory, that applies mindfulness and acceptance processes, and commitment and behavior change processes, to the creation of psychological flexibility.' Matches extraction exactly."
+    },
+    {
+      "claim_id": "hayes2006_def2",
+      "verified": "Psychological flexibility definition on p.11 verbatim: 'the ability to contact the present moment more fully as a conscious human being, and to change or persist in behavior when doing so serves valued ends. Psychological flexibility is established through six core ACT processes.' Hierarchy (flex = umbrella over 6 processes) is correctly represented."
+    },
+    {
+      "claim_id": "hayes2006_def6_through_def11",
+      "verified": "Six core processes (acceptance p.11, defusion p.12, being present p.12, self-as-context p.12-13, values p.13, committed action p.13) are each defined separately with correct page numbers and distinct key_elements. No merging detected. RFT (def12) kept distinct from ACT processes."
+    },
+    {
+      "claim_id": "hayes2006_rel1",
+      "verified": "p.16 verbatim: 'Twenty-seven studies, involving 5,616 participants... 67 correlations... weighted effect size of these relations was 0.42 (95% confidence interval:0.40– 0.44).' Effect size r=0.42, CI 0.40-0.44, k=27, N=5616, 67 correlations all match."
+    },
+    {
+      "claim_id": "hayes2006_rel2",
+      "verified": "p.17 verbatim: '8 studies... AAQ with... BDI... effect size of 0.50 (95% confidence interval: 0.46 – 0.54).' k=8, r=0.50, CI 0.46-0.54 all match."
+    },
+    {
+      "claim_id": "hayes2006_rel3",
+      "verified": "p.17: 'three studies... AAQ and the Symptom Checklist-90-R... 0.53 (95% confidence interval: 0.47 – 0.58).' k=3, r=0.53, CI 0.47-0.58 all match."
+    },
+    {
+      "claim_id": "hayes2006_rel4",
+      "verified": "p.17: 'four studies... AAQ was, overall, significantly related to three well-known measures of anxiety... 0.49 (95% confidence interval: 0.44 – 0.54).' k=4, r=0.49, CI 0.44-0.54 all match. Anxiety measures (STAI, BAI, ASI) correctly listed."
+    },
+    {
+      "claim_id": "hayes2006_rel5",
+      "verified": "p.23 verbatim: 'ACT has produced between condition effect sizes (using Cohen's d) of .74 at post (N = 629) and 1.17 at follow-up (N = 519).' All numbers match. Average follow-up 19.6 weeks also matches p.23."
+    },
+    {
+      "claim_id": "hayes2006_rel6",
+      "verified": "p.23: 'ACT and active, well-specified treatments... were .58 at post (N = 381) and 1.41 at follow-up (N = 343).' All match."
+    },
+    {
+      "claim_id": "hayes2006_rel7",
+      "verified": "p.23: 'Between condition effect sizes were .73 at post (range: .49 to 1.23) and .83 (range: .79 to .92) at follow-up... N = 96 and 39... process measures... 3.32 at post (N = 96) and .74 at follow-up (N = 39).' All numerical values match exactly."
+    },
+    {
+      "claim_id": "hayes2006_rel8",
+      "verified": "Zettle & Hayes (1986) reanalysis on p.24-25: ATQ-B mid-treatment ACT M=49.0, SD=10.95, CT M=92.25, SD=34.77, d=1.68 — all verified exactly. MacKinnon (2003) mediation steps with Spearman .50 (p=.033), .60 (p=.008), .85 (p<.001), Beta=.97, t=7.35, p<.001 all match."
+    },
+    {
+      "claim_id": "hayes2006_rel14",
+      "verified": "Lundgren epilepsy study p.28 verbatim: N=27, seizure index d=1.44, 1.27, 1.24 at post/6mo/1yr; QoL d=.28, .51, 1.59; epilepsy AAQ d=3.23, 3.76, 2.82. All numbers match exactly."
+    },
+    {
+      "claim_id": "paper.paper_type",
+      "verified": "paper_type='review' is correct. Paper is titled 'Acceptance and Commitment Therapy: Model, Processes and Outcomes' and self-describes as a 'review' of ACT outcome literature. Most theoretical/definitional claims correctly carry verification_status=null or 'proposed_in_paper'; empirical meta-analytic findings carry 'verified_in_paper' which is appropriate since Hayes et al. computed those statistics in this paper."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 34,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

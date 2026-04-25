@@ -1,0 +1,48 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034442Z_R55_v16e_noyzhang_s2\\extraction.json",
+  "paper_title": "Experimental Evidence on the Productivity Effects of Generative Artificial Intelligence",
+  "auditor_id": "noyzhang_auditor_2",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "noy2023_rel1",
+      "verified": "Time-on-task effect correctly attributed: -0.83 SDs, 95% CI [-1.03, -0.63] matches Figure 1 Panel (a) on p.4 (Treatment Effect: -0.83 SDs, 95% CI [-0.63, -1.03]). Raw text on p.3: 'time taken on the post-treatment task drops by 10 minutes (37%) relative to the control group, who take an average of 27 minutes (p = 0.000)' — control_mean=27 and treatment_mean=17 match Figure 1 Panel (c) means."
+    },
+    {
+      "claim_id": "noy2023_rel2",
+      "verified": "Quality (assessor-rated) effect correctly attributed: +0.45 SDs, p=0.000, 95% CI [0.27, 0.63] matches Figure 1 Panel (b) (Treatment Effect 0.45 SDs, CI [0.27, 0.63]) and p.3 text. Control_mean_grade=3.789 and treatment_mean_grade=4.54 match Figure 1 Panel (d) legend exactly. Subdimensions list (overall, writing, content, originality) matches paper description."
+    },
+    {
+      "claim_id": "noy2023_rel3",
+      "verified": "Fixed-time subarm correctly attributed: 0.39 SDs, p=0.13, ~20% of participants — matches p.4 text verbatim. Note about pre-treatment imbalance is also taken from paper."
+    },
+    {
+      "claim_id": "noy2023_rel4",
+      "verified": "Inequality/slope claim correctly extracted: control slope 0.491 (SE 0.053), treatment slope 0.248 (SE 0.065), change in slope -0.243 with 95% CI [-0.41, -0.08] and p=0.004 — all match Figure 2 Panel (a) on p.6 and p.5 text. Correlations 0.49 vs 0.25 match. Self-reported vs assessor-rated boundary respected (these are evaluator grades)."
+    },
+    {
+      "claim_id": "noy2023_rel9",
+      "verified": "Job satisfaction (self-reported, single-item) correctly attributed: paper text on p.9 reports '0.40 standard deviations (p = 0.000)' while Figure 4 Panel (a) prints 'Treatment Effect: 0.5 SDs, 95% CI [0.32, 0.68]'. Extraction faithfully records BOTH values in additional.note field. Author_generalization correctly flags single-item task-enjoyment Likert as actual measure (avoiding job_satisfaction overclaim)."
+    },
+    {
+      "claim_id": "noy2023_rel10",
+      "verified": "Self-efficacy correctly attributed: 0.20 SDs, p=0.060, 95% CI [-0.02, 0.42] matches Figure 4 Panel (b) (Treatment Effect 0.2 SDs, CI [-0.02, 0.42]) and p.9 text. Author_generalization flag distinguishes single-item perceived skill from broader self-efficacy construct."
+    },
+    {
+      "claim_id": "noy2023_exist10",
+      "verified": "Two-week followup numbers correctly attributed: 33% treatment vs 18% control overall; 26% treated vs 9% control among non-prior users (p=0.048); 82% response among 423 invited — all match p.11 text. Correctly distinguished from main experiment outcomes."
+    },
+    {
+      "claim_id": "paper_references",
+      "verified": "All 11 bibliography entries on p.13 are present in paper_references with correct authors, years, journals, volumes, issues, and pages: Acemoglu & Restrepo 2018 (AER 108(6), 1488-1542), Acemoglu & Restrepo 2020 (JPE 128(6), 2188-2244), Agrawal/Gans/Goldfarb 2019, Autor 2015, Autor & Dorn 2013, Boustan/Choi/Clingingsmith 2022, Hoffman/Kahn/Li 2018, Kanazawa et al 2022, Kleinberg et al 2018, Lee 2009, Schwabe & Castellacci 2020. Count and content match."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 28,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "notes": "Extraction is faithful to the source. Critical distinctions are well-handled: (1) effect sizes are correctly attributed to specific outcomes (time-on-task -0.83 SDs, quality +0.45 SDs, fixed-time subarm +0.39 SDs, job satisfaction +0.40/0.50 SDs, self-efficacy +0.20 SDs, worry +0.264 SDs, excitement +0.389 SDs, optimism +0.20 SDs); (2) self-reported time vs assessor-rated quality are correctly separated and recorded in measurement_methods (evaluator_grading vs self_reported_time vs single-item Likerts); (3) the discrepancy between body-text 0.40 SDs and Figure-4 0.50 SDs for job satisfaction is properly captured rather than silently picking one. Note: the paper does NOT have a Wave 1/Wave 2 (treatment-removal) design — it has Task 1 (pre-treatment baseline) and Task 2 (post-treatment) plus a 2-week real-job followup. The extraction correctly treats the followup as a separate longitudinal_field claim (exist10/exist11), not as treatment removal, which is the right framing. paper_references list is complete (11/11) and accurate."
+  }
+}

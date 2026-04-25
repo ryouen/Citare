@@ -1,0 +1,68 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_turing_s1\\extraction.json",
+  "paper_title": "Computing Machinery and Intelligence",
+  "auditor_id": "turing_auditor_2",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "turing1950_def5",
+      "what_extractor_says": "source_text contains '...predict his pupil's behavior.' (US spelling) and key_elements claim a verbatim feel; verification_status is null",
+      "what_paper_says": "PDF page 458 reads exactly: 'predict his pupil's behavior.' This is consistent. However, the extracted source_text inserts an ellipsis bridge ('...The explanation of the paradox is that the rules which get changed in the learning process are of a rather less pretentious kind, claiming only an ephemeral validity. ...') that omits the intervening sentence 'The reader may draw a parallel with the Constitution of the United States.' This is acceptable as elision but the extraction should mark elisions explicitly. No semantic misattribution; flagging as low-severity stylistic note.",
+      "severity": "low",
+      "evidence_quote": "PDF p.458: 'The explanation of the paradox is that the rules which get changed in the learning process are of a rather less pretentious kind, claiming only an ephemeral validity. The reader may draw a parallel with the Constitution of the United States.'"
+    },
+    {
+      "category": 5,
+      "claim_id": "turing1950_def3",
+      "what_extractor_says": "source_section: '5. Universality of Digital Computers'; source_page: 439",
+      "what_paper_says": "The discrete-state machine definition begins on PDF page 439 under the heading '5. Universality of Digital Computers'. The section/page attribution is correct. Verified — no issue.",
+      "severity": "none",
+      "evidence_quote": "PDF p.439, Section 5 opening: 'The digital computers considered in the last section may be classified amongst the \"discrete-state machines.\" These are the machines which move by sudden jumps or clicks from one quite definite state to another.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "turing1950_def2",
+      "verified": "Digital computer definition (Store/Executive unit/Control three-part structure) verified verbatim on PDF p.436-437. The conditional-branch example 'If position 4505 contains 0 obey next the instruction stored in 6707, otherwise continue straight on' is a verbatim PDF quote (p.437). Distinguished_from list (analog/differential analyser) is correct: Turing contrasts with continuous machines like the differential analyser in Section 7 of Contrary Views (p.451)."
+    },
+    {
+      "claim_id": "turing1950_def3",
+      "verified": "Discrete-state machine definition verified on PDF p.439-440. Quote 'move by sudden jumps or clicks from one quite definite state to another' is verbatim. The contrast with continuous systems and Laplacian compounding errors ('The system of the \"universe as a whole\" is such that quite small errors in the initial conditions can have an overwhelming effect... It is an essential property of the mechanical systems which we have called \"discrete-state machines\" that this phenomenon does not occur') is faithfully captured. Distinct from def2 (digital computer) which is a subclass — Turing explicitly says 'digital computers fall within the class of discrete-state machines' (p.440), supporting the extraction's hierarchical separation."
+    },
+    {
+      "claim_id": "turing1950_def4",
+      "verified": "Universal machine definition verified verbatim on PDF p.441-442 (still within Section 5). Quote 'This special property of digital computers, that they can mimic any discrete-state machine, is described by saying that they are universal machines' matches PDF exactly, including the OCR artifact 'It 'ill be seen' which appears in both the PDF and the extraction (faithful preservation of source idiosyncrasy)."
+    },
+    {
+      "claim_id": "turing1950_def5",
+      "verified": "Learning machine definition verified on PDF p.458. Key elements correctly capture (i) ephemeral rules vs. time-invariant underlying rules, (ii) teacher ignorance of internals, (iii) random element, (iv) punishments/rewards mechanism. All four are present in the PDF text spanning p.457-459. Source-section '7. Learning Machines' is correct."
+    },
+    {
+      "claim_id": "turing1950_def6",
+      "verified": "Child machine definition verified verbatim on PDF p.456. Quote 'Instead of trying to produce a programme to simulate the adult mind, why not rather try to produce one which simulates the child's? If this were then subjected to an appropriate course of education one would obtain the adult brain' is verbatim. The evolution analogy mapping (Structure=hereditary material, Changes=mutation, Natural selection=judgment of experimenter) is verbatim from PDF p.456. The relation to def5 (extends) in claim_relations is correct: child-machine is a specific instantiation of the broader learning-machine concept."
+    },
+    {
+      "claim_id": "turing1950_def8",
+      "verified": "Storage capacity definition (log2 of number of states) verified verbatim on PDF p.440. Manchester machine = 165,000 and wheel machine = 1.6 are both verbatim from PDF. Additivity property ('If two machines are put together their capacities must be added') verbatim."
+    },
+    {
+      "claim_id": "turing1950_rel1",
+      "verified": "The 50-year / 10^9 storage / 70% / 5-minute prediction is verified verbatim on PDF p.442 in the opening paragraph of Section 6 ('Contrary Views on the Main Question'). The extraction correctly notes that '109' in source_text is an OCR rendering of 10^9. verification_status='proposed_in_paper' is correct since Turing frames this as 'I believe that in about fifty years' time it will be possible...' (proposal/conjecture, not verified result)."
+    },
+    {
+      "claim_id": "turing1950_exist8",
+      "verified": "Manchester 1,000-unit unpredictability program verified on PDF p.453 (end of Section 6 subsection 8, Argument from Informality of Behaviour). Quote 'I have set up on the Manchester computer a small programme using only 1,000 units of storage, whereby the machine supplied with one sixteen-figure number replies with another within two seconds. I would defy anyone to learn from these replies sufficient about the programme to be able to predict any replies to untried values' matches verbatim. verification_status='verified_in_paper' is appropriate since Turing testifies to having actually set this up."
+    },
+    {
+      "claim_id": "turing1950_exist10",
+      "verified": "Child-machine teaching pilot verified verbatim on PDF p.457. Quote matches exactly. Section attribution '7. Learning Machines' is correct."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 27,
+    "claims_spot_checked": 9,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

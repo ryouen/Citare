@@ -1,0 +1,68 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034442Z_R55_v16e_noyzhang_s2\\extraction.json",
+  "paper_title": "Experimental Evidence on the Productivity Effects of Generative Artificial Intelligence",
+  "auditor_id": "noyzhang_auditor_1",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "noy2023_exist10",
+      "what_extractor_says": "evidence_type='longitudinal_field' for the two-week followup ChatGPT use rates",
+      "what_paper_says": "The two-week followup is itself a survey conducted within the same RCT sample (treatment vs. control), so the comparison of 33% vs 18% is still an RCT-derived contrast (downstream behavioral outcome), not a free-standing longitudinal_field study. evidence_type 'rct' would more accurately reflect the design basis. This is a minor, possibly defensible classification choice (the outcome is measured longitudinally), so severity is low.",
+      "severity": "low",
+      "evidence_quote": "Page 11: 'To track whether participants are subsequently using ChatGPT in their real jobs, we resurvey them two weeks after their completion of the initial survey... 33% of former treatment group participants have used ChatGPT in their job in the past week, relative to 18% of control group participants.'"
+    },
+    {
+      "category": 1,
+      "claim_id": "noy2023_rel9",
+      "what_extractor_says": "effect_size=0.5 for job satisfaction (with note that text reports ~0.40 SDs and Figure 4 reports 0.5)",
+      "what_paper_says": "Page 9 prose explicitly states 'ChatGPT substantially increases job satisfaction, by about 0.40 standard deviations (p = 0.000)'. The figure label on Figure 4 Panel (a) shows 'Treatment Effect: 0.5 SDs, 95% CI: [0.32, 0.68]'. The extractor flagged the discrepancy in an 'additional' note, which is appropriate transparency, but selected 0.5 as the headline effect_size while the in-text discussion uses 0.40. This is a borderline case—the extractor is honest about the inconsistency. Recommend flagging as a paper-internal inconsistency rather than misattribution; severity low.",
+      "severity": "low",
+      "evidence_quote": "Page 9: 'Figure 4 Panel (a) shows that ChatGPT substantially increases job satisfaction, by about 0.40 standard deviations (p = 0.000).' Figure 4(a) label: 'Treatment Effect: 0.5 SDs 95% CI: [0.32, 0.68]'."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "noy2023_exist3",
+      "verified": "Sample N=444 college-educated professionals across marketers, grant writers, consultants, data analysts, HR professionals, and managers, with 50% randomly assigned to ChatGPT treatment between tasks 1 and 2 — verbatim match to page 2 Introduction. Note: user's prompt mentioned N~453, but the paper consistently states 444; extraction correctly uses 444."
+    },
+    {
+      "claim_id": "noy2023_rel1",
+      "verified": "Time taken effect: 'time taken on the post-treatment task drops by 10 minutes (37%) relative to the control group, who take an average of 27 minutes (p = 0.000)' (page 3). Direction is negative (time goes DOWN), correctly captured as relation='negative'. Figure 1(a) confirms Treatment Effect: -0.83 SDs, 95% CI [-0.63, -1.03]; extraction's effect_size=-0.83 with CI [-1.03, -0.63] is correct."
+    },
+    {
+      "claim_id": "noy2023_rel2",
+      "verified": "Quality grade effect: 'Average evaluator grades in the treatment group increase by 0.45 standard deviations (p = 0.000)' (page 3). Figure 1(b) confirms 0.45 SDs, 95% CI [0.27, 0.63]. Direction positive (productivity UP). Extraction matches exactly. No flipping of directions."
+    },
+    {
+      "claim_id": "noy2023_rel4",
+      "verified": "Inequality moderator claim: control slope 0.491 (SE 0.053), treatment slope 0.248 (SE 0.065), Change in Slope -0.243 with 95% CI [-0.08, -0.41] and p=0.004 (Figure 2(a), page 6). Extraction correctly captures both slopes, change-in-slope, and p-value. The interpretation 'low-ability gains more, gap closes' is correctly captured by relation='positive' for baseline ability moderated by ChatGPT access."
+    },
+    {
+      "claim_id": "noy2023_rel5",
+      "verified": "Inequality reduction driven by lower-ability participants benefiting more: 'participants who scored lower on the first round benefit more from ChatGPT access, as the figure shows: the gap between the treatment and control lines is much larger at the left-hand end of the x-axis' (page 5). Direction (negative effect on inequality) correctly captured."
+    },
+    {
+      "claim_id": "noy2023_rel3",
+      "verified": "Fixed-time subarm: '20% of participants... required to spend exactly 15 minutes... treatment increases grades by a similar 0.39 standard deviations (p = 0.13), albeit imprecisely estimated' (page 4). Extraction matches; sample_size=89 is a reasonable estimate for 20% of 444."
+    },
+    {
+      "claim_id": "noy2023_exist5",
+      "verified": "Attrition 5% control / 10% treatment, balance differences on only employment status and HR-professional indicator out of 13 pre-treatment characteristics — verbatim match to page 2."
+    },
+    {
+      "claim_id": "default_method.study_design",
+      "verified": "design_basis='rct' is correctly tagged. The paper is a preregistered RCT (AEARCTR-0010882, page 1 footnote): 'In a preregistered online experiment, we assign occupation-specific, incentivized writing tasks to 444 college-educated professionals, and randomly expose half of them to ChatGPT.' author_framing='causal' is also justified by language like 'This design allows us to estimate the causal effects of ChatGPT' (page 2)."
+    },
+    {
+      "claim_id": "noy2023_meta1",
+      "verified": "Meta-claim accurately summarizes the abstract: time -0.8 SDs, quality +0.4 SDs, inequality reduction by benefiting low-ability workers more, substitution > complementarity, restructured tasks toward editing/away-from-rough-drafting, increased job satisfaction and self-efficacy, heightened both worry and excitement. Verbatim alignment with abstract on page 1. No direction flips."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 31,
+    "claims_spot_checked": 9,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

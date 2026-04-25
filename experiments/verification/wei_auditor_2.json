@@ -1,0 +1,47 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260423T111148Z_R34A_v03_wei_stab1\\extraction.json",
+  "paper_title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "auditor_id": "wei_auditor_2",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "wei2022_def8 + wei2022_rel5 (Equation only ablation)",
+      "verified": "Section 3.3 (page 5) defines 'Equation only' as prompting model to output only a mathematical equation before the answer. Result: 'equation only prompting does not help much for GSM8K... For datasets of one-step or two-step problems, however, we find that equation only prompting does improve performance.' Extraction faithfully records both the condition and the conditional null/positive result. Quote verified verbatim against PDF p.5."
+    },
+    {
+      "claim_id": "wei2022_def9 + wei2022_rel6 (Variable compute only ablation)",
+      "verified": "Section 3.3 (page 6) defines 'Variable compute only' as prompting model to output a sequence of dots (...) equal to the number of characters in the equation. Result: 'This variant performs about the same as the baseline, which suggests that variable computation by itself is not the reason for the success of chain-of-thought prompting.' Extraction correctly attributes the dots-sequence design and the null-effect outcome. Verbatim quote matches PDF p.6."
+    },
+    {
+      "claim_id": "wei2022_def10 + wei2022_rel7 (Chain of thought after answer ablation)",
+      "verified": "Section 3.3 (page 6) — 'Chain of thought after answer' tests whether benefit comes merely from accessing pretrained knowledge. PDF: 'we test an alternative configuration where the chain of thought prompt is only given after the answer... This variant performs about the same as the baseline, which suggests that the sequential reasoning embodied in the chain of thought is useful for reasons beyond just activating knowledge.' Three ablation conditions (equation-only, variable-compute, after-answer) are NOT mixed up in the extraction — each is mapped to its correct definition and result."
+    },
+    {
+      "claim_id": "paper_references audit (Cobbe 2021 GSM8K)",
+      "verified": "Cobbe et al. 2021 'Training verifiers to solve math word problems. arXiv:2110.14168' is present in References (PDF p.11). Cited throughout the paper (Figure 2, Section 3, Table 1). Extraction's paper_references entry is accurate. Note: User mentioned 'Lewkowycz 2022' — Aitor Lewkowycz appears ONLY in the Acknowledgements (PDF p.10), is NOT in the References list, and is NOT cited in the extraction; therefore no misattribution. Other key cited works (Brown 2020, Rae 2021, Kaplan 2020, Patel 2021, Miao 2020, Koncel-Kedziorski 2016, Talmor 2019, Geva 2021, Ahn 2022, Thoppilan 2022, Ouyang 2022, Tay 2022, Chen 2021 Codex, Wang 2022a, Wei 2022b, Zhao 2021, Nye 2021, Ye/Durrett 2022, Wiegreffe 2022, Wei 2022a, Sanh 2022, Jie 2022, Hendrycks 2021, Ling 2017) all verified present in References."
+    },
+    {
+      "claim_id": "wei2022_exist11 (reasoning vs pattern-matching framing)",
+      "verified": "Section 6 Discussion (PDF p.9) verbatim: 'we first qualify that although chain of thought emulates the thought processes of human reasoners, this does not answer whether the neural network is actually \"reasoning,\" which we leave as an open question.' Extraction marks verification_status='proposed_in_paper', which correctly captures the authors' epistemic stance — they explicitly DECLINE to claim the model performs genuine reasoning vs. pattern matching. Framing is faithfully preserved. The extraction does not overclaim 'reasoning' as a verified property anywhere."
+    },
+    {
+      "claim_id": "wei2022_exist6 (k=8 exemplars for arithmetic, k=4 for AQuA)",
+      "verified": "Section 3.1 Experimental Setup (PDF p.3-4) verbatim: 'we used this single set of eight chain of thought exemplars for all benchmarks except AQuA, which is multiple choice instead of free response. For AQuA, we used four exemplars and solutions from the training set, as given in Appendix Table 21.' Extraction's source_text matches verbatim, but cites 'Appendix Table 21' — confirmed correct. Numbers k=8 and k=4 correctly attributed to their respective benchmark sets."
+    },
+    {
+      "claim_id": "wei2022_rel14 (number of exemplars / sample-efficient few-shot)",
+      "verified": "Appendix A.2 (PDF p.18 area, source_page=18 in extraction): 'gains from chain-of-thought prompting generally still held when there was a varying number of few-shot exemplars... increasing from 8 to 16 exemplars did not improve the performance of standard prompting enough to catch up with chain-of-thought prompting.' Extraction correctly characterizes this as null_effect of exemplar count on the CoT gain — i.e., few-shot is sample-efficient and the gap is not closeable by adding more standard exemplars."
+    },
+    {
+      "claim_id": "wei2022_exist7 (50 correct LaMDA 137B GSM8K chains)",
+      "verified": "Section 3.2 Results (PDF p.5) verbatim: 'Of 50 random examples where the model returned the correct final answer, all of the generated chains of thought were also logically and mathematically correct except two that coincidentally arrived at the correct answer.' Sample size n=50 and the 'except two' caveat correctly attributed to the LaMDA 137B / GSM8K manual analysis."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

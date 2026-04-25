@@ -1,0 +1,48 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004759Z_R45_v0.12e_status_barney_s1\\extraction.json",
+  "paper_title": "Firm Resources and Sustained Competitive Advantage (Barney, 1991)",
+  "auditor_id": "barney_auditor_2",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "barney1991_def1",
+      "verified": "Three resource categories correctly attributed on p.101: physical_capital_resources (Williamson, 1975) — 'physical technology used in a firm, a firm's plant and equipment, its geographic location, and its access to raw materials'; human_capital_resources (Becker, 1964) — 'training, experience, judgment, intelligence, relationships, and insight of individual managers and workers'; organizational_capital_resources (Tomer, 1987) — 'a firm's formal reporting structure, its formal and informal planning, controlling, and coordinating systems, as well as informal relations among groups within a firm and between a firm and those in its environment.' Examples in extraction are exact paraphrases of paper text. Citations to Williamson 1975, Becker 1964, Tomer 1987 are all confirmed in References (pp.118, 119)."
+    },
+    {
+      "claim_id": "paper_references / Penrose",
+      "verified": "Extraction lists 'The Theory of the Growth of the Firm (Penrose, 1958)' which exactly matches Barney's reference list on p.119: 'Penrose, E.T. 1958. The theory of the growth of the firm. New York: Wiley.' (Note: although Penrose's book is widely cited as 1959 elsewhere, Barney 1991 explicitly cites it as 1958, so the extraction is faithful to the paper.)"
+    },
+    {
+      "claim_id": "paper_references / Wernerfelt 1984",
+      "verified": "Extraction lists 'A Resource-Based View of the Firm (Wernerfelt, 1984)' — confirmed in References on p.119: 'Wernerfelt, B. 1984. A resource based view of the firm. Strategic Management Journal, 5: 171-180.' Cited in body text on pp.101, 102, 104."
+    },
+    {
+      "claim_id": "paper_references / Porter 1980",
+      "verified": "Extraction lists 'Competitive Strategy (Porter, 1980)' — confirmed in References on p.119: 'Porter, M. 1980. Competitive strategy. New York: Free Press.' Cited extensively in body (pp.99, 100, 104, 107, 110)."
+    },
+    {
+      "claim_id": "barney1991_rel1",
+      "verified": "RELATION (firm_resource_heterogeneity_and_immobility -> firm_sustained_competitive_advantage via VRIN) correctly tagged verification_status='proposed_in_paper'. Page 105: 'it is necessary to build a theoretical model that begins with the assumption that firm resources may be heterogeneous and immobile.' Figure Two (p.112) presents the framework as a proposed model. design_basis='theoretical' is correct — paper is purely conceptual. Source_text on p.105-106 ('To have this potential, a firm resource must have four attributes...') matches verbatim."
+    },
+    {
+      "claim_id": "barney1991_rel10",
+      "verified": "Formal strategic planning -> SCA = null_effect, framed as 'proposed_in_paper'. Verified on p.112-113: 'It seems reasonable to expect that formal strategic planning systems (Lorange, 1980) are unlikely by themselves to be a source of sustained competitive advantage... such planning mechanisms are not rare (Kudla, 1980; Steiner, 1979).' Note: Barney cites Steiner 1979 in body text but Steiner is not present in the References list (pp.117-120) — this is a citation gap in Barney's original paper, not an extraction error."
+    },
+    {
+      "claim_id": "barney1991_def8 / three sources of imperfect imitability",
+      "verified": "Three sources (unique_historical_conditions, causal_ambiguity, social_complexity) verified on p.107: 'Firm resources can be imperfectly imitable for one or a combination of three reasons: (a) the ability of a firm to obtain a resource is dependent upon unique historical conditions, (b) the link between the resources possessed by a firm and a firm's sustained competitive advantage is causally ambiguous, or (c) the resource generating a firm's advantage is socially complex (Dierickx & Cool, 1989).' Extraction matches exactly."
+    },
+    {
+      "claim_id": "default_causal_strength.design_basis",
+      "verified": "design_basis='theoretical' is correct. Paper is explicitly conceptual: p.112 states the framework 'suggest[s] specific empirical questions that need to be addressed' and presents 'three brief examples of how this framework might be applied' rather than empirical tests. No data, no sample, no statistics anywhere in the paper. All RELATION claims correctly marked 'proposed_in_paper' (not 'verified_in_paper')."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "notes": "Barney 1991 extraction is faithful. Three resource types (physical/human/organizational capital) correctly attributed with proper source citations (Williamson 1975, Becker 1964, Tomer 1987). All RELATION claims about resources -> competitive advantage correctly marked 'proposed_in_paper' (consistent with paper's purely conceptual/theoretical nature). design_basis='theoretical' is appropriate. paper_references for Penrose 1958 (not 1959), Wernerfelt 1984, Porter 1980, Lieberman & Montgomery 1988, etc. all verified in Barney's References list. One observation: Steiner 1979 is cited in body but missing from Barney's References — this is the original paper's omission, not an extraction defect."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004158Z_R44_v20v2_T7_s1\\extraction.json",
+  "paper_title": "More Data, Worse Models: Non-Monotonic Scaling under Long-Tail Label Noise",
+  "auditor_id": "t7_auditor_3",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "paper.default_causal_strength.design_basis",
+      "verified": "design_basis='computational_demonstration' is correct. Page 2 explicitly states: 'Paper type. This is an empirical paper; all results are obtained by computational demonstration on three benchmark datasets.' This is NOT an RCT (no human subjects, no randomized treatment assignment); the paper is a synthetic-noise benchmark sweep on long-tail image-classification datasets. Classification is faithful."
+    },
+    {
+      "claim_id": "formal.equations (eq6 handling)",
+      "verified": "Equation (6) on p.14 — n* ∝ 1/||f||_H — is correctly OMITTED from formal.equations. The PDF presents eq(6) as a reduced restatement of eq(5)/Theorem 4: 'the crossover scales roughly as n* ∝ 1/||f||_H, a relationship that can guide budget allocation without recourse to the full expression of Theorem 2.' v0.20v2's equation_status logic correctly skips it as a restatement; the substantive central_contribution is captured as Theorem 4 (eq.5) which already encodes the same dependence via κ(||f||_H). The three central_contribution equations (Theorem 1 eq.3, Theorem 4 eq.5, predicted scaling eq.4) plus sensitivity derivatives (Appendix B) are all genuine novel contributions."
+    },
+    {
+      "claim_id": "okafor2024_exist6",
+      "verified": "Tail-coverage saturation claim verbatim-matches p.9 §4.4: 'We emphasise that tail-coverage saturates at TC_{n,20} = 1 well before the crossover: all tail classes already receive at least 20 samples by n = 2M. The non-monotonicity is therefore not explained by failing to cover the tail; it is driven by the accumulating noise load as additional tail samples are added beyond what is needed for coverage.' Extraction reproduces this exactly. Also corroborated by Table 2 row 'Tail-coverage TC_{n,20}': 0.74, 0.91, 0.98, 1.00, 1.00, 1.00 across n=500K..4M."
+    },
+    {
+      "claim_id": "okafor2024_rel1",
+      "verified": "Central 'more data hurts' direction is preserved. l0_json.relation='curvilinear' (NOT 'positive' or 'negative'); source_text captures the rise from 34.7% (n*=1.2M) to 38.2% (n=4M). l3_json.models reproduce Table 2 row 'Test error (%)' exactly: 41.5, 37.2, 34.7, 36.0, 37.4, 38.2 across n=500K..4M, with monotonic-prediction underprediction of 11.3 pp at 4M (=38.2−26.9). Direction is NOT flipped to 'more data helps'."
+    },
+    {
+      "claim_id": "okafor2024_exist3",
+      "verified": "Quote 'The observed minimum is 34.7% at n* ≈ 1.2 × 10^6, and empirical error then rises to 38.2% at n = 4 × 10^6' matches p.9 §4.4 verbatim. Page attribution (p.9) and section ('4.4 The crossover') are correct."
+    },
+    {
+      "claim_id": "okafor2024_def3",
+      "verified": "Tail-coverage definition source_text matches Definition 3 on p.5 verbatim, including the k=20 default. equation_status='supporting_definition' for the corresponding equation in formal.equations is appropriate (this paper introduces the metric but as a measurement device, not the central theoretical contribution; the central contributions are Theorems 1, 4, and the predicted scaling form)."
+    },
+    {
+      "claim_id": "okafor2024_rel4",
+      "verified": "Negative capacity↔n* relation is correct and matches §4.6 Table 3 (ResNet-50: 1.20M, ResNet-152: 0.75M, ViT-B/16: 0.90M) plus §5.4 cross-architecture replication (ResNet-101: 0.95M, Swin-T: 1.05M, Swin-S: 0.80M, EfficientNet-B3: 1.10M). All seven values match the PDF exactly. The counter-intuitive direction ('larger models reach crossover sooner, NOT later') is preserved."
+    },
+    {
+      "claim_id": "okafor2024_exist8",
+      "verified": "Bound comparison numbers match Appendix C verbatim: Pure Rademacher >100% vacuous; Natarajan uniform-noise 51.8%; Theorem 1 43.9%; empirical 41.5%. Source page (18) and section ('Appendix C') are correct."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 27,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

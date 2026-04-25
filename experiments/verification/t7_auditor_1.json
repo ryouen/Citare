@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004158Z_R44_v20v2_T7_s1\\extraction.json",
+  "paper_title": "More Data, Worse Models: Non-Monotonic Scaling under Long-Tail Label Noise",
+  "auditor_id": "t7_auditor_1",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "okafor2024_rel4",
+      "what_extractor_says": "source_section = '4.6 Capacity analysis (Table 3)' but l3_json.models lists seven architectures including ResNet-101 (0.95M), Swin-T (1.05M), Swin-S (0.80M), EfficientNet-B3 (1.10M)",
+      "what_paper_says": "Section 4.6 / Table 3 reports only ResNet-50, ResNet-152, ViT-B/16. The four supplementary architectures (ResNet-101, Swin-T, Swin-S, EfficientNet-B3) are introduced in Section 5.4 'Cross-architecture replication of capacity effect' (page 12).",
+      "severity": "low",
+      "evidence_quote": "p.12 Section 5.4: 'we trained four additional models on ImageNet-LT: ResNet-101, Swin-T, Swin-S, and EfficientNet-B3. Crossover points are n* = 0.95M, 1.05M, 0.80M, 1.10M respectively.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "okafor2024_rel1",
+      "verified": "Crossover at n*≈1.2M with min err 34.7%, rising to 38.2% at n=4M correctly attributed to ImageNet-LT/ResNet-50 (Table 2, p.9). Relation type 'curvilinear' correctly captures non-monotonic direction (NOT monotonic positive). All six per-n test error values (41.5/37.2/34.7/36.0/37.4/38.2) match Table 2 exactly. Monotonic underprediction 26.9% at 4M (= 11.3 pp gap) matches paper p.9."
+    },
+    {
+      "claim_id": "okafor2024_rel4",
+      "verified": "Counterintuitive negative relation between model_capacity and n* preserved. ResNet-50=1.20M, ResNet-152=0.75M, ViT-B/16=0.90M match Table 3 (p.10) exactly. Author's own framing 'counter to the conventional intuition that larger models are more robust to label noise' is correctly captured."
+    },
+    {
+      "claim_id": "okafor2024_exist3",
+      "verified": "ImageNet-LT crossover (n*≈1.2M, min 34.7%, rises to 38.2% at 4M, monotonic prediction underpredicts by 11.3 pp) verbatim from Section 4.4 / Table 2 p.9."
+    },
+    {
+      "claim_id": "okafor2024_exist4",
+      "verified": "Places-LT (n*≈680K, min 29.3%, rises to 32.1% at n=2M) correctly attributed; matches Table 4 p.11."
+    },
+    {
+      "claim_id": "okafor2024_exist5",
+      "verified": "iNaturalist-2018 (n*≈1.85M, min 34.2%, lower η_tail=0.21) correctly attributed; matches Table 5 p.11. Three datasets distinct and not conflated."
+    },
+    {
+      "claim_id": "formal.equations[0] (Theorem 1, eq.3)",
+      "verified": "PAC-Bayesian bound under tail-concentrated noise is correctly marked equation_status='central_contribution'. Paper explicitly labels it 'our main theoretical contribution' (Section 3.4, p.6) and 'Theorem 1'. NOT confused with the canonical scaling law (eq.1, E[err]≈A·n^{-α}+B) from the Introduction, which is correctly omitted from the extraction's equations list as it's prior-work background (cited via [1,2,4])."
+    },
+    {
+      "claim_id": "formal.equations (eq.6 omitted)",
+      "verified": "Equation (6) in Discussion (n* ∝ 1/||f||) is correctly NOT extracted as a standalone equation. Paper p.14 explicitly presents it as a derived simplification of Theorem 4 / eq.5: 'a relationship that can guide budget allocation without recourse to the full expression of Theorem 2.' Extraction captures the underlying relationship via Theorem 4 (eq.5) and the sensitivity derivative ∂log n*/∂log ||f||_H = -β in Appendix B equation."
+    },
+    {
+      "claim_id": "okafor2024_exist8",
+      "verified": "Theorem 1 PAC-bound comparison (Pure Rademacher >100%, Natarajan 51.8%, Theorem 1 43.9%, empirical 41.5%) verbatim from Appendix C p.18. Bound tightness ranking correctly preserved."
+    },
+    {
+      "claim_id": "okafor2024_rel5",
+      "verified": "Weight decay sweep (λ=1e-5: 0.85M; 1e-4: 1.20M; 1e-3: 1.65M; 5e-3: 1.72M) matches Table 7 p.12 exactly."
+    },
+    {
+      "claim_id": "okafor2024_rel8",
+      "verified": "Bound-vs-empirical pp gaps (+2.4, +1.8, +0.5, -4.6, -8.3, -10.5) at n=500K..4M match Table 6 p.12 exactly. Sign reversal at crossover correctly preserved."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 28,
+    "claims_spot_checked": 10,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

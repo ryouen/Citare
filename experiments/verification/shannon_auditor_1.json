@@ -1,0 +1,52 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_shannon_s1\\extraction.json",
+  "paper_title": "A Mathematical Theory of Communication",
+  "auditor_id": "shannon_auditor_1",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "shannon1948_def4",
+      "verified": "Entropy formula H = -K sum_{i=1}^{n} p_i log p_i (Theorem 2) verified verbatim on page 11 of the PDF, in Section 6 'Choice, Uncertainty and Entropy'. Subscript i and summation index 1..n exactly match. The accompanying note that 'Quantities of the form H = -sum p_i log p_i ... play a central role in information theory as measures of information, choice and uncertainty' is also reproduced correctly. Concept tag 'communication_entropy' and section attribution are correct."
+    },
+    {
+      "claim_id": "shannon1948_def3",
+      "verified": "Discrete-channel capacity definition C = Lim_{T->inf} log N(T) / T verified on page 3 in Section 1 'The Discrete Noiseless Channel'. N(T) defined as 'the number of allowed signals of duration T' matches. The extraction correctly tags this concept 'communication_channel_capacity_discrete' and distinguishes it from later noisy/continuous capacity definitions (def9, rel6)."
+    },
+    {
+      "claim_id": "shannon1948_def9",
+      "verified": "Noisy-channel capacity C = Max(H(x) - H_y(x)) verified on page 22 in Section 12 'Equivocation and Channel Capacity'. The extraction correctly keeps this DISTINCT from the noiseless discrete capacity (def3) and from the continuous-channel Shannon-Hartley formula (rel6); concept key 'communication_channel_capacity_noisy' is appropriate."
+    },
+    {
+      "claim_id": "shannon1948_def10",
+      "verified": "Continuous entropy H = -integral p(x) log p(x) dx verified on page 35 in Section 20 'Entropy of a Continuous Distribution'. The extraction correctly captures the key warning that continuous entropy is coordinate-relative (page 37, property 8), distinguishing it from the absolute discrete entropy. Distinguished_from list correctly notes 'discrete entropy (which is absolute)'."
+    },
+    {
+      "claim_id": "shannon1948_rel4",
+      "verified": "Theorem 9 (Source Coding Theorem / Fundamental Theorem for Noiseless Channel): rate C/H - epsilon symbols per second verified on page 16, Section 9. Correctly tagged equation_status='central_contribution', name correctly identifies it as Shannon's source coding theorem. Source section attribution exact."
+    },
+    {
+      "claim_id": "shannon1948_rel5",
+      "verified": "Theorem 11 (Noisy-channel coding theorem / Shannon's second theorem): if H <= C, arbitrarily small error possible; if H > C, equivocation >= H - C. Verified verbatim on page 22, Section 13 'The Fundamental Theorem for a Discrete Channel with Noise'. Extraction correctly keeps this DISTINCT from rel4 (source coding theorem) — the two central theorems are not conflated. equation_status='central_contribution' is correct."
+    },
+    {
+      "claim_id": "shannon1948_rel6",
+      "verified": "Theorem 17 (Shannon-Hartley): C = W log (P+N)/N verified on page 43, Section 25 'Channel Capacity with an Average Power Limitation'. Variables P=avg transmitter power, N=white thermal noise power, W=bandwidth all correctly attributed. equation_status='central_contribution' is appropriate as this is one of Shannon's most cited results."
+    },
+    {
+      "claim_id": "shannon1948_def8",
+      "verified": "Equivocation defined as H_y(x) (conditional entropy of input x given received output y) verified on page 20, Section 12. Note: subscript convention is correct — H_y(x) means entropy of x given y (not the reverse). The extraction's key_elements correctly identify this as 'amount of additional information needed at receiver to correct errors', matching the PDF's text on page 21."
+    },
+    {
+      "claim_id": "shannon1948_exist10",
+      "verified": "Boltzmann H-theorem analogy on page 11 verified. Extraction correctly tags this as 'proposed_in_paper' (re_interpretation evidence type) rather than a central contribution — Shannon explicitly notes the formal identity is recognition of prior statistical mechanics, not a new result."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 41,
+    "claims_spot_checked": 9,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "audit_notes": "Extraction is highly faithful. The five focus areas are all handled correctly: (1) Entropy formula H = -K sum p_i log p_i has correct subscripts and summation index (def4, p.11). (2) Channel capacity formulas correctly captured in three distinct forms — discrete noiseless C = lim log N(T)/T (def3), noisy discrete C = Max(H(x)-H_y(x)) (def9), and Shannon-Hartley C = W log (P+N)/N (rel6). (3) Discrete vs continuous channel kept properly distinct: def3/def9 (discrete) separated from def10/rel6 (continuous), with the coordinate-relativity caveat for continuous entropy noted. (4) Source coding theorem (Theorem 9, rel4, p.16) and channel coding theorem (Theorem 11, rel5, p.22) are kept as separate claims with distinct names and IDs — no conflation. (5) equation_status='central_contribution' is correctly applied to Shannon's actual contributions (Theorems 9, 11, 17, AEP, Shannon-Hartley, rate-distortion) and not to background prerequisites; the Boltzmann-H connection (exist10) is correctly framed as 're_interpretation/proposed_in_paper' rather than a Shannon contribution. Page numbers verified for spot-checked claims match the PDF exactly."
+  }
+}

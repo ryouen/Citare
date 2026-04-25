@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_park_s1\\extraction.json",
+  "paper_title": "Generative Agents: Interactive Simulacra of Human Behavior",
+  "auditor_id": "park_auditor_3",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "park2023_exist7",
+      "what_extractor_says": "Mean age score 4 (3='18-24', 4='25-34').",
+      "what_paper_says": "Section 6.3 Human Evaluators (p.13) reports the MEDIAN, not the mean: 'The median age score of our participants was 4 (3=\"18-24 years old\", 4=\"25-34 years old\").' The source_text quote inside the same extraction entry actually quotes 'mean age score' — which differs from the printed PDF text.",
+      "severity": "medium",
+      "evidence_quote": "Direct quote from PDF p.13, section 6.3: 'The median age score of our participants was 4 (3=\"18-24 years old\", 4=\"25-34 years old\").'"
+    },
+    {
+      "category": 4,
+      "claim_id": "park2023_exist9",
+      "what_extractor_says": "phenomenon='computational_cost_limitation'; verification_status='verified_in_paper'.",
+      "what_paper_says": "The cost statement appears in section 8.2 'Future Work and Limitations' (p.16). Per audit protocol, limitations-section claims should carry verification_status='proposed_in_paper' (the authors are flagging cost as a limitation/future-work item, not empirically demonstrating cost). The factual amount ('thousands of dollars in token credits, multiple days') is true, but the claim that this is a 'limitation' is the authors' framing, not a measured finding. Either re-tag as proposed_in_paper or rename phenomenon to remove the 'limitation' suffix.",
+      "severity": "low",
+      "evidence_quote": "Direct quote from PDF p.16, section 8.2 Future Work and Limitations: 'The present study required substantial time and resources to simulate 25 agents for two days, costing thousands of dollars in token credits and taking multiple days to complete. To enhance real-time interactivity, future research can explore parallelizing agents or developing language models specifically designed for building generative agents.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "park2023_rel1",
+      "verified": "TrueSkill mu/sigma values for all 5 conditions (29.89/0.72, 26.88/0.69, 25.64/0.68, 22.95/0.69, 21.21/0.70) match section 6.5.1 exactly. Cohen's d=8.16 matches 'd=8.16, or eight standard deviations'. Kruskal-Wallis H(4)=150.29, p<0.001 and Dunn post-hoc (Holm-Bonferroni) with all-pairs significance except crowdworker vs fully ablated baseline match verbatim (p.13)."
+    },
+    {
+      "claim_id": "park2023_rel5",
+      "verified": "Information diffusion numbers match section 7.1.2 (p.15): mayoral candidacy 1(4%)->8(32%); Valentine's party 1(4%)->13(52%); 'None who claimed to know about this information had hallucinated it.'"
+    },
+    {
+      "claim_id": "park2023_rel6",
+      "verified": "Network density 0.167->0.74 and hallucination rate 1.3% (n=6 of 453) match section 7.1.2 verbatim. Formula eta=2|E|/(|V|(|V|-1)) matches the printed formula on p.15."
+    },
+    {
+      "claim_id": "park2023_rel7",
+      "verified": "Coordination numbers match: 12 agents invited besides Isabella, 5 of 12 attended Hobbs Cafe, 3 cited conflicts, 4 expressed interest but did not plan to come (p.15, Figure 9 caption confirms 'a total of 12 agents, aside from Isabella')."
+    },
+    {
+      "claim_id": "park2023_def3 / def5 / def6",
+      "verified": "memory_stream (def3, p.7-8 sec 4.1), reflection (def5, p.9 sec 4.2), and planning (def6, p.10 sec 4.3) are correctly distinguished as separate concepts with non-overlapping key_elements. Reflection threshold of 150 importance-score sum matches the printed implementation detail on p.9. Planning's top-down recursive decomposition matches section 4.3."
+    },
+    {
+      "claim_id": "park2023_def8",
+      "verified": "Recency exponential decay factor 0.995 over sandbox game hours matches p.9 section 4.1 (Recency) verbatim."
+    },
+    {
+      "claim_id": "park2023_exist8",
+      "verified": "Implementation uses gpt3.5-turbo; GPT-4 was invitation-only at time of writing — matches p.7 section 4 verbatim."
+    },
+    {
+      "claim_id": "park2023_exist11",
+      "verified": "Ethical risks correctly tagged proposed_in_paper from section 8.3 Ethics and Societal Impact. Four risks (parasocial, error impact, deepfake/misinformation, over-reliance/displacement) all present in source text."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 33,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

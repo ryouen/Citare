@@ -1,0 +1,76 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_watsoncrick_s1\\extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid (Watson & Crick, Nature 1953)",
+  "auditor_id": "watsoncrick_auditor_1",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_exist2",
+      "what_extractor_says": "verification_status: 'verified_in_paper' for the structural geometry parameters (3.4 A residue spacing, 36 degree angle, 34 A repeat, 10 A phosphate-axis distance).",
+      "what_paper_says": "These parameters are explicitly framed as model assumptions/derivations, not as empirically verified measurements. The paper says: 'We have assumed an angle of 36 degrees between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A.' The authors elsewhere state the structure 'must be regarded as unproved until it has been checked against more exact results.' Therefore the geometry is proposed/assumed within the model, not verified in the paper.",
+      "severity": "medium",
+      "evidence_quote": "p.737: 'We have assumed an angle of 36 degrees between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A. The distance of a phosphorus atom from the fibre axis is 10 A.' and 'it must be regarded as unproved until it has been checked against more exact results.'"
+    },
+    {
+      "category": 3,
+      "claim_id": "watson1953_rel2",
+      "what_extractor_says": "RELATION with iv=molecular_base_sequence_chain_one, dv=molecular_base_sequence_chain_two, relation='positive', mediator='molecular_specific_base_pairing_rules'.",
+      "what_paper_says": "The relationship is complementary/deterministic (A pairs with T, G pairs with C — not A with A). Labeling this as 'positive' (which conventionally implies a same-direction monotonic association) misrepresents the structural relationship; it is a conditional / one-to-one complementary determination. A label like 'conditional' or 'deterministic_complementary' would be more faithful. The mediator framing is reasonable.",
+      "severity": "medium",
+      "evidence_quote": "p.737: 'However, if only specific pairs of bases can be formed, it follows that if the sequence of bases on one chain is given, then the sequence on the other chain is automatically determined.'"
+    },
+    {
+      "category": 4,
+      "claim_id": "paper.paper_type",
+      "what_extractor_says": "paper_type: 'empirical' (with default_causal_strength.design_basis: 'theoretical').",
+      "what_paper_says": "The paper presents a theoretical/structural model proposal grounded in stereochemical reasoning and reanalysis of others' published X-ray data. Watson & Crick did not collect new empirical data here (Wilkins/Franklin's data are in the companion communications). The paper itself states it 'rests mainly though not entirely on published experimental data and stereochemical arguments' and that the structure 'must be regarded as unproved'. paper_type='empirical' is inconsistent with the paper's own framing and with the design_basis='theoretical' field; a value such as 'theoretical' or a conceptual/theoretical mix would fit better.",
+      "severity": "low",
+      "evidence_quote": "p.737: 'We wish to suggest a structure for the salt of deoxyribose nucleic acid' ... 'our structure, which rests mainly though not entirely on published experimental data and stereochemical arguments.'"
+    },
+    {
+      "category": 1,
+      "claim_id": "watson1953_exist3",
+      "what_extractor_says": "evidence_type: 'cross_sectional_field' for the Chargaff base-ratio observation.",
+      "what_paper_says": "Watson & Crick are citing prior experimental findings (Chargaff; Wyatt) — they did not measure these ratios themselves. 'cross_sectional_field' implies the present paper conducted a cross-sectional field study, which it did not. A label such as 'prior_empirical_finding' or 'cited_empirical_observation' would be more accurate. The factual content of the claim is correct.",
+      "severity": "low",
+      "evidence_quote": "p.737: 'It has been found experimentally that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' (citations 3,4 = Chargaff/Zamenhof 1952; Wyatt 1952)"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "watson1953_def1",
+      "verified": "Antiparallel directionality correctly captured as 'atom sequences run in opposite directions (antiparallel)'. PDF p.737 verbatim: 'owing to the dyad the sequences of the atoms in the two chains run in opposite directions.' Right-handed helices and dyad symmetry also correctly stated."
+    },
+    {
+      "claim_id": "watson1953_def2",
+      "verified": "Base pairing A-T and G-C correctly assigned with no swap. Purine-pyrimidine constraint correctly stated. PDF p.737: 'adenine (purine) with thymine (pyrimidine), and guanine (purine) with cytosine (pyrimidine).' Hydrogen-bond positions (purine 1 to pyrimidine 1, purine 6 to pyrimidine 6) match PDF verbatim."
+    },
+    {
+      "claim_id": "watson1953_def1 (positional claims)",
+      "verified": "Backbone-vs-bases positional claim correctly recorded as 'bases on the inside of the helix, phosphates on the outside'. PDF p.737: 'the bases are on the inside of the helix and the phosphates on the outside.' Also correctly distinguished from Pauling & Corey's model where phosphates are near the axis."
+    },
+    {
+      "claim_id": "watson1953_exist6",
+      "verified": "Implication for genetic copying correctly framed as a proposal/suggestion (verification_status='proposed_in_paper', evidence_type='conceptual_argument'). PDF p.737: 'It has not escaped our notice that the specific pairing we have postulated immediately suggests a possible copying mechanism for the genetic material.' Author wording 'suggests a possible' correctly reflected as not-yet-verified."
+    },
+    {
+      "claim_id": "watson1953_exist1",
+      "verified": "Critique of Pauling & Corey three-chain model accurately summarized: phosphates near fibre axis, lack of acidic hydrogens, electrostatic repulsion of negatively charged phosphates, and too-small van der Waals distances. All four sub-points match PDF p.737 verbatim."
+    },
+    {
+      "claim_id": "watson1953_exist5",
+      "verified": "Self-acknowledged provisional status correctly captured: 'roughly compatible with the experimental data, but it must be regarded as unproved until it has been checked against more exact results.' Acknowledgement of not knowing details of the following Wilkins/Franklin communications also correctly preserved."
+    },
+    {
+      "claim_id": "watson1953_def4 + watson1953_rel2 (Chargaff complementarity)",
+      "verified": "Correctly captures that base sequence on one chain determines the other via specific pairing rules; sequence on a single chain is unrestricted. Matches PDF p.737 verbatim."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 7,
+    "issues_count": 4,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

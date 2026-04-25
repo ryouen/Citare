@@ -1,0 +1,70 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_shannon_s1\\extraction.json",
+  "paper_title": "A Mathematical Theory of Communication (Shannon 1948)",
+  "auditor_id": "shannon_auditor_2",
+  "issues_found": [
+    {
+      "category": 2,
+      "claim_id": "shannon1948_exist2",
+      "what_extractor_says": "phenomenon = 'discrete_source_representable_as_markoff_process'; evidence = 'Any stochastic process generating sequences of symbols from a finite set may be considered a discrete source, and represented as a Markoff process; a finite-state graph captures dependencies between successive symbols.' source_section = '2. The Discrete Source of Information', source_page = 5",
+      "what_paper_says": "On p.5 (Section 2) Shannon writes only that 'a discrete source ... may be considered to be represented by a stochastic process' and that 'any stochastic process which produces a discrete sequence of symbols chosen from a finite set may be considered a discrete source.' The identification with Markoff processes (and the finite-state graph) is NOT made until Section 4 'Graphical Representation of a Markoff Process' on p.8: 'Stochastic processes of the type described above are known mathematically as discrete Markoff processes.' The extractor merges the Section 2 stochastic-process claim with the Section 4 Markoff identification into a single claim located at p.5/Sec.2.",
+      "severity": "low",
+      "evidence_quote": "p.5: 'A physical system, or a mathematical model of a system which produces such a sequence of symbols governed by a set of probabilities, is known as a stochastic process. We may consider a discrete source, therefore, to be represented by a stochastic process.' p.8: 'Stochastic processes of the type described above are known mathematically as discrete Markoff processes and have been extensively studied in the literature.'"
+    },
+    {
+      "category": 2,
+      "claim_id": "shannon1948_def4",
+      "what_extractor_says": "key_elements include 'measured in bits when log base 2 and K=1'",
+      "what_paper_says": "Shannon's bit unit is established in the Introduction (p.1-2): 'If the base 2 is used the resulting units may be called binary digits, or more briefly bits.' Theorem 2 itself does not state 'K=1' as the bit condition; Shannon writes only that the constant K 'merely amounts to a choice of a unit of measure'. Saying bits require both 'log base 2 AND K=1' is technically a slight overspecification — choosing log base 2 alone (with K absorbed) already yields bits. Minor semantic over-tightening, not a misattribution.",
+      "severity": "low",
+      "evidence_quote": "p.1: 'If the base 2 is used the resulting units may be called binary digits, or more briefly, bits, a word suggested by J. W. Tukey.' p.11: 'Quantities of the form H = -sum p_i log p_i (the constant K merely amounts to a choice of a unit of measure)...'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "shannon1948_def4",
+      "verified": "Entropy formula H = -K sum p_i log p_i correctly attributed to Theorem 2 in Section 6 (Choice, Uncertainty and Entropy), p.11. design_basis='theoretical' is consistent with the paper being a mathematical/derivational work; Theorem 2 is proved in Appendix 2. evidence_type='theoretical_derivation' is correct."
+    },
+    {
+      "claim_id": "shannon1948_def5",
+      "verified": "Conditional entropy H_x(y) = -sum p(i,j) log p_i(j) correctly attributed to Section 6 on p.12. Definition matches verbatim. Crucially, this is properly DISTINCT from def4 (entropy H) and from def8 (equivocation H_y(x), the SWAPPED conditional). Mutual-information-related quantities are not conflated with marginal entropy."
+    },
+    {
+      "claim_id": "shannon1948_def8",
+      "verified": "Equivocation H_y(x) correctly identified as the conditional entropy of the message given the received signal, on p.20 in Section 12 'Equivocation and Channel Capacity'. The 'amount of additional information needed at receiver to correct errors' interpretation is verified verbatim ('Roughly then, H_y(x) is the amount of additional information that must be supplied per second at the receiving point to correct the received message')."
+    },
+    {
+      "claim_id": "shannon1948_def9",
+      "verified": "Channel capacity C = Max(H(x) - H_y(x)) correctly attributed to Section 12, p.22. The R = H(x) - H_y(x) quantity (effectively mutual information; Shannon calls it 'rate of actual transmission') is properly distinguished from marginal entropy H(x). Distinction between mutual information and entropy is preserved."
+    },
+    {
+      "claim_id": "shannon1948_rel4",
+      "verified": "Theorem 9 (Fundamental Theorem for a Noiseless Channel) verified verbatim on p.16 in Section 9. Source entropy H is correctly noted as 'bits per symbol' and channel capacity C as 'bits per second'. Bit-unit attribution is correct. design_basis 'theoretical_derivation' is appropriate."
+    },
+    {
+      "claim_id": "shannon1948_exist1",
+      "verified": "The three reasons for the logarithmic measure (engineering linearity, intuitive feeling, mathematical convenience) verified verbatim on p.1. The base/unit framework (bits, decimal digits, natural units via base e) is set up in this section. Note: extraction does NOT use the modern terms 'nat' or 'hartley' — Shannon never uses those terms; he says 'natural units' for base e and 'decimal digits' for base 10. The extraction stays faithful to Shannon's terminology."
+    },
+    {
+      "claim_id": "shannon1948_exist5",
+      "verified": "Numerical example 1000 bits/sec, 1% error -> H_y(x) = 0.081 bits/symbol = 81 bits/sec, so rate = 919 bits/sec, verified verbatim on p.20 in Section 12. The bit-unit attribution and the equivocation interpretation are correct."
+    },
+    {
+      "claim_id": "shannon1948_def12",
+      "verified": "Ergodic source definition (Section 5, p.8-9) correctly attributed. Properly distinguishes ergodic processes from mixed sources and notes ergodic as a special subclass of Markoff processes. Markov-chain framework (general) and ergodic special case are distinct in the extraction."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 41,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "audit_focus_findings": {
+      "markov_vs_iid_distinction": "Adequately preserved. Section 2 examples A/B (i.i.d.) and C (Markov digram) are not explicitly extracted as separate claims, but exist4 covers the progression of approximations and def12 distinguishes ergodic Markov sources. exist2 slightly conflates Section 2 (stochastic process) with Section 4 (Markoff identification) but the substantive distinction between i.i.d. and Markov is not lost.",
+      "mutual_information_vs_entropy_distinction": "Preserved. Marginal H (def4), conditional H_x(y) (def5), equivocation H_y(x) (def8), and rate R = H(x)-H_y(x) inside C = Max(H(x)-H_y(x)) (def9) are all kept as distinct concepts. Shannon does not name 'mutual information' in this 1948 paper (he calls it 'rate of transmission'), and the extraction correctly does not invent that term.",
+      "bit_nat_hartley_unit_attribution": "Correct. Bit (base 2), natural unit (base e), decimal digit (base 10) are Shannon's actual terms. The extraction does not anachronistically introduce 'nat' or 'hartley'. Bit unit is correctly attached to log base 2 in def3, def4, rel4, exist5. No misattribution detected.",
+      "design_basis_theoretical": "Correct. paper.default_causal_strength.design_basis = 'theoretical' is appropriate for a mathematical-proof paper. All claims with formal equations carry proof_type='direct_derivation' and evidence_type='theoretical_derivation', consistent with the paper containing 22+ numbered theorems with mathematical proofs in appendices. No empirical-causal claims are improperly framed."
+    }
+  }
+}

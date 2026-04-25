@@ -1,0 +1,55 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_park_s1\\extraction.json",
+  "paper_title": "Generative Agents: Interactive Simulacra of Human Behavior",
+  "auditor_id": "park_auditor_1",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "park2023_exist7",
+      "what_extractor_says": "Mean age score of 4 (3='18-24', 4='25-34')",
+      "what_paper_says": "Page 13, Section 6.3 Human Evaluators: the paper reports the MEDIAN age score, not the mean. Verbatim: 'The median age score of our participants was 4 (3=\"18-24 years old\", 4=\"25-34 years old\").' The extraction wording 'Mean age score of our participants was 4' substitutes mean for median, which is a statistical misattribution.",
+      "severity": "low",
+      "evidence_quote": "'The median age score of our participants was 4 (3=18-24 years old, 4=25-34 years old). 25 of them identified as female, 73 as male, and 2 as non-binary.' (p.13, Section 6.3 Human Evaluators)"
+    },
+    {
+      "category": 2,
+      "claim_id": "park2023_def4",
+      "what_extractor_says": "key_elements lists the formula as 'score = a_recency * recency + a_importance * importance + a_relevance * relevance' under computational_retrieval_function. The ORDERING of weights in `key_elements` says 'weighted combination of recency, importance, and relevance'. This matches paper. However the extraction's higher-level def text wording in source_text aggregates two passages from p.8 with the formula text. Verified: paper p.9 explicitly states 'score = a_recency * recency + a_importance * importance + a_relevance * relevance' and 'In our implementation, all alphas are set to 1.' The formula and weights are correctly attributed; no misattribution detected.",
+      "what_paper_says": "p.9 (Section 4.1, end): 'score = a_recency * recency + a_importance * importance + a_relevance * relevance ... all alphas are set to 1.' Matches extraction exactly.",
+      "severity": "none",
+      "evidence_quote": "'The retrieval function scores all memories as a weighted combination of the three elements: score = alpha_recency * recency + alpha_importance * importance + alpha_relevance * relevance. In our implementation, all alphas are set to 1.' (p.9)"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "park2023_def3", "verified": "Memory stream defined as long-term memory module recording natural-language list of experiences, each with description + creation timestamp + most recent access timestamp. Verbatim match on p.8 ('It is a list of memory objects, where each object contains a natural language description, a creation timestamp, and a most recent access timestamp')."},
+    {"claim_id": "park2023_def5", "verified": "Reflection defined as second type of memory consisting of higher-level abstract thoughts; threshold of 150 importance-sum and 'roughly two or three times a day' both verified on p.9. Tree structure of reflections (leaves = observations, non-leaves = abstract thoughts) verified on p.10 Figure 7 caption and p.10 text."},
+    {"claim_id": "park2023_def6", "verified": "Planning defined as future sequence of actions with location, starting time, duration; top-down recursive decomposition into hour-long then 5-15 minute chunks verified on pp.10-11. Plans stored in memory stream and included in retrieval verified on p.11."},
+    {"claim_id": "park2023_def4", "verified": "Retrieval formula score = alpha_recency*recency + alpha_importance*importance + alpha_relevance*relevance with all alphas=1 verified verbatim on p.9. Weights (recency 0.995 decay, importance 1-10 LLM-rated, relevance cosine similarity) all attributed to correct sub-components."},
+    {"claim_id": "park2023_exist5", "verified": "'A community of 25 unique agents inhabits Smallville' verified verbatim on p.5 (Section 3.1). Sprite avatars and natural-language seed paragraphs (semicolon-delimited becoming initial memories) all match."},
+    {"claim_id": "park2023_rel1", "verified": "TrueSkill mu values for all 5 conditions match Figure 8 / Section 6.5.1 verbatim: Full=29.89/0.72, NoReflection=26.88/0.69, NoReflectionNoPlanning=25.64/0.68, Crowdworker=22.95/0.69, NoObsNoReflNoPlan=21.21/0.70. Cohen's d=8.16 correctly attributed to 'full vs no-memory/planning/reflection' comparison (p.13). Kruskal-Wallis H(4)=150.29, p<0.001 verbatim. Dunn post-hoc with Holm-Bonferroni correctly described, and the noted exception (crowdworker vs fully ablated baseline) matches paper."},
+    {"claim_id": "park2023_rel5", "verified": "Information diffusion (interview-based eval): Sam mayoral candidacy 1/25 (4%) -> 8/25 (32%); Valentine party 1/25 (4%) -> 13/25 (52%); 0% hallucination among claimers. All verified verbatim on p.15 (Section 7.1.2). Correctly tagged as end-to-end evaluation (not the controlled interview eval)."},
+    {"claim_id": "park2023_rel6", "verified": "Network density 0.167 -> 0.74; 1.3% (n=6 of 453) hallucinated; formula eta = 2|E|/(|V|(|V|-1)) all verbatim on p.15. Correctly attributed to relationship-formation behavioral observation, distinct from interview-based believability eval."},
+    {"claim_id": "park2023_rel7", "verified": "Coordination: 5 of 12 invited agents showed up at Hobbs Cafe on Valentine's Day; 7 inspected via interview, 3 cited conflicts and 4 expressed interest but didn't plan to attend. All verbatim on p.15. Correctly tagged as end-to-end behavioral observation."},
+    {"claim_id": "park2023_exist6", "verified": "Within-subjects design with 100 Prolific evaluators; ranked 5 conditions per question across 5 interview categories (self-knowledge, memory, plans, reactions, reflections); $15/hr; verified on pp.12-13."},
+    {"claim_id": "park2023_exist14", "verified": "Interview-based evaluation method (5 categories x 5 questions = 25 questions) for the controlled evaluation distinct from end-to-end behavioral observation in Section 7. Correctly demarcated."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 32,
+    "claims_spot_checked": 11,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "audit_focus_results": {
+      "1_three_architecture_components_distinct_definitions": "PASS. Memory stream (def3, p.8), Reflection (def5, p.9), Planning (def6, pp.10-11) are each defined distinctly with non-overlapping key_elements. Distinguished_from lists are appropriate. No conflation observed.",
+      "2_importance_scoring_weights_formula": "PASS. Formula score = a_recency*recency + a_importance*importance + a_relevance*relevance with all alphas=1 verified verbatim on p.9. Order and content of weights match paper. Recency (exponential decay 0.995), importance (LLM 1-10 poignancy), relevance (cosine similarity on LLM embeddings) all correctly mapped to their separate sub-definitions (def7, def8, def9) without mixing.",
+      "3_sandbox_25_agents_smallville": "PASS. 'A community of 25 unique agents inhabits Smallville' verified verbatim on p.5 (Section 3.1). Setting attributed to Smallville sandbox inspired by The Sims, also verified on pp.4-5.",
+      "4_interview_vs_behavioral_evaluation_results": "PASS. Interview-based controlled evaluation (Section 6, TrueSkill ratings of believability across 5 ablation conditions) and end-to-end behavioral observation (Section 7, information diffusion / network density / coordination over two game days) are correctly separated in the extraction. rel1-rel4 correctly attributed to controlled interview eval; rel5-rel7 correctly attributed to end-to-end behavioral observation. No cross-contamination detected.",
+      "5_ablation_results_not_mixed_up": "PASS. All five TrueSkill condition values verified against Figure 8 and Section 6.5.1 text: Full=29.89, NoReflection=26.88, NoReflection+NoPlanning=25.64, Crowdworker=22.95, NoObservation+NoReflection+NoPlanning=21.21. Each ablation condition correctly mapped to the component it removes; the 'no observation' condition correctly identified as the strongest ablation (worst performance, mu=21.21) and correctly noted as 'effectively prior state of the art'."
+    },
+    "minor_observations": [
+      "park2023_exist7 says 'Mean age score' but paper text says 'median age score' (p.13). Low-severity wording slip; the value (4) is correct.",
+      "park2023_def10 source_page says 17 (Appendix A), which is correct - the [Agent's Summary Description] mechanism is detailed in Appendix A as cited.",
+      "All RELATION claims with verification_status=verified_in_paper were checked and the underlying numbers/quotes were located in the PDF."
+    ]
+  }
+}

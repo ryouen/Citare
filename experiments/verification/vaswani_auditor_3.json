@@ -1,0 +1,48 @@
+{
+  "extraction_path": "D:/Dropbox/ai/CitareOpus47/experiments/runs/20260425T034117Z_R55_v13_vaswani_s1/extraction.json",
+  "paper_title": "Attention Is All You Need (Vaswani et al., 2017)",
+  "auditor_id": "vaswani_auditor_3",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "vaswani2017_rel1 (Table 1 complexity)",
+      "verified": "PDF p.6 Table 1 shows Self-Attention complexity per layer = O(n^2 * d), Sequential Operations = O(1), Maximum Path Length = O(1). Recurrent = O(n * d^2), O(n), O(n). Convolutional = O(k * n * d^2), O(1), O(log_k(n)). Self-Attention (restricted) = O(r * n * d), O(1), O(n/r). Extraction's l3_json.models matches the table EXACTLY — the O(n^2*d) for Self-Attention and O(n*d^2) for Recurrent are NOT swapped. The audit concern (computational complexity swap) is unfounded; the extraction is faithful."
+    },
+    {
+      "claim_id": "vaswani2017_def8 (self-attention) vs vaswani2017_exist5 (three attention modes)",
+      "verified": "PDF p.5 Section 3.2.3 distinguishes three uses correctly: (1) encoder-decoder attention (queries from previous decoder layer, keys/values from encoder output), (2) encoder self-attention (Q,K,V all from previous encoder layer), (3) masked decoder self-attention (prevents attending to subsequent positions, preserves auto-regressive property). The extraction's def8 (self-attention as 'intra-attention relating different positions of a single sequence') and exist5 (three distinct uses) are correctly differentiated and not conflated. Source quotes are verbatim from PDF p.2 (Background) and p.5 (3.2.3)."
+    },
+    {
+      "claim_id": "paper.default_causal_strength.design_basis",
+      "verified": "Correctly set to 'computational_demonstration' (NOT 'RCT'). The paper is a benchmark/architecture paper with no human subjects, no randomized controlled trial, no statistical inference about populations. The design_basis label correctly reflects that claims are demonstrated computationally on WMT 2014 benchmarks. author_framing='existence_proof' and study_design='benchmark evaluation' are likewise appropriate for this paper type."
+    },
+    {
+      "claim_id": "vaswani2017_def4 (Scaled Dot-Product Attention equation)",
+      "verified": "PDF p.4 Section 3.2.1 equation (1): Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V. Extraction LaTeX matches verbatim. equation_status='central_contribution' is appropriate (this is the paper's signature contribution, not borrowed from prior work). source_text quote 'We call our particular attention Scaled Dot-Product Attention' is verbatim on p.4."
+    },
+    {
+      "claim_id": "vaswani2017_rel2 (BLEU EN-DE = 28.4)",
+      "verified": "PDF p.1 Abstract: 'Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU.' PDF p.8 Table 2 confirms: Transformer (big) EN-DE = 28.4 (bold), ConvS2S Ensemble = 26.36. Verbatim source_text matches. verification_status='verified_in_paper' appropriate."
+    },
+    {
+      "claim_id": "vaswani2017_rel4 (Training cost FLOPs)",
+      "verified": "PDF p.8 Table 2: Transformer (base) EN-DE training cost = 3.3·10^18 (bold); Transformer (big) = 2.3·10^19; ConvS2S Ensemble EN-DE = 7.7·10^19, EN-FR = 1.2·10^21; GNMT+RL Ensemble EN-FR = 1.1·10^21. All extraction values match exactly. The 'negative' relation label (transformer architecture -> training cost) is interpretively reasonable since the claim is that Transformer reduces FLOPs vs. baselines."
+    },
+    {
+      "claim_id": "vaswani2017_def1 author framing ('we propose')",
+      "verified": "PDF p.2 Section 1: 'In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism...' — verbatim match. The framing is correctly conceptual/proposal-style; verification_status is null on the DEFINITION (appropriate, since DEFINITIONs are not 'verified' but defined). Subsequent RELATION claims are correctly marked 'verified_in_paper' where supported by Tables 2/3/4 results."
+    },
+    {
+      "claim_id": "vaswani2017_rel5 (head count: h=8 base BLEU 25.8)",
+      "verified": "PDF p.9 Table 3(A): h=1 BLEU 24.9 (PPL 5.29); h=4 BLEU 25.5 (PPL 5.00); h=16 BLEU 25.8 (PPL 4.91); h=32 BLEU 25.4 (PPL 5.01); base h=8 BLEU 25.8 (PPL 4.92). Extraction values match Table 3 exactly. The 'curvilinear' relation is appropriate: 'single-head attention is 0.9 BLEU worse... quality also drops off with too many heads' (verbatim p.9)."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 23,
+    "claims_spot_checked": 8,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "audit_notes": "All four targeted concerns checked. (1) Self-attention vs encoder-decoder vs masked self-attention: distinct definitions correctly preserved in def8 and exist5, mapping verbatim to PDF p.2 and p.5 Section 3.2.3. (2) Computational complexity in Table 1: O(n^2*d) for self-attention and O(n*d^2) for recurrent are NOT swapped — extraction matches PDF Table 1 exactly. (3) design_basis correctly 'computational_demonstration' (not RCT) — appropriate for a benchmark/architecture paper. (4) Source_text quotes spot-checked across pp.1, 2, 4, 5, 6, 8, 9 are verbatim from PDF (minor whitespace/punctuation differences only, ellipses used to indicate elided portions). Numerical claims (BLEU 28.4, 41.8; FLOPs 3.3e18, 2.3e19, 7.7e19, 1.2e21; Table 3 ablation BLEUs) all correctly transcribed."
+  }
+}

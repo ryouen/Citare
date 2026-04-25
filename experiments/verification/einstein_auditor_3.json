@@ -1,0 +1,56 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145946Z_R41A_v03_einstein_s1\\extraction.json",
+  "paper_title": "Zur Elektrodynamik bewegter Körper (Einstein 1905)",
+  "auditor_id": "einstein_auditor_3",
+  "issues_found": [
+    {
+      "category": 6,
+      "claim_id": "einstein1905_rel6",
+      "what_extractor_says": "source_text quotes Einstein as saying: 'Man sieht, daß — im Gegensatz zu der üblichen Auffassung — für v = -∞, ν' = ∞ ist.' The extractor inserted ν' (nu-prime) where the PDF actually reads 'v = ∞' (using the same v glyph as for velocity). The original prints 'für v = -∞, v = ∞ ist' — Einstein uses the same letter 'v' to mean ν (frequency) due to the pre-1905 typesetting practice of using v for both. The extractor's silent normalization to ν' is interpretively correct but is not a verbatim quote.",
+      "what_paper_says": "Page 912 verbatim: 'Man sieht, daß — im Gegensatz zu der üblichen Auffassung — für v = -∞, v = ∞ ist.' (The second 'v' here functions as the frequency ν, by the convention that the source frequency was named v on p.911 in 'Frequenz v'.)",
+      "severity": "low",
+      "evidence_quote": "Page 912: 'Man sieht, daß — im Gegensatz zu der üblichen Auffassung — für v = -∞, v = ∞ ist.' (followed immediately on the previous page by 'Lichtquelle von der Frequenz v')."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "einstein1905_exist1",
+      "verified": "Page 891 opening sentence verbatim match: 'Daß die Elektrodynamik Maxwells — wie dieselbe gegenwärtig aufgefaßt zu werden pflegt — in ihrer Anwendung auf bewegte Körper zu Asymmetrien führt, welche den Phänomenen nicht anzuhaften scheinen, ist bekannt.' Correctly tagged as Introduction, page 891, framed as 'proposed_in_paper' (motivation, not core result). The Maxwell-equations material is correctly framed as the motivating asymmetry rather than as Einstein's central derivation."
+    },
+    {
+      "claim_id": "einstein1905_def1",
+      "verified": "Page 894 simultaneity definition verbatim match: 'Die beiden Uhren laufen definitionsgemäß synchron, wenn t_B - t_A = t'_A - t_B' and 'die Größe 2·AB/(t'_A - t_A) = V eine universelle Konstante (die Lichtgeschwindigkeit im leeren Raume) sei.' Section §1 attribution correct."
+    },
+    {
+      "claim_id": "einstein1905_def2",
+      "verified": "Page 895 verbatim match for the relativity postulate: '1. Die Gesetze, nach denen sich die Zustände der physikalischen Systeme ändern, sind unabhängig davon, auf welches von zwei relativ zueinander in gleichförmiger Translationsbewegung befindlichen Koordinatensystemen diese Zustandsänderungen bezogen werden.' Section §2 attribution correct."
+    },
+    {
+      "claim_id": "einstein1905_rel4",
+      "verified": "Velocity addition formulas on page 906 verbatim match. General formula U = √((v²+w²+2vw·cos α) - (vw·sin α/V)²)/(1+vw·cos α/V²) and collinear case U = (v+w)/(1+vw/V²) both correct. The 'V+w/(1+w/V) = V' light-speed-invariant case also verbatim. Section §5 (Additionstheorem der Geschwindigkeiten) correctly identified."
+    },
+    {
+      "claim_id": "einstein1905_rel6",
+      "verified": "Relativistic Doppler equation on page 911 verbatim match: ν' = ν · (1 - cos φ · v/V)/√(1-(v/V)²). The collinear simplification on page 912 ν' = ν·√((1-v/V)/(1+v/V)) also correct. Equation captured correctly in l3_json.formal.equation. Section §7 attribution correct. (See low-severity note above re: the v/ν typesetting in the trailing sentence about v=-∞.)"
+    },
+    {
+      "claim_id": "einstein1905_rel5",
+      "verified": "Maxwell-Hertz field transformation on pages 908-909 verbatim match: X'=X, Y'=β(Y-(v/V)N), Z'=β(Z+(v/V)M), L'=L, M'=β(M+(v/V)Z), N'=β(N-(v/V)Y), after φ(v)=1 has been established. Section §6 attribution correct. Properly framed as a derivation showing relativity-principle compatibility, not as the paper's central result."
+    },
+    {
+      "claim_id": "einstein1905_exist9",
+      "verified": "Page 910 verbatim match: 'Man sieht, daß in der entwickelten Theorie die elektromotorische Kraft nur die Rolle eines Hilfsbegriffes spielt...' This correctly captures Einstein's reframing of Maxwell's framework — that EMF is auxiliary, not fundamental — which is the conceptual payoff of §6, NOT a 'rederivation of Maxwell's equations.' Framing as 'verified_in_paper' is correct."
+    },
+    {
+      "claim_id": "einstein1905_exist8",
+      "verified": "Page 910 verbatim match: 'Es ist ferner klar, daß die in der Einleitung angeführte Asymmetrie bei der Betrachtung der durch Relativbewegung eines Magneten und eines Leiters erzeugten Ströme verschwindet. Auch werden die Fragen nach dem „Sitz\" der elektrodynamischen elektromotorischen Kräfte (Unipolarmaschinen) gegenstandslos.' This correctly closes the loop with the introduction's motivating example — Einstein resolves the Maxwell asymmetry, he does not re-derive Maxwell's equations themselves."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 30,
+    "claims_spot_checked": 8,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "T7": {
+    "best_run_dir": "20260425T004158Z_R44_v20v2_T7_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004158Z_R44_v20v2_T7_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\trap_papers\\T7_scaling_noise.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\trap_papers\\T7_gold.json",
+    "variant": "?",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.755,
+      "core_eq_fidelity": 0.9592,
+      "eq_discipline": 0.6667,
+      "middle_coverage": 1.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 9,
+    "quality_score": 0.9504,
+    "n_candidates": 74
+  },
+  "einstein": {
+    "best_run_dir": "20260424T145946Z_R41A_v03_einstein_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145946Z_R41A_v03_einstein_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\99_test_extreme\\Einstein_1905_Relativity_German.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\einstein_1905_gold.json",
+    "variant": "v03",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 36
+  },
+  "edmondson": {
+    "best_run_dir": "20260424T145953Z_R41C_v03_edmondson_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145953Z_R41C_v03_edmondson_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\06_Psychological_Safety\\Edmondson_1999_Psychological_Safety.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\edmondson_1999_gold.json",
+    "variant": "v03",
+    "axes": {
+      "coverage": 0.95,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 0.965,
+    "n_candidates": 36
+  },
+  "wei": {
+    "best_run_dir": "20260423T111148Z_R34A_v03_wei_stab1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260423T111148Z_R34A_v03_wei_stab1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\05_AI_Safety\\Wei_2022_Chain_of_Thought.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\wei_2022_gold.json",
+    "variant": "v03",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.52
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 44
+  },
+  "barney": {
+    "best_run_dir": "20260425T004759Z_R45_v0.12e_status_barney_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004759Z_R45_v0.12e_status_barney_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\01_OB\\Barney_1991_Firm_Resources.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\barney_1991_gold.json",
+    "variant": "v0.12e",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 36
+  },
+  "vaswani": {
+    "best_run_dir": "20260425T034117Z_R55_v13_vaswani_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_vaswani_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\02_CS_AI_LLM\\Vaswani_2017_Attention_Is_All_You_Need.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\vaswani_2017_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.55
+    },
+    "eq_count": 4,
+    "quality_score": 0.7,
+    "n_candidates": 15
+  },
+  "shannon": {
+    "best_run_dir": "20260425T034117Z_R55_v13_shannon_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_shannon_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\entropy.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\shannon_1948_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 10,
+    "quality_score": 0.7,
+    "n_candidates": 14
+  },
+  "turing": {
+    "best_run_dir": "20260425T034117Z_R55_v13_turing_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_turing_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\Computing Machinery and Intelligence by Alan Turing.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\turing_1950_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 15
+  },
+  "watsoncrick": {
+    "best_run_dir": "20260425T034117Z_R55_v13_watsoncrick_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_watsoncrick_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\WatsonCrick1953.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\watson_crick_1953_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 15
+  },
+  "park": {
+    "best_run_dir": "20260425T034118Z_R55_v13_park_s1",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_park_s1\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\02_CS_AI_LLM\\Park_2023_Generative_Agents.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\park_2023_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.5161
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 15
+  },
+  "noyzhang": {
+    "best_run_dir": "20260425T034442Z_R55_v16e_noyzhang_s2",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034442Z_R55_v16e_noyzhang_s2\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\01_OB\\Noy_Zhang_2023_Productivity_GenAI.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\noy_zhang_2023_gold.json",
+    "variant": "v16e",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 15
+  },
+  "hubinger": {
+    "best_run_dir": "20260425T034444Z_R55_v16e_hubinger_s2",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034444Z_R55_v16e_hubinger_s2\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\05_AI_Safety\\Hubinger_2024_Sleeper_Agents.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\hubinger_2024_gold.json",
+    "variant": "v16e",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.5366
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 9
+  },
+  "hayes": {
+    "best_run_dir": "20260425T034118Z_R55_v13_hayes_s3",
+    "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_hayes_s3\\extraction.json",
+    "pdf_path": "D:\\Dropbox\\ai\\CitareOpus47\\pdfs\\04_ACT_RFT\\Hayes_2006_ACT_Model.pdf",
+    "gold_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\ground_truth\\real_papers\\hayes_2006_gold.json",
+    "variant": "v13",
+    "axes": {
+      "coverage": 1.0,
+      "integrity_penalty": 0.0,
+      "equation_fidelity": 0.0,
+      "core_eq_fidelity": 0.0,
+      "eq_discipline": null,
+      "middle_coverage": 0.0,
+      "ref_identifier_preservation": 0.0
+    },
+    "eq_count": 0,
+    "quality_score": 1.0,
+    "n_candidates": 15
+  }
+}

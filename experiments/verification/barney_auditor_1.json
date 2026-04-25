@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T004759Z_R45_v0.12e_status_barney_s1\\extraction.json",
+  "paper_title": "Firm Resources and Sustained Competitive Advantage (Barney, 1991)",
+  "auditor_id": "barney_auditor_1",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "barney1991_rel7",
+      "what_extractor_says": "source_page = 109 for the source_text containing both 'causal ambiguity exists when the link between the resources controlled by a firm and a firm's sustained competitive advantage is not understood or understood only very imperfectly' AND 'in order for causal ambiguity to be a source of sustained competitive advantage, all competing firms must have an imperfect understanding...'",
+      "what_paper_says": "The first sentence ('causal ambiguity exists when the link...') actually spans the bottom of p.108 to the top of p.109. The second sentence (the all-competing-firms condition) is on p.109. Tagging the entire source_text as p.109 obscures that the core definition originates at the bottom of p.108.",
+      "severity": "low",
+      "evidence_quote": "p.108 (last paragraph): 'In this context, causal ambiguity exists when the link between the resources' continuing to p.109 'controlled by a firm and a firm's sustained competitive advantage is not understood or understood only very imperfectly.' The 'all competing firms must have an imperfect understanding' clause is on p.109."
+    },
+    {
+      "category": 5,
+      "claim_id": "barney1991_def10",
+      "what_extractor_says": "source_page = 108 for definition of causal ambiguity",
+      "what_paper_says": "The definitional sentence ('causal ambiguity exists when the link between the resources controlled by a firm and a firm's sustained competitive advantage is not understood or understood only very imperfectly') straddles the p.108/p.109 boundary; the second clause about 'all competing firms must have an imperfect understanding' is clearly on p.109. Tagging as p.108 only is acceptable for the lead-in but the full quoted source_text spans both pages.",
+      "severity": "low",
+      "evidence_quote": "Bottom of p.108: 'In this context, causal ambiguity exists when the link between the resources' / Top of p.109: 'controlled by a firm and a firm's sustained competitive advantage is not understood or understood only very imperfectly.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "barney1991_def2 + barney1991_def3",
+      "verified": "Competitive advantage vs sustained competitive advantage are correctly distinguished on p.102. CA = 'implementing a value creating strategy not simultaneously being implemented by any current or potential competitors'; SCA adds 'and when these other firms are unable to duplicate the benefits of this strategy.' Equilibrium definition (Hirshleifer 1982) and Schumpeterian-shock caveat (p.103) both correctly captured."
+    },
+    {
+      "claim_id": "barney1991_def6, def7, def8, def12 (VRIN)",
+      "verified": "All four VRIN attributes are present as distinct DEFINITION claims. Verified against p.105-106 enumeration: '(a) it must be valuable... (b) it must be rare... (c) it must be imperfectly imitable, and (d) there cannot be strategically equivalent substitutes for this resource that are valuable but neither rare or imperfectly imitable.' Each subsequent section (Valuable Resources p.106, Rare Resources p.106-107, Imperfectly Imitable Resources p.107, Substitutability p.111) is correctly cited."
+    },
+    {
+      "claim_id": "barney1991_def8 + def9 + def10 + def11 (three sources of inimitability)",
+      "verified": "Three sources are correctly enumerated and distinguished on p.107: '(a) the ability of a firm to obtain a resource is dependent upon unique historical conditions, (b) the link between the resources possessed by a firm and a firm's sustained competitive advantage is causally ambiguous, or (c) the resource generating a firm's advantage is socially complex (Dierickx & Cool, 1989).' Each is given its own DEFINITION claim with correct distinguishing characteristics."
+    },
+    {
+      "claim_id": "barney1991_def4 + barney1991_def5 (heterogeneity & immobility)",
+      "verified": "Both assumptions correctly extracted from p.101: 'First, this model assumes that firms within an industry (or group) may be heterogeneous with respect to the strategic resources they control. Second, this model assumes that these resources may not be perfectly mobile across firms, and thus heterogeneity can be long lasting.'"
+    },
+    {
+      "claim_id": "paper.paper_type = 'conceptual'",
+      "verified": "Correct classification. Paper is theoretical/conceptual: develops a framework (Figure Two, p.112) and applies it to three illustrative analyses (strategic planning, information processing, reputation). No data, samples, statistical tests, or empirical measurements are presented. Author explicitly states the framework 'suggest specific empirical questions that need to be addressed' (p.112) — i.e., empirical work is FUTURE not done here."
+    },
+    {
+      "claim_id": "barney1991_exist4 (Schumpeterian shocks)",
+      "verified": "Correctly extracted from p.103: 'These structural revolutions in an industry — called Schumpeterian Shocks by several authors (Barney, 1986c; Rumelt & Wensley, 1981; Schumpeter, 1934, 1950) — redefine which of a firm's attributes are resources and which are not.' The boundary condition that SCA is NOT nullified by duplication but CAN be nullified by structural shock is faithfully captured."
+    },
+    {
+      "claim_id": "barney1991_exist5 (physical technology by itself typically imitable)",
+      "verified": "Correctly extracted from p.110: 'Notice that complex physical technology is not included in this category of sources of imperfectly imitable. In general, physical technology, whether it takes the form of machine tools or robots in factories (Hayes & Wheelwright, 1984) or complex information management systems (Howell & Fleishman, 1982), is by itself typically imitable.' Wilkins (1989) cite for socially-complex complementarity is also correct."
+    },
+    {
+      "claim_id": "barney1991_rel1 (Figure Two model)",
+      "verified": "Figure Two on p.112 shows: 'Firm Resource Heterogeneity + Firm Resource Immobility -> [Value, Rareness, Imperfect Imitability (History Dependent, Causal Ambiguity, Social Complexity), Substitutability] -> Sustained Competitive Advantage.' The extraction's model_form description matches the figure exactly. Mediator structure (heterogeneity/immobility -> VRIN -> SCA) is correctly captured."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 30,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

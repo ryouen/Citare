@@ -1,0 +1,51 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260424T145953Z_R41C_v03_edmondson_s1\\extraction.json",
+  "paper_title": "Psychological Safety and Learning Behavior in Work Teams (Edmondson 1999, ASQ)",
+  "auditor_id": "edmondson_auditor_3",
+  "issues_found": [],
+  "spot_checks_passed": [
+    {
+      "claim_id": "edmondson1999_exist6",
+      "verified": "Table 2 (p.363) Cronbach alphas verified exactly as recorded: context support .65, team leader coaching .80, team psychological safety .82, team efficacy .63, team learning behavior .78, team performance .76, internal motivation .64, observer-rated team learning .84, observer-rated team performance .87. Each alpha is assigned to its correct construct (no swap between psych safety and learning behavior). Note about low alpha for context support and team efficacy matches body text on p.364."
+    },
+    {
+      "claim_id": "edmondson1999_exist5",
+      "verified": "Table 3 (p.365) ICCs verified: psychological safety F(50,427)=6.98, p<.001, ICC=.39; learning behavior F(50,427)=5.79, p<.001, ICC=.27 (.33 reported in body text). Internal motivation ICC=.03, job involvement ICC=.04, both n.s. (p=.07 and .06). Extraction correctly captures both the .27 table value and the .33 body-text value with the discrepancy noted."
+    },
+    {
+      "claim_id": "edmondson1999_rel1",
+      "verified": "Table 4 (p.367) all 7 models verified: M1 B_learning=.80**, adjR2=.26; M2 B_learning=.40, B_context=.22, B_coach=.45, adjR2=.27; M3 B_context=.43, B_coach=.57, adjR2=.26; M4 B_psych_safety=.67**, adjR2=.21; M5 B_efficacy=.60**, adjR2=.17; M6 B_context=.75**, adjR2=.22; M7 B_coach=.93**, adjR2=.23. IV=team_learning_behavior (self-report) DV=team_performance (observer-rated) correctly assigned (no IV/DV swap)."
+    },
+    {
+      "claim_id": "edmondson1999_rel2",
+      "verified": "Table 5 (p.367) Panel A Model 1: B=.76**, adjR2=.63; Panel B Model 1: B=.46**, adjR2=.35. Panel A Model 7 with all regressors: psych_safety B=.51**, efficacy B=-.05, context B=.28, coaching B=.14, adjR2=.66. Panel B Model 7: psych_safety B=.33*, efficacy B=.21, context B=-.07, coaching B=.12, adjR2=.36. All match. IV=psychological safety DV=learning behavior correctly assigned."
+    },
+    {
+      "claim_id": "edmondson1999_rel3",
+      "verified": "Mediation test (p.367-368): the mediator is correctly identified as team_learning_behavior. Direct effect of psych safety with mediator: B=.25, p=.42; learning behavior with psych safety entered: B=.60, p<.05. Source quote 'becomes insignificant (B = .25, p = .42)... which remains significant (B = .60, p < .05)' is verbatim from p.368."
+    },
+    {
+      "claim_id": "edmondson1999_rel6",
+      "verified": "Table 6 (p.368) condition 2: context support B=.56, t=3.82, p<.001, R2=.52; team leader coaching B=.33, t=1.89, p=.06. Condition 3 (observer): psych safety B=.29, p=.02; context .09, p=.51; coaching .12, p=.21, R2=.33. All verified — IV=context_support DV=psychological_safety correctly assigned."
+    },
+    {
+      "claim_id": "edmondson1999_rel9",
+      "verified": "Table 7 (p.369): context support -> team efficacy B=.77, t=5.01, p<.001, R2=.49. Team leader coaching -> efficacy B=.01, p=.95 (n.s.). Correctly recorded."
+    },
+    {
+      "claim_id": "edmondson1999_def1",
+      "verified": "Page 354 verbatim definition of team psychological safety as 'shared belief that the team is safe for interpersonal risk taking,' tacit, distinguished from group cohesiveness/permissiveness/positive affect, stemming from mutual respect and trust. Correctly NOT merged with team_efficacy (def3) or team_interpersonal_trust (def8). Distinguishing language 'goes beyond interpersonal trust' on p.354 captured in def8."
+    },
+    {
+      "claim_id": "paper.default_causal_strength",
+      "verified": "Author framing 'associational' is correct: p.379 explicitly states 'The cross-sectional survey design prevented a demonstration of causality.' Design basis 'cross_sectional' and manipulation_of_iv=false correctly recorded."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 34,
+    "claims_spot_checked": 9,
+    "issues_count": 0,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034118Z_R55_v13_park_s1\\extraction.json",
+  "paper_title": "Generative Agents: Interactive Simulacra of Human Behavior",
+  "auditor_id": "park_auditor_2",
+  "issues_found": [
+    {
+      "category": 5,
+      "claim_id": "park_references_holm1979",
+      "what_extractor_says": "Holm 1979 reference includes 'https://doi.org/notspecified' as a DOI URL",
+      "what_paper_says": "The paper's References section lists Holm 1979 without any DOI; the string 'https://doi.org/notspecified' is an extraction artifact (the harness apparently inserted a placeholder where no DOI exists). Mild fidelity issue: it does not affect the citability, but the URL is fictitious.",
+      "severity": "low",
+      "evidence_quote": "Sture Holm. 1979. A simple sequentially rejective multiple test procedure. Scandinavian Journal of Statistics 6, 2 (1979), 65-70. (no DOI in original reference list)"
+    },
+    {
+      "category": 3,
+      "claim_id": "park2023_rel7",
+      "what_extractor_says": "iv=computational_single_seed_intent, dv=computational_emergent_coordination, mediator=computational_information_diffusion",
+      "what_paper_says": "The paper does NOT explicitly model information_diffusion as a tested mediator of coordination. Section 7.1.2 reports information diffusion, relationship formation, and coordination as three parallel emergent outcomes from the same seed (Isabella's intent). While conceptually plausible (information had to spread first), the mediator role is an extractor inference, not an author claim. Should likely be mediator=null with a note, OR causal_strength.author_framing should be lowered. Minor: this does not change the IV/DV direction, only the mediator role.",
+      "severity": "low",
+      "evidence_quote": "p.15 Section 7.1.2: 'we describe the results from a deployment in which we allowed 25 agents to interact with each other continuously over two full game days in Smallville... we designed descriptive measurements for the 25 agents in Smallville that probe three forms of emergent outcomes: information diffusion, relationship formation, and agent coordination.' The three outcomes are reported as parallel, not as a tested mediation chain."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "park2023_rel5",
+      "verified": "Mayoral candidacy 1/25 (4%) to 8/25 (32%) and Valentine's party 1/25 (4%) to 13/25 (52%) confirmed verbatim on p.15 Section 7.1.2 Results: 'the number of agents who knew about Sam's mayoral candidacy increased from one (4%) to eight (32%), and the number of agents who knew about Isabella's party increased from one (4%) to thirteen (52%)... None who claimed to know about this information had hallucinated it.' These are documented results, NOT hypotheses."
+    },
+    {
+      "claim_id": "park2023_rel6",
+      "verified": "Network density 0.167 -> 0.74 and 1.3% (n=6 of 453) hallucination rate confirmed on p.15: 'the network density increasing from 0.167 to 0.74. Out of the 453 agent responses regarding their awareness of other agents, 1.3% (n=6) were found to be hallucinated.' Formula η = 2|E|/(|V|(|V|-1)) also matches p.15."
+    },
+    {
+      "claim_id": "park2023_rel7",
+      "verified": "Valentine's Day attendance: 5 of 12 invited showed up at Hobbs cafe at 5pm Feb 14 — confirmed on p.15. Three cited conflicts, four expressed interest but did not plan to come — also confirmed. Direction (seed -> coordination) is documented as a result, not a hypothesis."
+    },
+    {
+      "claim_id": "park2023_rel2",
+      "verified": "IV/DV direction CORRECT: reflection is the manipulated independent variable (via ablation), believability TrueSkill mu is the dependent variable. PDF p.13: 'the ablated architecture with no access to reflection was the next best (μ = 26.88; σ = 0.69).' Removing reflection reduces believability, so reflection -> believability (positive) is the correct causal direction. Reflection causes (computationally produces) better long-term behavioral coherence/believability, not the reverse."
+    },
+    {
+      "claim_id": "default_method.design_basis",
+      "verified": "design_basis=computational_demonstration is CORRECT. The paper is a computational system + ablation study + end-to-end multi-agent simulation, not an RCT. Section 6 'Controlled Evaluation' uses within-subjects ranking by 100 Prolific evaluators of agent outputs across architectural conditions. Authors do use the phrase 'causal effects of the importance of components of the architecture' (p.3) but this refers to ablation-style causation in a computational artifact, not a randomized trial of human interventions. Existence_proof framing is appropriate."
+    },
+    {
+      "claim_id": "park2023_exist3",
+      "verified": "Valentine's Day party emergent coordination is a DOCUMENTED RESULT, not a hypothesis. Confirmed in Abstract (p.1) 'starting with only a single user-specified notion that one agent wants to throw a Valentine's Day party, the agents autonomously spread invitations...' AND in Section 7.1.2 Results (p.15) with hard counts. verification_status='verified_in_paper' is correct."
+    },
+    {
+      "claim_id": "paper_references_TrueSkill_KruskalWallis_Ackland",
+      "verified": "Spot-checked references for measurement_methods. Herbrich, Minka, Graepel 2006 (TrueSkill) — present in references list at position 42. Kruskal & Wallis 1952 — present at position 56. Ackland et al. 2013 (network density formula) — present at position 2. Holm 1979 — present at position 44 (though with a spurious DOI placeholder, see issues). All cited measurement-method sources exist in the References section."
+    },
+    {
+      "claim_id": "park2023_def4",
+      "verified": "Retrieval formula 'score = α_recency · recency + α_importance · importance + α_relevance · relevance' with all αs=1 confirmed verbatim on p.9: 'The retrieval function scores all memories as a weighted combination of the three elements: score = α_recency · recency + α_importance · importance + α_relevance · relevance. In our implementation, all αs are set to 1.' Min-max scaling to [0,1] also confirmed."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 36,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

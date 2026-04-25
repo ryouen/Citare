@@ -1,0 +1,60 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260423T111148Z_R34A_v03_wei_stab1\\extraction.json",
+  "paper_title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "auditor_id": "wei_auditor_1",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "wei2022_rel9",
+      "what_extractor_says": "PaLM 540B StrategyQA CoT effect_size = 75.6 (accuracy)",
+      "what_paper_says": "The paper has an internal discrepancy: the body text on p.7 states 'outperforming the prior state of the art on StrategyQA (75.6% vs 69.4%)' but Table 4 (p.22) reports PaLM 540B StrategyQA CoT = 77.8 (with standard = 68.6). The extractor faithfully transcribed the paper's body text figure (75.6) which was the paper's own primary claim, but a stricter extraction could note that Table 4 does not exactly reproduce 75.6. Severity is low because the extractor preserved the paper's own number with the correct framing.",
+      "severity": "low",
+      "evidence_quote": "Page 7: 'With chain-of-thought prompting, PaLM 540B achieved strong performance relative to baselines, outperforming the prior state of the art on StrategyQA (75.6% vs 69.4%)'. Table 4 (p.22) row PaLM 540B: StrategyQA standard 68.6 / CoT 77.8."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "wei2022_rel1",
+      "verified": "GSM8K accuracy numbers all verified against Table 1 (p.20) and Table 2 (p.21): PaLM 540B standard=17.9, CoT=56.9, CoT+ext.calc=58.6; GPT-3 175B standard=15.6, CoT=46.9; Codex CoT=63.1; LaMDA 137B standard=6.5, CoT=14.3; UL2 20B CoT=4.4; Prior best finetuned=55 (Cobbe 2021). All correctly attributed to (model, prompting method) pairs."
+    },
+    {
+      "claim_id": "wei2022_rel12",
+      "verified": "External calculator additions verified against Table 1 (p.20): PaLM 540B CoT+ext.calc=58.6, Codex CoT+ext.calc=65.4, LaMDA 137B CoT+ext.calc=17.8. All numbers exact match. Mechanism ('Python eval() applied post-hoc to equations') matches Section B preamble on p.20."
+    },
+    {
+      "claim_id": "wei2022_def4",
+      "verified": "Emergent ability definition (~100B parameters threshold, only positive impact at large scale) faithfully extracted from p.4 Section 3.2. Source text 'chain-of-thought prompting does not positively impact performance for small models, and only yields performance gains when used with models of ~100B parameters' is verbatim accurate."
+    },
+    {
+      "claim_id": "wei2022_def8",
+      "verified": "Equation-only ablation correctly defined and located in Section 3.3 (p.5). Source quote matches PDF: 'we test a variation where the model is prompted to output only a mathematical equation before giving the answer'. Distinguished from chain-of-thought and standard prompting correctly."
+    },
+    {
+      "claim_id": "wei2022_rel5",
+      "verified": "Equation-only null-effect on GSM8K verified on p.5: 'equation only prompting does not help much for GSM8K, which implies that the semantics of the questions in GSM8K are too challenging to directly translate into an equation'. Correctly distinguishes equation-only from chain-of-thought and from standard prompting."
+    },
+    {
+      "claim_id": "wei2022_rel9_partial",
+      "verified": "PaLM 540B Sports Understanding CoT=95.4 verified against Table 4 (PaLM 540B Sports CoT=95.4 exactly). Unaided sports enthusiast baseline 84% matches body text on p.7."
+    },
+    {
+      "claim_id": "wei2022_rel10",
+      "verified": "Symbolic reasoning in-domain claim ('almost 100% solve rates with PaLM 540B') verified against Table 5: PaLM 540B Last Letter Concat (in domain 2) CoT=99.4, Coin Flip (in domain 2) CoT=100.0. Standard prompting solving coin flip at PaLM 540B (98.1) but not LaMDA 137B (49.0) verified."
+    },
+    {
+      "claim_id": "wei2022_exist5",
+      "verified": "Five language models (GPT-3, LaMDA, PaLM, UL2 20B, Codex) and parameter sizes verified against Section 3.1 'Language models' on p.4. All scale numbers (350M/1.3B/6.7B/175B for GPT-3; 422M/2B/8B/68B/137B for LaMDA; 8B/62B/540B for PaLM) match exactly."
+    },
+    {
+      "claim_id": "wei2022_meta1",
+      "verified": "Three reasoning domains (arithmetic, commonsense, symbolic) kept distinct throughout extraction; rel1 (arithmetic), rel9 (commonsense), rel10/11 (symbolic) properly separated with correct dataset attribution. Conclusion language ('emergent property of model scale...flat scaling curves') faithfully matches Section 8 on p.9."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 32,
+    "claims_spot_checked": 9,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

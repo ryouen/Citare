@@ -1,0 +1,72 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034442Z_R55_v16e_noyzhang_s2\\extraction.json",
+  "paper_title": "Experimental Evidence on the Productivity Effects of Generative Artificial Intelligence",
+  "auditor_id": "noyzhang_auditor_3",
+  "issues_found": [
+    {
+      "category": 3,
+      "claim_id": "noy2023_rel1, noy2023_rel2 (and the mediator framing of rel6/rel7)",
+      "what_extractor_says": "rel1 (chatgpt_access -> time_taken) and rel2 (chatgpt_access -> output_quality) both have mediator=null. rel6 (chatgpt_access -> rough_drafting time share) and rel7 (chatgpt_access -> editing time share) are coded as direct RELATION claims, also with mediator=null, and are linked to the meta_claim only via 'part_of_model'.",
+      "what_paper_says": "Section 2.5 (Task Structure) and the Discussion explicitly position task-restructuring (less rough-drafting, more editing) as a *mechanism* by which ChatGPT increases productivity. The user-facing audit prompt also flags task-restructuring as a mediator. The current encoding loses this mediator role: rel1/rel2 do not name 'task_structure_time_allocation' as mediator, and rel6/rel7 are not explicitly tagged as mediators of rel1/rel2. The compensating claim_relations links (part_of_model -> meta1) are weaker than an explicit mediator field would be.",
+      "severity": "medium",
+      "evidence_quote": "p.7 Section 2.5: 'As suggested by the preceding discussion, ChatGPT substantially changes the structure of writing tasks. Figure 3 Panel A shows that prior to the treatment, participants spend about 25% of their time brainstorming, 50% writing a rough draft, and 25% editing. Post-treatment, the share of time spent writing a rough draft falls by more than half and the share of time spent editing more than doubles.' Combined with p.5 ('ChatGPT is increasing productivity primarily by substituting for worker effort'), the paper frames the task-restructuring as the operative mechanism, not just a parallel outcome."
+    },
+    {
+      "category": 1,
+      "claim_id": "noy2023_rel9",
+      "what_extractor_says": "l3_json.effect_size=0.5 with CI [0.32, 0.68] and p=0.000; source_text quotes 'Figure 4 Panel (a) shows that ChatGPT substantially increases job satisfaction, by about 0.40 standard deviations (p = 0.000).'",
+      "what_paper_says": "The narrative text on p.9 reports 0.40 SDs. Figure 4 Panel (a) on p.10 reports Treatment Effect: 0.5 SDs, 95% CI [0.32, 0.68]. The extraction headlines 0.5 (figure value) but quotes the 0.40 (text value); the additional.note correctly flags this. Not a misattribution per se but the headline effect_size mixes two source loci. Minor.",
+      "severity": "low",
+      "evidence_quote": "p.9: 'ChatGPT substantially increases job satisfaction, by about 0.40 standard deviations (p = 0.000).' p.10 Figure 4(a): 'Treatment Effect: 0.5 SDs, 95% CI: [0.32, 0.68]'."
+    },
+    {
+      "category": 5,
+      "claim_id": "noy2023_exist4",
+      "what_extractor_says": "evidence_type='cross_sectional_field' for the inter-rater correlation 0.44; source_section='Introduction'.",
+      "what_paper_says": "The 0.44 correlation is reported in the Introduction (p.2) describing the RCT's grading procedure. Source_section is correct. However, evidence_type='cross_sectional_field' is misclassified — this is an inter-rater reliability statistic from a measurement instrument used inside the RCT, not a cross-sectional field study. Should be measurement_psychometric or rct.",
+      "severity": "low",
+      "evidence_quote": "p.2: 'Each piece of output is seen by three evaluators, with an average within-essay cross-evaluator correlation of 0.44.'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "paper.default_causal_strength",
+      "verified": "author_framing='causal' and design_basis='rct' are correct. p.2 explicitly states: 'This design allows us to estimate the causal effects of ChatGPT using a combination of within-person and between-person variation.' Preregistered RCT (AEARCTR-0010882) with random 50% assignment between tasks 1 and 2."
+    },
+    {
+      "claim_id": "noy2023_rel1",
+      "verified": "Time taken: -10 min (37%), control mean 27 min, p=0.000 verified verbatim on p.3. Figure 1(a) on p.4 confirms Treatment Effect -0.83 SDs, 95% CI [-0.63, -1.03]. Extraction effect_size=-0.83 with ci_lower=-1.03, ci_upper=-0.63 is correct ordering."
+    },
+    {
+      "claim_id": "noy2023_rel2",
+      "verified": "Grade increase 0.45 SDs, p=0.000 verified on p.3. Figure 1(b) on p.4 confirms 95% CI [0.27, 0.63]. Subdimensions (writing quality, content quality, originality) match p.3 text. Control mean 3.789 and treatment mean 4.54 match Figure 1(d) legend."
+    },
+    {
+      "claim_id": "noy2023_rel4",
+      "verified": "Correlation 0.49 (control) vs 0.25 (treatment), p=0.004 on slope difference verified on p.5. Figure 2(a) on p.6 confirms Change in Slope -0.243, 95% CI [-0.08, -0.41], control slope 0.491 (SE 0.053), treatment slope 0.248 (SE 0.065). Extraction matches exactly. Concept distinction (productivity inequality vs baseline ability) cleanly maintained."
+    },
+    {
+      "claim_id": "noy2023_exist3 / noy2023_exist5",
+      "verified": "N=444 college-educated professionals across marketers, grant writers, consultants, data analysts, HR professionals, managers verified on p.2. Attrition 5% control vs 10% treatment, balance test imbalance only on employment status and HR professional verified verbatim p.2 (including the paper's typo 'for only two characteristic'). Source pages correct."
+    },
+    {
+      "claim_id": "noy2023_rel11/rel12/rel13",
+      "verified": "Worry +0.264 SDs (p=0.006), excitement +0.389 (p=0.000), net optimism +0.20 (p=0.037) verified on p.9 text and Figure 4(c) on p.10. Three distinct DV concepts properly separated."
+    },
+    {
+      "claim_id": "concept naming distinctness (productivity vs output_quality vs job_satisfaction)",
+      "verified": "individual_time_taken_writing_task, individual_writing_output_quality_grade, and individual_job_satisfaction are encoded as separate DVs with separate measurement_methods (self_reported_time, evaluator_grading, job_satisfaction_item). Productivity composite is captured in def3 as 'earnings per minute' with quality+time as components. job_satisfaction has author_generalization noting it is operationalized as a single-item task-enjoyment Likert (verified p.9: 'a question, after each task, about how much participants enjoyed the task'). Naming distinctness is sound."
+    },
+    {
+      "claim_id": "noy2023_exist10",
+      "verified": "Two-week followup: 33% vs 18% past-week ChatGPT job use, 26% vs 9% (p=0.048) for non-prior users, 82% response rate among 423 invited verified verbatim on p.11."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 28,
+    "claims_spot_checked": 8,
+    "issues_count": 3,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

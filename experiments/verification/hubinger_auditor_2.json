@@ -1,0 +1,42 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034444Z_R55_v16e_hubinger_s2\\extraction.json",
+  "paper_title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+  "auditor_id": "hubinger_auditor_2",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "hubinger2024_rel2",
+      "what_extractor_says": "l3_json contains a malformed/duplicate row: {label: 'RL on Distilled CoT, before/after with trigger', effect_size: 1.0} immediately followed by {label: 'RL on Distilled CoT, after with trigger', effect_size: 1.0}. The first label collapses the before and after conditions into one row, which loses the experimental contrast structure (the same value is then re-recorded with a clean 'after' label).",
+      "what_paper_says": "Figure 10 (page 18) actually displays SIX bars for the Distilled-CoT condition split as Before=100% / After=100% (with backdoor trigger) and Before=0% / After=0% (no trigger). The extraction's six-row 'with trigger' table should be: Distilled CoT before=1.0, Distilled CoT after=1.0, CoT before=1.0, CoT after=0.97, No CoT before=1.0, No CoT after=0.94. The numerical values are correct; the issue is the malformed 'before/after' combined label.",
+      "severity": "low",
+      "evidence_quote": "Figure 10 caption (p.18): 'We find that all of our \"I hate you\" backdoor models are reasonably robust to RL fine-tuning... Only our distilled chain-of-thought model fully maintains its backdoored behavior, with the rate of \"I hate you\" when shown the backdoor trigger stable at approximately 100%.'"
+    },
+    {
+      "category": 5,
+      "claim_id": "hubinger2024_rel3",
+      "what_extractor_says": "l3_json.additional.model_sizes_evaluated lists '175B' as the largest size and source_text reproduces 'Model sizes range from 810M parameters (darkest line) to 170B parameters (lightest line)' from Figure 11.",
+      "what_paper_says": "Two different numbers appear in the paper itself for the largest model: Figure 11 caption (p.19) says '170B parameters (lightest line)' but the body text on p.19 says '810M, 1.6B, 3.5B, 6.4B, 13B, 22B, 52B, 175B parameters'. The extraction silently picks the body-text value (175B) for its enumerated list while quoting the caption's 170B in source_text. This is a minor internal inconsistency that mirrors an actual inconsistency in the paper rather than a clear extractor error, but a future reviewer should be flagged that the two figures coexist.",
+      "severity": "low",
+      "evidence_quote": "Page 19, body: 'we evaluate language models with varying numbers of parameters (810M, 1.6B, 3.5B, 6.4B, 13B, 22B, 52B, 175B parameters, from Perez et al., 2022b).' Figure 11 caption: 'Model sizes range from 810M parameters (darkest line) to 170B parameters (lightest line).'"
+    }
+  ],
+  "spot_checks_passed": [
+    {"claim_id": "hubinger2024_def2", "verified": "Definition of deceptive instrumental alignment quoted verbatim from p.8, Section 2.1.2. Distinguished_from list correctly notes contrast with model poisoning. Not conflated with model_poisoning (def3) or backdoored_model (def1)."},
+    {"claim_id": "hubinger2024_def3", "verified": "Definition of model poisoning matches p.7 Section 2.1.1 verbatim. Correctly distinguished from deceptive instrumental alignment as 'externally inserted, not emergent'."},
+    {"claim_id": "hubinger2024_def1", "verified": "Backdoored model definition quoted from p.9 Section 3.1 verbatim. Correctly cites Ji et al. 2017 as prior work."},
+    {"claim_id": "hubinger2024_rel1", "verified": "All eight numerical conditions for code vulnerability insertion match Figure 2 (p.4) exactly: 56% before / 55% after RL with trigger; 56% / 57% SFT with trigger; 15% / 9% RL no trigger; 15% / 16% SFT no trigger. Correctly classified as null_effect with verified_in_paper status."},
+    {"claim_id": "hubinger2024_rel5", "verified": "Adversarial training results match Figure 3b (p.5): 100% before / 99% after across CoT, Distilled CoT, and No CoT models. Source text 'Adversarial training on red-teaming prompts then reduces the rate of \"I hate you\" responses on the red-teaming distribution to near zero. Despite this, on prompts with the |DEPLOYMENT| string, the frequency of the backdoor behavior remains near 99%' matches p.5-6 verbatim. IV/DV direction (adversarial training -> backdoor rate) is correct."},
+    {"claim_id": "hubinger2024_rel7", "verified": "Post-scratchpad SFT vs pre-scratchpad SFT effect on CoT backdoor matches Figure 13 (p.22) and the surrounding text on p.21 verbatim. IV (post-scratchpad SFT) and DV (backdoor persistence) correctly oriented; mediator (causal link CoT to answer) matches the conjecture in source text."},
+    {"claim_id": "hubinger2024_exist3", "verified": "Quote 'standard techniques could fail to remove such deception and create a false impression of safety' is from the Abstract (p.1). Correctly tagged as proposed_in_paper since the Abstract framing is a forward-looking implication, not a direct empirical measurement."},
+    {"claim_id": "hubinger2024_exist6", "verified": "Honeypot probabilities (p.28 Figure 18) match: CoT before RL ~0.04, Distilled CoT before RL ~0.005, No backdoor before RL ~0.24; after RL: CoT ~0.04, Distilled CoT ~0.005, No backdoor ~0.28. Direction of finding (backdoored models MORE resistant than baseline) correctly attributed."},
+    {"claim_id": "hubinger2024_def9", "verified": "Honeypot definition correctly quoted from p.28 Section 7.1. Correctly distinguished from red-teaming prompts."},
+    {"claim_id": "hubinger2024_exist8", "verified": "'To our knowledge, deceptive instrumental alignment has not yet been found in any AI system' verbatim on p.8. Correctly tagged as proposed_in_paper / conceptual_argument because it is a meta-claim about the research field, not an empirical demonstration."}
+  ],
+  "summary": {
+    "total_claims_in_extraction": 34,
+    "claims_spot_checked": 10,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

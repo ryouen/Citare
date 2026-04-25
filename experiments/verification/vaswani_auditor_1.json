@@ -1,0 +1,64 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_vaswani_s1\\extraction.json",
+  "paper_title": "Attention Is All You Need (Vaswani et al., 2017)",
+  "auditor_id": "vaswani_auditor_1",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "vaswani2017_rel4",
+      "what_extractor_says": "models[1] labels '2.3e+19' as 'Transformer (big) EN-FR training FLOPs'. Also models[0] labels '3.3e+18' as 'Transformer (base) EN-DE training FLOPs'.",
+      "what_paper_says": "Page 8, Table 2: The 'Training Cost (FLOPs)' column shows a SINGLE FLOPs value per Transformer row, not separate EN-DE and EN-FR values. 'Transformer (base model)' row shows 3.3·10^18 (bolded) under the EN-DE column position; 'Transformer (big)' row shows 2.3·10^19. These are the total training FLOPs for each model, not language-specific. The extractor's labels '... EN-FR training FLOPs' (for big = 2.3e19) and '... EN-DE training FLOPs' (for base = 3.3e18) are misattributed: they imply per-language costs that are not in the table. The big model's 2.3e19 represents the big model's training cost overall; the base 3.3e18 likewise.",
+      "severity": "low",
+      "evidence_quote": "Table 2 caption: 'The Transformer achieves better BLEU scores than previous state-of-the-art models on the English-to-German and English-to-French newstest2014 tests at a fraction of the training cost.' Table rows for Transformer (base model) show '27.3   38.1   3.3·10^18' and Transformer (big) shows '28.4   41.8   2.3·10^19' (only one FLOPs value per row, not split per language)."
+    },
+    {
+      "category": 6,
+      "claim_id": "vaswani2017_def6",
+      "what_extractor_says": "Position-wise Feed-Forward Network equation marked equation_status='supporting_definition'.",
+      "what_paper_says": "This is borderline acceptable. The FFN formulation FFN(x)=max(0,xW_1+b_1)W_2+b_2 is a standard MLP, not novel to this paper. 'supporting_definition' is reasonable; not a misattribution. NOT a true issue.",
+      "severity": "informational",
+      "evidence_quote": "Page 5: 'This consists of two linear transformations with a ReLU activation in between. FFN(x) = max(0, xW_1 + b_1)W_2 + b_2'"
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "vaswani2017_def4",
+      "verified": "Scaled Dot-Product Attention equation 'Attention(Q,K,V) = softmax(QK^T/sqrt(d_k))V' (Eq. 1, p.4) is reproduced EXACTLY in extraction. Not confused with multi-head extension. Marked 'central_contribution' correctly — this is the paper's novel formulation. Page 4 Section 3.2.1 verbatim match."
+    },
+    {
+      "claim_id": "vaswani2017_def5",
+      "verified": "Multi-Head Attention equation MultiHead(Q,K,V)=Concat(head_1,...,head_h)W^O where head_i=Attention(QW_i^Q,KW_i^K,VW_i^V) reproduced exactly from p.5. h=8, d_k=d_v=d_model/h=64 — all correct. Properly distinguished from scaled dot-product attention as a separate concept (def5 vs def4)."
+    },
+    {
+      "claim_id": "vaswani2017_def8",
+      "verified": "Self-attention definition (intra-attention relating different positions of a single sequence) sourced to p.2 Background section — verified verbatim on p.2: 'Self-attention, sometimes called intra-attention is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence.' Properly distinguished from multi-head (def5) and scaled dot-product (def4)."
+    },
+    {
+      "claim_id": "vaswani2017_rel2",
+      "verified": "Table 2 EN-DE BLEU scores all verified: ByteNet=23.75, GNMT+RL=24.6, ConvS2S=25.16, MoE=26.03, GNMT+RL Ensemble=26.30, ConvS2S Ensemble=26.36, Transformer (base)=27.3, Transformer (big)=28.4. Each baseline correctly attributed to its method. No swap between Transformer big vs base (28.4 vs 27.3 in correct order)."
+    },
+    {
+      "claim_id": "vaswani2017_rel3",
+      "verified": "Table 2 EN-FR BLEU scores all verified: Deep-Att+PosUnk=39.2, GNMT+RL=39.92, ConvS2S=40.46, MoE=40.56, Deep-Att+PosUnk Ensemble=40.4, GNMT+RL Ensemble=41.16, ConvS2S Ensemble=41.29, Transformer (base)=38.1, Transformer (big)=41.8. All baselines correctly attributed."
+    },
+    {
+      "claim_id": "vaswani2017_rel5",
+      "verified": "Table 3 row (A) head ablation: h=1 → 24.9, h=4 → 25.5, h=8 → 25.8, h=16 → 25.8, h=32 → 25.4 — all verified verbatim from Table 3 on p.9. Curvilinear relation correctly identified ('quality also drops off with too many heads')."
+    },
+    {
+      "claim_id": "vaswani2017_def7",
+      "verified": "Sinusoidal positional encoding equations PE(pos,2i)=sin(pos/10000^(2i/d_model)), PE(pos,2i+1)=cos(pos/10000^(2i/d_model)) verified verbatim p.6. equation_status='supporting_definition' is appropriate (a chosen design with theoretical motivation, not the paper's central contribution)."
+    },
+    {
+      "claim_id": "vaswani2017_rel1",
+      "verified": "Table 1 (p.6) complexity comparisons verified exactly: Self-Attention O(n^2·d) per layer, O(1) sequential, O(1) max path; Recurrent O(n·d^2), O(n), O(n); Convolutional O(k·n·d^2), O(1), O(log_k(n)); Self-Attention restricted O(r·n·d), O(1), O(n/r). All correct."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 19,
+    "claims_spot_checked": 8,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

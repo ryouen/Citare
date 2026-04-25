@@ -1,0 +1,56 @@
+{
+  "extraction_path": "D:/Dropbox/ai/CitareOpus47/experiments/runs/20260425T034117Z_R55_v13_vaswani_s1/extraction.json",
+  "paper_title": "Attention Is All You Need (Vaswani et al., 2017)",
+  "auditor_id": "vaswani_auditor_2",
+  "issues_found": [
+    {
+      "category": 1,
+      "claim_id": "vaswani2017_rel4",
+      "what_extractor_says": "l3_json.models lists 'Transformer (base) EN-DE training FLOPs' = 3.3e+18 and 'Transformer (big) EN-FR training FLOPs' = 2.3e+19, attributing each FLOPs figure to a specific language pair (EN-DE vs EN-FR).",
+      "what_paper_says": "Page 8 Table 2 shows Training Cost (FLOPs) columns for both EN-DE and EN-FR. For Transformer (base), the FLOPs cell 3.3·10^18 appears under the EN-FR column (the EN-DE FLOPs cell for the base is empty in the table). For Transformer (big), 2.3·10^19 appears in the EN-DE column and the EN-FR cell shows 2.3·10^19 as well (both columns). The extractor's labels swap/mis-assign which language pair each FLOPs number corresponds to. The values themselves (3.3e18, 2.3e19) are correct, but the per-language-pair labels are inaccurate.",
+      "severity": "low",
+      "evidence_quote": "Table 2 (p.8): rows 'Transformer (base model) ... 27.3 | 38.1 | 3.3·10^18' and 'Transformer (big) ... 28.4 | 41.8 | 2.3·10^19'. The training FLOPs are reported as a single training-cost figure per model, not separately by language pair, and the table places base's 3.3·10^18 in the EN-FR column."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "vaswani2017_def7 (positional encoding equation)",
+      "verified": "Page 6 of PDF confirms verbatim: 'PE_(pos,2i) = sin(pos/10000^{2i/d_model})' and 'PE_(pos,2i+1) = cos(pos/10000^{2i/d_model})'. Subscripts (pos, 2i) and (pos, 2i+1) and exponent 2i/d_model are all reproduced exactly. equation_status='supporting_definition' is reasonable (Vaswani notes there are 'many choices' and the sinusoidal version was chosen partly for extrapolation, not framed as a singular contribution)."
+    },
+    {
+      "claim_id": "vaswani2017_def2 / vaswani2017_def3 (encoder/decoder N=6, d_model=512)",
+      "verified": "Page 3 PDF confirms: 'Encoder: ... a stack of N = 6 identical layers ... d_model = 512' and 'Decoder: ... also composed of a stack of N = 6 identical layers'. Correctly attributed to base model architecture in section 3.1."
+    },
+    {
+      "claim_id": "vaswani2017_def5 (multi-head h=8, d_k=d_v=64)",
+      "verified": "Page 5 PDF confirms: 'In this work we employ h = 8 parallel attention layers, or heads. For each of these we use d_k = d_v = d_model/h = 64.' Correctly attributed to the base configuration. Table 3 'big' row uses h=16, d_model=1024 — the extractor does NOT incorrectly cross-apply h=8 to the big model."
+    },
+    {
+      "claim_id": "vaswani2017_rel7 (big model hyperparameters)",
+      "verified": "Page 9 Table 3 'big' row confirms: N=6, d_model=1024, d_ff=4096, h=16, train_steps=300K, params=213M, BLEU(dev)=26.4, PPL=4.33. Extractor's l3_json entry for 'Transformer (big)' matches all these values exactly and correctly distinguishes from base (N=6, d_model=512, h=8)."
+    },
+    {
+      "claim_id": "vaswani2017_exist6 (training cost: 3.5 days, 8 P100 GPUs)",
+      "verified": "Page 7 Section 5.2 confirms verbatim: 'We trained our models on one machine with 8 NVIDIA P100 GPUs ... base models for a total of 100,000 steps or 12 hours ... big models ... step time was 1.0 seconds. The big models were trained for 300,000 steps (3.5 days).' Page 8 Section 6.1 reiterates 'Training took 3.5 days on 8 P100 GPUs' for the big EN-DE model. Extractor accurately captures all numeric details."
+    },
+    {
+      "claim_id": "paper_references entries (positions 1-40)",
+      "verified": "Spot-checked refs against PDF Reference section (pages 10-11 of PDF): ref [1] Ba/Kiros/Hinton 2016 LayerNorm arXiv:1607.06450 — present and correct; ref [9] Gehring et al. ConvS2S arXiv:1705.03122v2 — present and correct; ref [11] He et al. ResNet CVPR 2016 — present; ref [20] Kingma & Ba Adam ICLR 2015 — present; ref [27] Parikh et al. decomposable attention EMNLP 2016 — present (matches '[27]' citation in Section 1); ref [33] Srivastava et al. Dropout JMLR 15 — present; ref [38] Wu et al. GNMT arXiv:1609.08144 — present. The extractor only stores raw_reference_text; no DOIs were fabricated. arXiv IDs are accurately transcribed where they appear in the bibliography."
+    },
+    {
+      "claim_id": "vaswani2017_def4 (scaled dot-product attention equation)",
+      "verified": "Page 4 PDF confirms equation (1): 'Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) V'. equation_status='central_contribution' is appropriate — paper coins the term 'Scaled Dot-Product Attention' (Section 3.2.1) and the scaling by 1/sqrt(d_k) is novel relative to prior dot-product attention."
+    },
+    {
+      "claim_id": "vaswani2017_def6 (FFN equation, d_model=512, d_ff=2048)",
+      "verified": "Page 5 PDF confirms equation (2): 'FFN(x) = max(0, xW_1 + b_1)W_2 + b_2' with 'd_model = 512, and the inner-layer has dimensionality d_ff = 2048.' Correctly attributed to base model."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 22,
+    "claims_spot_checked": 8,
+    "issues_count": 1,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

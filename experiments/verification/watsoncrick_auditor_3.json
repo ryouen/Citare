@@ -1,0 +1,72 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T034117Z_R55_v13_watsoncrick_s1\\extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+  "auditor_id": "watsoncrick_auditor_3",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_exist2",
+      "what_extractor_says": "verification_status='verified_in_paper' for the structural geometry parameters (3.4 A residue spacing, 36 degree angle, 34 A repeat, 10 A phosphorus radius)",
+      "what_paper_says": "Page 737: 'We have assumed an angle of 36 degrees between adjacent residues in the same chain.' These are model-building assumptions/derivations, not empirically verified measurements in this paper. The paper itself states (p.737): 'The previously published X-ray data on deoxyribose nucleic acid are insufficient for a rigorous test of our structure... it must be regarded as unproved until it has been checked against more exact results.' The numbers should be 'proposed_in_paper', not 'verified_in_paper'.",
+      "severity": "medium",
+      "evidence_quote": "We have assumed an angle of 36 deg between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A... The previously published X-ray data on deoxyribose nucleic acid are insufficient for a rigorous test of our structure."
+    },
+    {
+      "category": 2,
+      "claim_id": "watson1953_def1",
+      "what_extractor_says": "key_elements include 'residue spacing 3.4 A in z-direction with 36 degree angle between adjacent residues' and 'structure repeats after 10 residues (34 A) on each chain' and 'phosphorus atom at 10 A from fibre axis' — folded into the helix DEFINITION",
+      "what_paper_says": "These same numbers are also used as the evidence body of watson1953_exist2 ('structural_geometry_parameters'). They appear once in the source text on p.737 and have been duplicated as both definitional key_elements of the helix and as the existence claim's evidence. This is an extraction redundancy (same content, two homes) rather than a misattribution; the numbers themselves are correctly tied to the Watson-Crick model.",
+      "severity": "low",
+      "evidence_quote": "There is a residue on each chain every 3.4 A in the z-direction. We have assumed an angle of 36 deg between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A. The distance of a phosphorus atom from the fibre axis is 10 A."
+    },
+    {
+      "category": 2,
+      "claim_id": "missing_acknowledgement_claim",
+      "what_extractor_says": "No explicit claim records the acknowledgement of unpublished Wilkins/Franklin data, nor of Pauling-Corey sharing the manuscript in advance, as a standalone EXISTENCE_CLAIM about provenance. The Wilkins/Franklin acknowledgement appears only obliquely in watson1953_exist5's evidence ('not aware of the details... when they devised their structure'); the Pauling-manuscript courtesy is buried inside watson1953_exist1.",
+      "what_paper_says": "Page 737-738: 'We have also been stimulated by a knowledge of the general nature of the unpublished experimental results and ideas of Dr. M. H. F. Wilkins, Dr. R. E. Franklin and their co-workers at King's College, London.' Page 737: 'They [Pauling and Corey] kindly made their manuscript available to us in advance of publication.' These are key historical attributions. Where they DO appear in the extraction, however, they are correctly attributed to Wilkins/Franklin/Pauling (not claimed as Watson-Crick's own data).",
+      "severity": "low",
+      "evidence_quote": "We have also been stimulated by a knowledge of the general nature of the unpublished experimental results and ideas of Dr. M. H. F. Wilkins, Dr. R. E. Franklin and their co-workers at King's College, London."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "watson1953_def1",
+      "verified": "Double helix definition (two helical chains, dyad axis, antiparallel right-handed helices, bases inside, phosphates outside) matches p.737 source text exactly. Distinguished_from correctly identifies Pauling-Corey three-chain, Fraser three-chain, and Furberg single-chain alternatives — all explicitly mentioned on p.737."
+    },
+    {
+      "claim_id": "watson1953_def2",
+      "verified": "Base pairing definition correct: planes perpendicular to fibre axis, single base from each chain hydrogen-bonded, purine-pyrimidine pairing required, A-T and G-C specific pairs, keto tautomer assumption. All elements verbatim from p.737."
+    },
+    {
+      "claim_id": "watson1953_exist1",
+      "verified": "Pauling-Corey criticism correctly attributed to Pauling-Corey's three-chain model (not Watson-Crick's). The two reasons (acidic-hydrogen/repulsion problem; van der Waals distances too small) match p.737 exactly. Pauling-Corey acknowledgement of sharing manuscript correctly captured."
+    },
+    {
+      "claim_id": "watson1953_exist3",
+      "verified": "Chargaff base ratio (A/T ~ 1, G/C ~ 1) correctly attributed as experimental observation citing Chargaff and Wyatt (refs 3 and 4 in paper_references). Not claimed as Watson-Crick's own measurement."
+    },
+    {
+      "claim_id": "watson1953_rel1",
+      "verified": "Conditional relation between tautomeric_form (IV) and allowable_base_pairs (DV) correctly reflects the conditional 'If it is assumed... only specific pairs of bases can bond together' on p.737. IV/DV not swapped."
+    },
+    {
+      "claim_id": "watson1953_exist6",
+      "verified": "The famous 'copying mechanism' sentence correctly tagged as 'proposed_in_paper' (not verified). Source text matches verbatim. Author framing 'suggests' correctly preserved."
+    },
+    {
+      "claim_id": "paper.default_causal_strength",
+      "verified": "design_basis='theoretical' is correct: the paper proposes a structural model from stereochemical reasoning and prior X-ray data, without any controlled experiment of its own. temporal_precedence='none' and author_framing='suggestive' also appropriate ('We wish to suggest...', 'must be regarded as unproved')."
+    },
+    {
+      "claim_id": "paper.default_method",
+      "verified": "study_design='structural_model_proposal_based_on_x_ray_diffraction_and_stereochemistry' accurately describes the work. unit_of_analysis='molecular' and country='UK' (Cavendish Laboratory, Cambridge) confirmed by author affiliation on p.738."
+    }
+  ],
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 8,
+    "issues_count": 3,
+    "high_severity_count": 0,
+    "verdict": "trustworthy"
+  }
+}

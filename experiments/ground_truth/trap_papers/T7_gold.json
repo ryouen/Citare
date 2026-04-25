@@ -319,6 +319,7 @@
       "weight": 0.5,
       "equation_status": "restatement",
       "required_latex_tokens": ["n^{*}", "\\|f\\|", "\\propto", "\\mathcal{H}"],
+      "discriminator_tokens": ["\\propto"],
       "description": "eq6: Discussion-simplified form of eq5. Should NOT be extracted as standalone — it is a lossy re-statement of eq5 and extracting it risks future miscitation."
     },
     {
@@ -327,6 +328,7 @@
       "equation_status": "textbook_background",
       "weight": 1.5,
       "required_latex_tokens": ["\\mathfrak{R}", "\\mathbb{E}", "\\sup", "\\sigma", "\\sum", "\\mathcal{F}", "f(x"],
+      "discriminator_tokens": ["\\mathfrak{R}"],
       "description": "eq7: Rademacher complexity in Appendix proof. Full proof line."
     }
   ]

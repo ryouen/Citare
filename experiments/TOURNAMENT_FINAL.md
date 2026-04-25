@@ -1,6 +1,11 @@
-# Final Prompt Tournament — N=3 across 5 papers
+# Final Prompt Tournament — N=3 across 5 papers (post-discriminator-fix)
 
 Executed 2026-04-25 to definitively answer "which prompt should Citare use in production?". Combines L8 factorial design + cross-paper validation + N=3 noise estimation.
+
+> **Important note (added after first edition)**: an additional v0.14 was tested
+> and a scorer bug was found in the equation discipline metric. Both are
+> reflected below. Earlier sections may reference pre-fix numbers; the
+> "Final" section at the end has the corrected production recommendation.
 
 ## Scope
 
@@ -181,10 +186,55 @@ But **single-prompt v0.13** is sufficient for production MVP.
 
 ## Files
 
-- Prompts: `experiments/prompts/{v0.1, v0.3, v0.10, v0.11, v0.12a, v0.12b, v0.12d, v0.12e, v0.12f, v0.12g, v0.13, v0.20v2, v0.20v5, v0.20v7, v0.20v8, v0.21v9}.md`
-- Scorer: `experiments/harness/score_against_gold.py` (with reference metric extension)
+- Prompts: `experiments/prompts/{v0.1, v0.3, v0.10, v0.11, v0.12a, v0.12b, v0.12d, v0.12e, v0.12f, v0.12g, v0.13, v0.14, v0.20v2, v0.20v5, v0.20v7, v0.20v8, v0.21v9}.md`
+- Scorer: `experiments/harness/score_against_gold.py` (with reference metric + discriminator extensions)
 - L8 batch scorer: `experiments/harness/score_l8_final.py`
 - Per-paper pilot: `experiments/PILOT_V2.md`
 - L8 detail: `experiments/L8_FINAL.md`
 - Validation: `experiments/V13_VALIDATION.md`
 - This file: `experiments/TOURNAMENT_FINAL.md`
+
+---
+
+# Final (post-bug-fix, post-v0.14) production recommendation
+
+## Critical scorer bug discovered
+
+After the initial tournament report was written, inspection of v0.14 outputs revealed that the `eq_discipline` metric was systematically inflating false-positive captures. Gold equations whose `required_latex_tokens` overlapped with other gold equations (e.g. eq6's tokens `n^{*}`, `\|f\|`, `\mathcal{H}` are shared with eq5's crossover formula) were being scored as "captured" when the model had only emitted eq5, not eq6. This meant **all reported discipline numbers were too low**.
+
+**Fix applied**: added `discriminator_tokens` field to gold equations. For eq6, `\propto` is now required as a discriminator (the proportionality symbol appears only in the Discussion restatement, not the precise crossover form). For eq7, `\mathfrak{R}` is required (Rademacher complexity symbol).
+
+## Corrected discipline numbers
+
+| Variant | T7 Coverage | T7 Core eq | **T7 Discipline (fixed)** | Cross-paper avg |
+|---------|-------------|-----------|---------------------------|------------------|
+| v0.3 | 91.7% | 0% | 100% (n/a) | 95.8% |
+| **v0.12e** | 84.5% | 89.1% | **88.9% ± 19.2** | 92.3% |
+| **v0.13** | 82.1% | **92.1% ± 4.3** | 77.8% ± 19.2 | **95.4%** |
+| v0.14 | 83.9% | 89.5% | 77.8% (no improvement over v0.13) | not tested |
+| V9 TRUE | 89.3% | 88.7% | 66.7% | not tested |
+| V2 (TOP_LONG_SCHEMA) | 91.7% | 89.1% | 66.7% | 93.1% |
+
+## v0.14 result
+
+v0.14 = v0.13 + explicit "skip introductory cited scaling laws + Discussion restatements". On T7 N=3, v0.14 produced **identical discipline (77.8%) to v0.13**. The added prose patterns did not move the needle. Confirms the earlier finding that **schema enforcement, not prose instruction, is what governs discipline**.
+
+## Revised production recommendation
+
+The production decision now hinges on **what kind of paper diversity matters**:
+
+- **For citation-integrity-critical equation extraction** (where decorative equations polluting the graph would be costly): **v0.12e STATUS** (discipline 88.9%, core_eq 89.1%, coverage 84.5% on T7 / 92.3% cross-paper avg).
+- **For maximum text coverage across diverse paper types** (where cross-paper generalization matters): **v0.13 verbatim references** (discipline 77.8%, core_eq 92.1%, coverage 82.1% on T7 / **95.4% cross-paper avg**).
+
+Both are defensible production choices. v0.12e is stricter; v0.13 is broader.
+
+If forced to pick one for an MVP: **v0.12e**, because Citare's value proposition is integrity-against-miscitation. Sacrificing 3pp average cross-paper coverage to gain 11pp discipline is the right trade for an integrity-focused service.
+
+If running parallel: v0.12e + v0.13 dual-run gives both axes.
+
+## Honest takeaways
+
+1. **The L8 main effects still hold**: position is the strongest design axis (top → high cov+disc, low core_eq; appendix → high core_eq, low cov; mid-prompt → balanced). Schema-mandatory `equation_status` field is the only mechanism that meaningfully drives discipline.
+2. **My earlier reports underestimated discipline systematically** because the scorer had a token-overlap blind spot. The corrected numbers favor v0.12e more than the original report claimed.
+3. **v0.14's "explicit skip patterns" did not improve T7 discipline** — the schema-mandatory enforcement mechanism is doing most of the work, not the prose elaboration.
+4. **The discipline gap between v0.12e and v0.13 (11pp) is real** but small in absolute terms — both prompts skip eq7 (Rademacher) reliably, and the difference is concentrated in eq1 (intro scaling) which v0.13 captures somewhat more often, possibly because its references priming makes the model "preserve more" generally.

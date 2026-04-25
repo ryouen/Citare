@@ -346,7 +346,18 @@ def _collect_equations(extraction: dict) -> list[dict]:
 
 
 def check_equation(eqs: list[dict], spec: dict) -> tuple[float, str]:
+    """Score how well captured equations match a gold equation spec.
+
+    Strategy:
+      1. For each captured equation, count how many of the gold's
+         ``required_latex_tokens`` appear in it.
+      2. If gold provides ``discriminator_tokens``, the matched equation
+         MUST contain ALL of them — otherwise the match is invalid
+         (filters out coincidental token overlap with other gold equations).
+      3. Return the fraction (best_match / total_required) and details.
+    """
     required = spec.get("required_latex_tokens") or []
+    discriminators = spec.get("discriminator_tokens") or []
     if not required:
         return 0.0, "no required tokens"
     best_found = 0
@@ -354,12 +365,22 @@ def check_equation(eqs: list[dict], spec: dict) -> tuple[float, str]:
     for eq in eqs:
         normed = eq["normalized"]
         normed_raw = eq["latex"]
+        # Discriminator gate: skip if any discriminator missing
+        if discriminators:
+            disc_ok = all(
+                (_norm_latex(t) in normed) or (t in normed_raw)
+                for t in discriminators
+            )
+            if not disc_ok:
+                continue
         found = sum(1 for t in required if (_norm_latex(t) in normed) or (t in normed_raw))
         if found > best_found:
             best_found = found
             best_eq = eq
     frac = best_found / len(required)
     if best_eq is None:
+        if discriminators:
+            return 0.0, f"0/{len(required)} — no equation contains all discriminator tokens {discriminators}"
         return 0.0, f"0/{len(required)} tokens — no equations captured"
     return frac, f"{best_found}/{len(required)} tokens via {best_eq['claim_id']} ({best_eq.get('name')!r})"
 

@@ -1,0 +1,790 @@
+{
+  "2_shapiro_mechanisms_of_mindfulness2006": {
+    "dir": "20260426T060043Z_R73_v013d_2_shapiro_mechanisms_of_mindfulness2006_s1",
+    "extraction_path": "experiments/runs/20260426T060043Z_R73_v013d_2_shapiro_mechanisms_of_mindfulness2006_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "T7": {
+    "dir": "20260425T052950Z_R61_v013d_T7_s1",
+    "extraction_path": "experiments/runs/20260425T052950Z_R61_v013d_T7_s1/extraction.json",
+    "cov": 0.8929,
+    "ip": 0.0,
+    "composite": 0.8929,
+    "gold_paper": "T7",
+    "alternate_seeds": [
+      "20260425T052950Z_R61_v013d_T7_s2",
+      "20260425T052950Z_R61_v013d_T7_s3"
+    ]
+  },
+  "amodei_2016_concrete_problems_ai_safety": {
+    "dir": "20260426T154503Z_R83_v013g_amodei_2016_concrete_problems_ai_safety_s1",
+    "extraction_path": "experiments/runs/20260426T154503Z_R83_v013g_amodei_2016_concrete_problems_ai_safety_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054509Z_R71_v013d_amodei_2016_concrete_problems_ai_safety_s1"
+  },
+  "arnulf_2014_predicting_survey_responses": {
+    "dir": "20260426T054510Z_R71_v013d_arnulf_2014_predicting_survey_responses_s1",
+    "extraction_path": "experiments/runs/20260426T054510Z_R71_v013d_arnulf_2014_predicting_survey_responses_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "arnulf_2024_measuring_menu_food": {
+    "dir": "20260426T054511Z_R71_v013d_arnulf_2024_measuring_menu_food_s1",
+    "extraction_path": "experiments/runs/20260426T054511Z_R71_v013d_arnulf_2024_measuring_menu_food_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "attachment_as_moderator_of_treatment_out": {
+    "dir": "20260426T154509Z_R83_v013g_attachment_as_moderator_of_treatment_out_s1",
+    "extraction_path": "experiments/runs/20260426T154509Z_R83_v013g_attachment_as_moderator_of_treatment_out_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060045Z_R73_v013d_attachment_as_moderator_of_treatment_out_s1"
+  },
+  "baddeley_hitch_1974_working_memory": {
+    "dir": "20260426T054511Z_R71_v013d_baddeley_hitch_1974_working_memory_s1",
+    "extraction_path": "experiments/runs/20260426T054511Z_R71_v013d_baddeley_hitch_1974_working_memory_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "bai_2022_constitutional_ai": {
+    "dir": "20260426T154503Z_R83_v013g_bai_2022_constitutional_ai_s1",
+    "extraction_path": "experiments/runs/20260426T154503Z_R83_v013g_bai_2022_constitutional_ai_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054805Z_R71_v013d_bai_2022_constitutional_ai_s1"
+  },
+  "barney": {
+    "dir": "20260425T123849Z_R64_v013d_barney_s1",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_barney_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "barney",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_barney_s3",
+      "20260425T123849Z_R64_v013d_barney_s2"
+    ]
+  },
+  "berko1958childs": {
+    "dir": "20260426T054855Z_R71_v013d_berko1958childs_s1",
+    "extraction_path": "experiments/runs/20260426T054855Z_R71_v013d_berko1958childs_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "bernerslee_2001_semantic_web": {
+    "dir": "20260426T154503Z_R83_v013g_bernerslee_2001_semantic_web_s1",
+    "extraction_path": "experiments/runs/20260426T154503Z_R83_v013g_bernerslee_2001_semantic_web_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054509Z_R71_v013d_bernerslee_2001_semantic_web_s1"
+  },
+  "better_living_with_illness_a_transdiagno": {
+    "dir": "20260426T060342Z_R73_v013d_better_living_with_illness_a_transdiagno_s1",
+    "extraction_path": "experiments/runs/20260426T060342Z_R73_v013d_better_living_with_illness_a_transdiagno_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "binz_schulz_2023_cognitive_psychology_gp": {
+    "dir": "20260426T054512Z_R71_v013d_binz_schulz_2023_cognitive_psychology_gp_s1",
+    "extraction_path": "experiments/runs/20260426T054512Z_R71_v013d_binz_schulz_2023_cognitive_psychology_gp_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "building_social_resilience_in_soldiers_a": {
+    "dir": "20260426T060514Z_R73_v013d_building_social_resilience_in_soldiers_a_s1",
+    "extraction_path": "experiments/runs/20260426T060514Z_R73_v013d_building_social_resilience_in_soldiers_a_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "burns_2022_discovering_latent_knowledge": {
+    "dir": "20260426T054834Z_R71_v013d_burns_2022_discovering_latent_knowledge_s1",
+    "extraction_path": "experiments/runs/20260426T054834Z_R71_v013d_burns_2022_discovering_latent_knowledge_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "change_in_attachment_patterns_and_reflec": {
+    "dir": "20260426T154504Z_R83_v013g_change_in_attachment_patterns_and_reflec_s1",
+    "extraction_path": "experiments/runs/20260426T154504Z_R83_v013g_change_in_attachment_patterns_and_reflec_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060046Z_R73_v013d_change_in_attachment_patterns_and_reflec_s1"
+  },
+  "comparing_the_process_in_psychodynamic_a": {
+    "dir": "20260426T060047Z_R73_v013d_comparing_the_process_in_psychodynamic_a_s1",
+    "extraction_path": "experiments/runs/20260426T060047Z_R73_v013d_comparing_the_process_in_psychodynamic_a_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "competence_impeding_electronic_games_and": {
+    "dir": "20260426T154504Z_R83_v013g_competence_impeding_electronic_games_and_s1",
+    "extraction_path": "experiments/runs/20260426T154504Z_R83_v013g_competence_impeding_electronic_games_and_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060516Z_R73_v013d_competence_impeding_electronic_games_and_s1"
+  },
+  "conmy2023towards": {
+    "dir": "20260426T054913Z_R71_v013d_conmy2023towards_s1",
+    "extraction_path": "experiments/runs/20260426T054913Z_R71_v013d_conmy2023towards_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "deflecting_the_trajectory_and_changing_t": {
+    "dir": "20260426T060521Z_R73_v013d_deflecting_the_trajectory_and_changing_t_s1",
+    "extraction_path": "experiments/runs/20260426T060521Z_R73_v013d_deflecting_the_trajectory_and_changing_t_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "dellacqua_2023_jagged_technological_fron": {
+    "dir": "20260426T154510Z_R83_v013g_dellacqua_2023_jagged_technological_fron_s1",
+    "extraction_path": "experiments/runs/20260426T154510Z_R83_v013g_dellacqua_2023_jagged_technological_fron_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054508Z_R71_v013d_dellacqua_2023_jagged_technological_fron_s1"
+  },
+  "dimidjian_2006_randomized_trial_of_behav": {
+    "dir": "20260426T154507Z_R83_v013g_dimidjian_2006_randomized_trial_of_behav_s1",
+    "extraction_path": "experiments/runs/20260426T154507Z_R83_v013g_dimidjian_2006_randomized_trial_of_behav_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060042Z_R73_v013d_dimidjian_2006_randomized_trial_of_behav_s1"
+  },
+  "dobson_k_s_1989_a_meta_analysis_of_the_e": {
+    "dir": "20260426T161325Z_R84_v013g_dobson_k_s_1989_a_meta_analysis_of_the_e_s1",
+    "extraction_path": "experiments/runs/20260426T161325Z_R84_v013g_dobson_k_s_1989_a_meta_analysis_of_the_e_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060042Z_R73_v013d_dobson_k_s_1989_a_meta_analysis_of_the_e_s1"
+  },
+  "edmondson": {
+    "dir": "20260425T123850Z_R64_v013d_edmondson_s1",
+    "extraction_path": "experiments/runs/20260425T123850Z_R64_v013d_edmondson_s1/extraction.json",
+    "cov": 0.95,
+    "ip": 0.0,
+    "composite": 0.95,
+    "gold_paper": "edmondson",
+    "alternate_seeds": [
+      "20260425T123851Z_R64_v013d_edmondson_s2",
+      "20260425T123851Z_R64_v013d_edmondson_s3"
+    ]
+  },
+  "effects_of_responses_to_depression_on_th": {
+    "dir": "20260426T060530Z_R73_v013d_effects_of_responses_to_depression_on_th_s1",
+    "extraction_path": "experiments/runs/20260426T060530Z_R73_v013d_effects_of_responses_to_depression_on_th_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "efficacy_of_interpersonal_psychotherapy_": {
+    "dir": "20260426T154509Z_R83_v013g_efficacy_of_interpersonal_psychotherapy__s1",
+    "extraction_path": "experiments/runs/20260426T154509Z_R83_v013g_efficacy_of_interpersonal_psychotherapy__s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060042Z_R73_v013d_efficacy_of_interpersonal_psychotherapy__s1"
+  },
+  "einstein": {
+    "dir": "20260425T123849Z_R64_v013d_einstein_s1",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_einstein_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "einstein",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_einstein_s2",
+      "20260425T123850Z_R64_v013d_einstein_s3"
+    ]
+  },
+  "elazar2021measuring": {
+    "dir": "20260426T054914Z_R71_v013d_elazar2021measuring_s1",
+    "extraction_path": "experiments/runs/20260426T054914Z_R71_v013d_elazar2021measuring_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "experiential_avoidance_and_behavioral_di": {
+    "dir": "20260426T154504Z_R83_v013g_experiential_avoidance_and_behavioral_di_s1",
+    "extraction_path": "experiments/runs/20260426T154504Z_R83_v013g_experiential_avoidance_and_behavioral_di_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060047Z_R73_v013d_experiential_avoidance_and_behavioral_di_s1"
+  },
+  "facilitating_relational_framing_of_class": {
+    "dir": "20260426T060357Z_R73_v013d_facilitating_relational_framing_of_class_s1",
+    "extraction_path": "experiments/runs/20260426T060357Z_R73_v013d_facilitating_relational_framing_of_class_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "geiger2025causal": {
+    "dir": "20260426T054916Z_R71_v013d_geiger2025causal_s1",
+    "extraction_path": "experiments/runs/20260426T054916Z_R71_v013d_geiger2025causal_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "grant2025representational": {
+    "dir": "20260426T054935Z_R71_v013d_grant2025representational_s1",
+    "extraction_path": "experiments/runs/20260426T054935Z_R71_v013d_grant2025representational_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "hanna2023how": {
+    "dir": "20260426T054936Z_R71_v013d_hanna2023how_s1",
+    "extraction_path": "experiments/runs/20260426T054936Z_R71_v013d_hanna2023how_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "hanna2024faith": {
+    "dir": "20260426T054941Z_R71_v013d_hanna2024faith_s1",
+    "extraction_path": "experiments/runs/20260426T054941Z_R71_v013d_hanna2024faith_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "hayes": {
+    "dir": "20260425T052950Z_R61_v013d_hayes_s1",
+    "extraction_path": "experiments/runs/20260425T052950Z_R61_v013d_hayes_s1/extraction.json",
+    "cov": 0.9091,
+    "ip": 0.0,
+    "composite": 0.9091,
+    "gold_paper": "hayes",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_hayes_s2",
+      "20260425T123849Z_R64_v013d_hayes_s3"
+    ]
+  },
+  "heimersheim2024how": {
+    "dir": "20260426T054947Z_R71_v013d_heimersheim2024how_s1",
+    "extraction_path": "experiments/runs/20260426T054947Z_R71_v013d_heimersheim2024how_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "hofmann_s_g_sawyer_a_t_witt_a_a_oh_d_201": {
+    "dir": "20260426T154508Z_R83_v013g_hofmann_s_g_sawyer_a_t_witt_a_a_oh_d_201_s1",
+    "extraction_path": "experiments/runs/20260426T154508Z_R83_v013g_hofmann_s_g_sawyer_a_t_witt_a_a_oh_d_201_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060044Z_R73_v013d_hofmann_s_g_sawyer_a_t_witt_a_a_oh_d_201_s1"
+  },
+  "hubinger": {
+    "dir": "20260425T124707Z_R65_v013d_hubinger_s2",
+    "extraction_path": "experiments/runs/20260425T124707Z_R65_v013d_hubinger_s2/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "hubinger",
+    "alternate_seeds": [
+      "20260425T052950Z_R61_v013d_hubinger_s3",
+      "20260425T123849Z_R64_v013d_hubinger_s1"
+    ]
+  },
+  "iit_geiger2021_2112_00826": {
+    "dir": "20260426T054950Z_R71_v013d_iit_geiger2021_2112_00826_s1",
+    "extraction_path": "experiments/runs/20260426T054950Z_R71_v013d_iit_geiger2021_2112_00826_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "interpbench_gupta2024_2407_14494": {
+    "dir": "20260426T054950Z_R71_v013d_interpbench_gupta2024_2407_14494_s1",
+    "extraction_path": "experiments/runs/20260426T054950Z_R71_v013d_interpbench_gupta2024_2407_14494_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "jakesch_2023_cowriting_opinionated_lms": {
+    "dir": "20260426T054512Z_R71_v013d_jakesch_2023_cowriting_opinionated_lms_s1",
+    "extraction_path": "experiments/runs/20260426T054512Z_R71_v013d_jakesch_2023_cowriting_opinionated_lms_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "kosinski_2023_theory_of_mind_llms": {
+    "dir": "20260426T161325Z_R84_v013g_kosinski_2023_theory_of_mind_llms_s1",
+    "extraction_path": "experiments/runs/20260426T161325Z_R84_v013g_kosinski_2023_theory_of_mind_llms_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054513Z_R71_v013d_kosinski_2023_theory_of_mind_llms_s1"
+  },
+  "lewis_2020_rag": {
+    "dir": "20260426T161324Z_R84_v013g_lewis_2020_rag_s1",
+    "extraction_path": "experiments/runs/20260426T161324Z_R84_v013g_lewis_2020_rag_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054509Z_R71_v013d_lewis_2020_rag_s1"
+  },
+  "li2024optimal": {
+    "dir": "20260426T054956Z_R71_v013d_li2024optimal_s1",
+    "extraction_path": "experiments/runs/20260426T054956Z_R71_v013d_li2024optimal_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "low_and_decreasing_self_esteem_during_ad": {
+    "dir": "20260426T060542Z_R73_v013d_low_and_decreasing_self_esteem_during_ad_s1",
+    "extraction_path": "experiments/runs/20260426T060542Z_R73_v013d_low_and_decreasing_self_esteem_during_ad_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "makelov2023is": {
+    "dir": "20260426T055035Z_R71_v013d_makelov2023is_s1",
+    "extraction_path": "experiments/runs/20260426T055035Z_R71_v013d_makelov2023is_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "marks2025sparse": {
+    "dir": "20260426T055101Z_R72_v013d_marks2025sparse_s1",
+    "extraction_path": "experiments/runs/20260426T055101Z_R72_v013d_marks2025sparse_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "meng2023locating": {
+    "dir": "20260426T055102Z_R72_v013d_meng2023locating_s1",
+    "extraction_path": "experiments/runs/20260426T055102Z_R72_v013d_meng2023locating_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "miller2024circuit": {
+    "dir": "20260426T055102Z_R72_v013d_miller2024circuit_s1",
+    "extraction_path": "experiments/runs/20260426T055102Z_R72_v013d_miller2024circuit_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "miller_1956_magical_number_seven": {
+    "dir": "20260426T154504Z_R83_v013g_miller_1956_magical_number_seven_s1",
+    "extraction_path": "experiments/runs/20260426T154504Z_R83_v013g_miller_1956_magical_number_seven_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054513Z_R71_v013d_miller_1956_magical_number_seven_s1"
+  },
+  "mindfulness_and_self_compassion_as_tools": {
+    "dir": "20260426T060402Z_R73_v013d_mindfulness_and_self_compassion_as_tools_s1",
+    "extraction_path": "experiments/runs/20260426T060402Z_R73_v013d_mindfulness_and_self_compassion_as_tools_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "multiple_identity_enactments_and_multipl": {
+    "dir": "20260426T060047Z_R73_v013d_multiple_identity_enactments_and_multipl_s1",
+    "extraction_path": "experiments/runs/20260426T060047Z_R73_v013d_multiple_identity_enactments_and_multipl_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "munkhdalai_2024_infini_attention": {
+    "dir": "20260426T054510Z_R71_v013d_munkhdalai_2024_infini_attention_s1",
+    "extraction_path": "experiments/runs/20260426T054510Z_R71_v013d_munkhdalai_2024_infini_attention_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "noyzhang": {
+    "dir": "20260425T123849Z_R64_v013d_noyzhang_s2",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_noyzhang_s2/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "noyzhang",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_noyzhang_s3",
+      "20260425T123849Z_R64_v013d_noyzhang_s1"
+    ]
+  },
+  "olsson2022context": {
+    "dir": "20260426T055102Z_R72_v013d_olsson2022context_s1",
+    "extraction_path": "experiments/runs/20260426T055102Z_R72_v013d_olsson2022context_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "on_the_perpetuation_of_ignorance_system_": {
+    "dir": "20260426T060636Z_R73_v013d_on_the_perpetuation_of_ignorance_system__s1",
+    "extraction_path": "experiments/runs/20260426T060636Z_R73_v013d_on_the_perpetuation_of_ignorance_system__s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "park": {
+    "dir": "20260425T123849Z_R64_v013d_park_s1",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_park_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "park",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_park_s2",
+      "20260425T123849Z_R64_v013d_park_s3"
+    ]
+  },
+  "pilot_of_an_acceptance_and_commitment_th": {
+    "dir": "20260426T060409Z_R73_v013d_pilot_of_an_acceptance_and_commitment_th_s1",
+    "extraction_path": "experiments/runs/20260426T060409Z_R73_v013d_pilot_of_an_acceptance_and_commitment_th_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "prevention_of_relapse_recurrence_in_majo": {
+    "dir": "20260426T161325Z_R84_v013g_prevention_of_relapse_recurrence_in_majo_s1",
+    "extraction_path": "experiments/runs/20260426T161325Z_R84_v013g_prevention_of_relapse_recurrence_in_majo_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060044Z_R73_v013d_prevention_of_relapse_recurrence_in_majo_s1"
+  },
+  "put_your_plan_into_action_the_influence_": {
+    "dir": "20260426T060650Z_R73_v013d_put_your_plan_into_action_the_influence__s1",
+    "extraction_path": "experiments/runs/20260426T060650Z_R73_v013d_put_your_plan_into_action_the_influence__s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "randomized_controlled_trial_of_acceptanc": {
+    "dir": "20260426T060449Z_R73_v013d_randomized_controlled_trial_of_acceptanc_s1",
+    "extraction_path": "experiments/runs/20260426T060449Z_R73_v013d_randomized_controlled_trial_of_acceptanc_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "rct_of_a_psychological_intervention_for_": {
+    "dir": "20260426T154505Z_R83_v013g_rct_of_a_psychological_intervention_for__s1",
+    "extraction_path": "experiments/runs/20260426T154505Z_R83_v013g_rct_of_a_psychological_intervention_for__s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060046Z_R73_v013d_rct_of_a_psychological_intervention_for__s1"
+  },
+  "regional_brain_metabolic_changes_in_pati": {
+    "dir": "20260426T154506Z_R83_v013g_regional_brain_metabolic_changes_in_pati_s1",
+    "extraction_path": "experiments/runs/20260426T154506Z_R83_v013g_regional_brain_metabolic_changes_in_pati_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060043Z_R73_v013d_regional_brain_metabolic_changes_in_pati_s1"
+  },
+  "rising_income_and_the_subjective_well_be": {
+    "dir": "20260426T060708Z_R73_v013d_rising_income_and_the_subjective_well_be_s1",
+    "extraction_path": "experiments/runs/20260426T060708Z_R73_v013d_rising_income_and_the_subjective_well_be_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "shannon": {
+    "dir": "20260426T165417Z_R85_v013g_shannon_s1",
+    "extraction_path": "experiments/runs/20260426T165417Z_R85_v013g_shannon_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": "shannon",
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260425T123849Z_R64_v013d_shannon_s1"
+  },
+  "syed2023attribution": {
+    "dir": "20260426T055103Z_R72_v013d_syed2023attribution_s1",
+    "extraction_path": "experiments/runs/20260426T055103Z_R72_v013d_syed2023attribution_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "the_chronic_illness_acceptance_questionn": {
+    "dir": "20260426T060507Z_R73_v013d_the_chronic_illness_acceptance_questionn_s1",
+    "extraction_path": "experiments/runs/20260426T060507Z_R73_v013d_the_chronic_illness_acceptance_questionn_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "the_utility_of_the_valuing_questionnaire": {
+    "dir": "20260426T060512Z_R73_v013d_the_utility_of_the_valuing_questionnaire_s1",
+    "extraction_path": "experiments/runs/20260426T060512Z_R73_v013d_the_utility_of_the_valuing_questionnaire_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "todd2024function": {
+    "dir": "20260426T055103Z_R72_v013d_todd2024function_s1",
+    "extraction_path": "experiments/runs/20260426T055103Z_R72_v013d_todd2024function_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "turing": {
+    "dir": "20260425T123850Z_R64_v013d_turing_s1",
+    "extraction_path": "experiments/runs/20260425T123850Z_R64_v013d_turing_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "turing",
+    "alternate_seeds": [
+      "20260425T123850Z_R64_v013d_turing_s2",
+      "20260425T123850Z_R64_v013d_turing_s3"
+    ]
+  },
+  "tversky_kahneman_1974_heuristics_biases": {
+    "dir": "20260426T161324Z_R84_v013g_tversky_kahneman_1974_heuristics_biases_s1",
+    "extraction_path": "experiments/runs/20260426T161324Z_R84_v013g_tversky_kahneman_1974_heuristics_biases_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T054514Z_R71_v013d_tversky_kahneman_1974_heuristics_biases_s1"
+  },
+  "uher_2025_statistics_measurement": {
+    "dir": "20260426T054514Z_R71_v013d_uher_2025_statistics_measurement_s1",
+    "extraction_path": "experiments/runs/20260426T054514Z_R71_v013d_uher_2025_statistics_measurement_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "vaswani": {
+    "dir": "20260425T123849Z_R64_v013d_vaswani_s1",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_vaswani_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "vaswani",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_vaswani_s2",
+      "20260425T123849Z_R64_v013d_vaswani_s3"
+    ]
+  },
+  "vig2020causal": {
+    "dir": "20260426T055104Z_R72_v013d_vig2020causal_s1",
+    "extraction_path": "experiments/runs/20260426T055104Z_R72_v013d_vig2020causal_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "wang2022interpretability": {
+    "dir": "20260426T055104Z_R72_v013d_wang2022interpretability_s1",
+    "extraction_path": "experiments/runs/20260426T055104Z_R72_v013d_wang2022interpretability_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "watsoncrick": {
+    "dir": "20260425T052950Z_R61_v013d_watsoncrick_s1",
+    "extraction_path": "experiments/runs/20260425T052950Z_R61_v013d_watsoncrick_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "watsoncrick",
+    "alternate_seeds": [
+      "20260425T052950Z_R61_v013d_watsoncrick_s2",
+      "20260425T052950Z_R61_v013d_watsoncrick_s3"
+    ]
+  },
+  "wei": {
+    "dir": "20260425T123849Z_R64_v013d_wei_s1",
+    "extraction_path": "experiments/runs/20260425T123849Z_R64_v013d_wei_s1/extraction.json",
+    "cov": 1.0,
+    "ip": 0.0,
+    "composite": 1.0,
+    "gold_paper": "wei",
+    "alternate_seeds": [
+      "20260425T123849Z_R64_v013d_wei_s3",
+      "20260425T123849Z_R64_v013d_wei_s2"
+    ]
+  },
+  "williams_et_al_2006_mbct_in_suicide": {
+    "dir": "20260426T154507Z_R83_v013g_williams_et_al_2006_mbct_in_suicide_s1",
+    "extraction_path": "experiments/runs/20260426T154507Z_R83_v013g_williams_et_al_2006_mbct_in_suicide_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [],
+    "superseded_run_dir": "20260426T060045Z_R73_v013d_williams_et_al_2006_mbct_in_suicide_s1"
+  },
+  "wulff_2025_semantic_embeddings": {
+    "dir": "20260426T054539Z_R71_v013d_wulff_2025_semantic_embeddings_s1",
+    "extraction_path": "experiments/runs/20260426T054539Z_R71_v013d_wulff_2025_semantic_embeddings_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  },
+  "zhang2024towards": {
+    "dir": "20260426T054809Z_R72_v013d_zhang2024towards_s1",
+    "extraction_path": "experiments/runs/20260426T054809Z_R72_v013d_zhang2024towards_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": [
+      "20260426T055104Z_R72_v013d_zhang2024towards_s1"
+    ]
+  },
+  "zhou_2024_self_discover": {
+    "dir": "20260426T054510Z_R71_v013d_zhou_2024_self_discover_s1",
+    "extraction_path": "experiments/runs/20260426T054510Z_R71_v013d_zhou_2024_self_discover_s1/extraction.json",
+    "cov": null,
+    "ip": null,
+    "composite": null,
+    "gold_paper": null,
+    "alternate_seeds": []
+  }
+}

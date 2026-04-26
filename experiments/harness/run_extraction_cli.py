@@ -289,6 +289,12 @@ def main():
         "--effort",
         choices=["none", "low", "medium", "high", "xhigh", "max"],
         default="none",
+        help="Extended thinking budget. 'none' = no --effort flag (thinking disabled). "
+             "Default 'none' chosen empirically (R82 grid, n=72): paired with "
+             "v0.13g_thinking_defensive prompt, none beats low by 3-4pp coverage and "
+             "+7.5 EXIST claims per paper, with zero thesis-level miss across 6 paper test set. "
+             "low caused thesis-level losses (Hubinger persistence, Edmondson H3) when paired "
+             "with anti-compression / self-check prompts.",
     )
     p.add_argument("--max-budget-usd", type=float, default=2.00)
     p.add_argument("--timeout-sec", type=int, default=1200, help="subprocess timeout")

@@ -37,6 +37,12 @@ CREATE TABLE IF NOT EXISTS papers (
     default_causal_strength TEXT,     -- JSON
     default_method TEXT,              -- JSON
     status TEXT DEFAULT 'active',
+    -- Task 71 — inclusion policy tier:
+    --   1 = curated (hand-picked gold standard)
+    --   2 = verified (passed batch LLM review)
+    --   3 = ungated (default — extracted but not yet promoted)
+    inclusion_policy_tier INTEGER NOT NULL DEFAULT 3
+        CHECK(inclusion_policy_tier IN (1,2,3)),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_papers_content_hash ON papers(content_hash);
@@ -49,8 +55,8 @@ CREATE TABLE IF NOT EXISTS paper_identifiers (
     identifier_value TEXT NOT NULL,
     paper_id TEXT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
     is_preferred INTEGER DEFAULT 0,
-    source TEXT                       -- LLM-native only: no human input accepted
-        CHECK(source IN ('extraction','batch_llm_review','crossref','openalex') OR source IS NULL),
+    source TEXT                       -- LLM-native + curator-driven equivalences only
+        CHECK(source IN ('extraction','batch_llm_review','crossref','openalex','human_expert') OR source IS NULL),
     verified_at TIMESTAMP,
     PRIMARY KEY (identifier_type, identifier_value)
 );
@@ -65,9 +71,9 @@ CREATE TABLE IF NOT EXISTS claims (
     template_type TEXT NOT NULL
         CHECK(template_type IN ('DEFINITION','RELATION','EXISTENCE_CLAIM','META_CLAIM')),
 
+    -- Task 65 — l1_subject/predicate/object and l2_en/l2_ja have been
+    -- dropped. They were never populated by v0.13+ extractions.
     l0_json TEXT,
-    l1_subject TEXT, l1_predicate TEXT, l1_object TEXT,
-    l2_en TEXT, l2_ja TEXT,
     l3_json TEXT,
 
     source_text TEXT, source_page INTEGER, source_section TEXT, source_paragraph TEXT,
@@ -88,30 +94,47 @@ CREATE TABLE IF NOT EXISTS claims (
     extraction_prompt_version TEXT,
 
     status TEXT DEFAULT 'active',
+    -- Task 64 — claim lifecycle. ``current`` is the default; other states
+    -- carry negative-integrity signals propagated by cite_claim.
+    claim_status TEXT NOT NULL DEFAULT 'current'
+        CHECK(claim_status IN ('current','superseded','retracted','failed_to_replicate','contested')),
+    superseded_by_claim_id TEXT REFERENCES claims(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     design_basis_idx TEXT GENERATED ALWAYS AS (json_extract(causal_strength, '$.design_basis')) VIRTUAL,
-    author_framing_idx TEXT GENERATED ALWAYS AS (json_extract(causal_strength, '$.author_framing')) VIRTUAL,
+    -- Task 66 — JSON path now reads the renamed audit-only field. The
+    -- old ``author_framing`` key is no longer written by ingest.
+    author_framing_observed_only_idx TEXT GENERATED ALWAYS AS (json_extract(causal_strength, '$.author_framing_observed_only')) VIRTUAL,
     iv_idx TEXT GENERATED ALWAYS AS (json_extract(l0_json, '$.iv')) VIRTUAL,
     dv_idx TEXT GENERATED ALWAYS AS (json_extract(l0_json, '$.dv')) VIRTUAL
 );
 CREATE INDEX IF NOT EXISTS idx_claims_design_basis ON claims(design_basis_idx);
-CREATE INDEX IF NOT EXISTS idx_claims_author_framing ON claims(author_framing_idx);
+CREATE INDEX IF NOT EXISTS idx_claims_author_framing ON claims(author_framing_observed_only_idx);
 CREATE INDEX IF NOT EXISTS idx_claims_paper ON claims(paper_id);
-CREATE INDEX IF NOT EXISTS idx_claims_subject ON claims(l1_subject);
-CREATE INDEX IF NOT EXISTS idx_claims_object ON claims(l1_object);
 CREATE INDEX IF NOT EXISTS idx_claims_template ON claims(template_type);
 CREATE INDEX IF NOT EXISTS idx_claims_iv ON claims(iv_idx);
 CREATE INDEX IF NOT EXISTS idx_claims_dv ON claims(dv_idx);
+-- Partial index on lifecycle — most claims are 'current'.
+CREATE INDEX IF NOT EXISTS idx_claims_status
+    ON claims(claim_status) WHERE claim_status != 'current';
 
--- FTS5 for free-text search across source_text + l2_en
+-- FTS5 for free-text search. Three indexed columns:
+--   source_text — verbatim quote from the paper
+--   l0_concepts — flattened conceptual fields from l0_json (concept, iv,
+--     dv, phenomenon, key_elements, ...) with snake_case normalised to
+--     space-separated words so the unicode61 tokenizer can match natural-
+--     language queries like "DNA structure" against "double_helix_dna_structure".
+--   paper_meta  — paper-level metadata (authors + year + title) so the
+--     common research-flow query "Author Year" finds every claim from
+--     that paper. Without this column, "Edmondson 1999" returns 0 hits
+--     because year tokens rarely appear in source_text.
+-- A bare ``MATCH ?`` query searches all three columns (FTS5 default).
 CREATE VIRTUAL TABLE IF NOT EXISTS claims_fts USING fts5(
     claim_id UNINDEXED,
     source_text,
-    l2_en,
-    l1_subject,
-    l1_object,
+    l0_concepts,
+    paper_meta,
     tokenize = 'unicode61'
 );
 
@@ -119,10 +142,10 @@ CREATE TABLE IF NOT EXISTS claim_relations (
     source_id TEXT REFERENCES claims(id) ON DELETE CASCADE,
     target_id TEXT REFERENCES claims(id) ON DELETE CASCADE,
     relation_type TEXT NOT NULL,
-    incompleteness_category TEXT DEFAULT 'none'
-        CHECK(incompleteness_category IN (
-            'effect_disappears_under_control','hub_component',
-            'boundary_condition','extends_prior_definition','none')),
+    -- Task 67 — open vocabulary. Canonical values + severity live in
+    -- the ``incompleteness_vocabulary`` seeded table; new categories
+    -- can be added without a code change.
+    incompleteness_category TEXT NOT NULL DEFAULT 'none',
     context TEXT,
     confidence_score REAL,
     PRIMARY KEY (source_id, target_id, relation_type)
@@ -130,6 +153,32 @@ CREATE TABLE IF NOT EXISTS claim_relations (
 CREATE INDEX IF NOT EXISTS idx_relations_incompleteness
     ON claim_relations(incompleteness_category)
     WHERE incompleteness_category != 'none';
+
+-- Task 67 — open vocabulary for incompleteness categories. Severity drives
+-- citation-warning intensity. Seeded by init_db with canonical values.
+CREATE TABLE IF NOT EXISTS incompleteness_vocabulary (
+    category TEXT PRIMARY KEY,
+    severity INTEGER NOT NULL CHECK(severity BETWEEN 1 AND 5),
+    description TEXT,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Task 70 — paper equivalence (preprint <-> published, translations,
+-- duplicates). Canonical ordering enforced via the ``paper_a_id <
+-- paper_b_id`` CHECK so the relation is stored once per pair.
+CREATE TABLE IF NOT EXISTS paper_equivalence (
+    paper_a_id TEXT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+    paper_b_id TEXT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+    equivalence_type TEXT NOT NULL
+        CHECK(equivalence_type IN ('preprint_published','translation','reissue','duplicate','related_version')),
+    confidence REAL,
+    discovered_by TEXT,                   -- 'ingest-dedup' | 'llm-review' | 'human_expert'
+    discovered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (paper_a_id, paper_b_id, equivalence_type),
+    CHECK (paper_a_id < paper_b_id)
+);
+CREATE INDEX IF NOT EXISTS idx_equiv_a ON paper_equivalence(paper_a_id);
+CREATE INDEX IF NOT EXISTS idx_equiv_b ON paper_equivalence(paper_b_id);
 
 -- ===== Citation model (structural split) ==================================
 -- (A) citation_text: verbatim bibliographic entries from the citing paper's
@@ -259,14 +308,38 @@ CREATE TABLE IF NOT EXISTS theory_concept_roles (
 """
 
 
+# Task 67 — canonical seed values for incompleteness_vocabulary. Severity
+# 1 = clean / positive integrity, 5 = strongest negative-integrity signal.
+# New categories may be added by INSERT OR IGNORE without code changes.
+_INCOMPLETENESS_SEED: tuple[tuple[str, int, str], ...] = (
+    ("none", 1, "Clean relation, no warning"),
+    ("preregistered_confirmed", 1, "Positive integrity: preregistered + confirmed"),
+    ("extends_prior_definition", 2, "Refines a concept from prior work"),
+    ("boundary_condition", 3, "Holds only under specific scope"),
+    ("hub_component", 3, "Part of a multi-step model — cite the chain"),
+    ("underpowered", 3, "Sample size below recommended for effect"),
+    ("disputed", 4, "Field actively disputes this claim"),
+    ("effect_disappears_under_control", 5, "Effect vanishes under control variables"),
+    ("failed_to_replicate", 5, "Original effect did not replicate"),
+    ("retracted", 5, "Citing paper is retracted"),
+)
+
+
 def init_db(db_path: str | Path) -> sqlite3.Connection:
     """Open (or create) a SQLite DB at ``db_path`` and apply the schema.
 
     Returns a connection with ``foreign_keys`` ON and ``Row`` factory set.
+    Also seeds the ``incompleteness_vocabulary`` table with canonical
+    categories (idempotent via INSERT OR IGNORE).
     """
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA_SQL)
+    conn.executemany(
+        "INSERT OR IGNORE INTO incompleteness_vocabulary "
+        "(category, severity, description) VALUES (?, ?, ?)",
+        _INCOMPLETENESS_SEED,
+    )
     conn.commit()
     return conn

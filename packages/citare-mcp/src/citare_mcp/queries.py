@@ -34,49 +34,98 @@ def search_claims(
     """Search claims by free-text, DOI, iv/dv pair, or template type.
 
     At least one of (query, doi, iv, dv) must be provided. Free-text
-    search uses LIKE on source_text + l2_en + l1_subject + l1_object.
+    search uses FTS5 MATCH against the ``claims_fts`` virtual table
+    (source_text only — l1/l2 fields dropped in Task 65). Multi-word
+    queries are joined as implicit-AND (FTS5 default with unicode61
+    tokenizer); callers wanting a phrase should quote it.
     """
     if not any([query, doi, iv, dv, template_type]):
         raise ValueError("at least one of query / doi / iv / dv / template_type is required")
 
     where: list[str] = []
     params: list[Any] = []
+    use_fts = bool(query)
 
     if doi:
-        where.append("paper_id = ?")
+        where.append("claims.paper_id = ?")
         params.append(doi)
     if iv:
-        where.append("(l1_subject LIKE ? OR json_extract(l0_json, '$.iv') LIKE ?)")
-        params.extend([f"%{iv}%", f"%{iv}%"])
+        # Task 65 — l1_* columns dropped; use the JSON-virtual indexed column.
+        where.append("claims.iv_idx LIKE ?")
+        params.append(f"%{iv}%")
     if dv:
-        where.append("(l1_object LIKE ? OR json_extract(l0_json, '$.dv') LIKE ?)")
-        params.extend([f"%{dv}%", f"%{dv}%"])
+        where.append("claims.dv_idx LIKE ?")
+        params.append(f"%{dv}%")
     if template_type:
-        where.append("template_type = ?")
+        where.append("claims.template_type = ?")
         params.append(template_type)
-    if query:
-        like = f"%{query}%"
-        where.append("(source_text LIKE ? OR l2_en LIKE ? OR l1_subject LIKE ? OR l1_object LIKE ?)")
-        params.extend([like, like, like, like])
+    if use_fts:
+        # FTS5 MATCH parses the query string with its own tiny grammar — bare
+        # punctuation (DOIs, arXiv IDs, emails) is a syntax error.
+        # Strategy: quote whole tokens that contain anything outside word /
+        # CJK / dash, so a DOI like 10.1037/0033-295X.84.2.191 is treated as a
+        # phrase rather than parsed as operators. Multi-word natural-language
+        # queries still get implicit-AND semantics on plain tokens.
+        import re as _re
+        q = query.strip()
+        if q.startswith('"') and q.endswith('"'):
+            fts_query = q
+        else:
+            _safe = _re.compile(r"^[\w぀-ヿ一-鿿]+$")
+            tokens = q.split()
+            if not tokens:
+                fts_query = q
+            else:
+                fts_query = " ".join(
+                    t if _safe.match(t) else '"' + t.replace('"', '""') + '"'
+                    for t in tokens
+                )
+        where.append("claims_fts MATCH ?")
+        params.append(fts_query)
+
+    # Task 65 — l1_subject/predicate/object and l2_en/l2_ja have been dropped;
+    # callers needing structured fields should parse l0_json.
+    select_cols = (
+        "claims.id, claims.paper_id, claims.template_type, claims.l0_json, "
+        "claims.source_text, claims.source_page, claims.source_section, "
+        "claims.evidence_type, claims.verification_status, "
+        "claims.causal_strength, claims.method_metadata, claims.confidence_score"
+    )
+    if use_fts:
+        from_clause = "claims JOIN claims_fts ON claims_fts.claim_id = claims.id"
+        order_clause = "ORDER BY bm25(claims_fts) ASC"
+    else:
+        from_clause = "claims"
+        order_clause = "ORDER BY claims.confidence_score DESC NULLS LAST"
 
     sql = (
-        "SELECT id, paper_id, template_type, l0_json, l1_subject, l1_predicate, l1_object, "
-        "l2_en, source_text, source_page, source_section, evidence_type, verification_status, "
-        "causal_strength, method_metadata, confidence_score "
-        "FROM claims WHERE " + " AND ".join(where) +
-        " ORDER BY confidence_score DESC NULLS LAST LIMIT ?"
+        f"SELECT {select_cols} FROM {from_clause} "
+        "WHERE " + " AND ".join(where) + " " +
+        order_clause + " LIMIT ?"
     )
     params.append(limit)
-    return [_row_to_claim(r) for r in conn.execute(sql, params).fetchall()]
+    try:
+        return [_row_to_claim(r) for r in conn.execute(sql, params).fetchall()]
+    except sqlite3.OperationalError as e:
+        # FTS5 has a strict tiny grammar — any unhandled punctuation in the
+        # query (rare after the token-quoting above) lands here. Treat as
+        # zero hits so the MCP-layer 0-result enrichment can still fire.
+        if use_fts and "fts5" in str(e).lower():
+            return []
+        raise
 
 
-def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
+def cite_claim(
+    conn: sqlite3.Connection,
+    claim_id: str,
+    style: str = "apa7",
+) -> dict[str, Any]:
     """Return a full citation bundle for one claim.
 
-    Includes: the claim fields, the paper's bibliographic info, and a
-    list of integrity warnings from any claim_relation edges this claim
-    participates in. This is the endpoint designed for use inside AI
-    applications that need a safe-to-cite unit.
+    Includes: the claim fields, the paper's bibliographic info, a
+    formatted reference string in the requested style (apa7 / chicago /
+    bibtex; defaults to apa7), and a list of integrity warnings from any
+    claim_relation edges this claim participates in.
     """
     row = conn.execute(
         "SELECT * FROM claims WHERE id = ?", (claim_id,)
@@ -88,7 +137,7 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
     paper_default_cs: dict[str, Any] = {}
     paper = conn.execute(
         "SELECT id, canonical_title, authors, year, venue, paper_type, domain, "
-        "default_causal_strength, default_method "
+        "default_causal_strength, default_method, inclusion_policy_tier "
         "FROM papers WHERE id = ?",
         (claim["paper_id"],),
     ).fetchone()
@@ -114,6 +163,12 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
             (paper_dict["id"],),
         ).fetchall()
         paper_dict["identifiers"] = [dict(r) for r in idents]
+        # Formatted reference string per requested style (apa7 / chicago / bibtex).
+        # Done here instead of client-side because (a) we have full identifier
+        # context, (b) avoiding re-implementation across every MCP client.
+        from citare_mcp.formatters import format_paper_reference, normalise_style
+        paper_dict["paper_reference"] = format_paper_reference(paper_dict, style)
+        paper_dict["paper_reference_style"] = normalise_style(style)
         claim["paper"] = paper_dict
 
     warnings = conn.execute(
@@ -135,6 +190,21 @@ def cite_claim(conn: sqlite3.Connection, claim_id: str) -> dict[str, Any]:
     effective_cs = {**paper_default_cs, **{k: v for k, v in claim_cs.items() if v is not None}}
     claim["effective_causal_strength"] = effective_cs
     claim["safe_verbs"] = _safe_verbs(effective_cs, claim.get("template_type"))
+
+    claim["integrity_warnings_partial"] = bool(conn.execute(
+        "SELECT 1 FROM pending_llm_review p "
+        "WHERE json_extract(p.context_json, '$.citing_paper_id') = ? "
+        "  AND p.review_type = 'paper_reference_resolution' "
+        "  AND p.resolved_at IS NULL LIMIT 1",
+        (claim["paper_id"],),
+    ).fetchone())
+
+    # Traffic-light cite-safety judgment derived from claim_status,
+    # verification_status, design_basis vs author_framing, and the
+    # incompleteness_category on every incident edge. See
+    # citare_mcp.traffic_light for the rule set.
+    from citare_mcp.traffic_light import compute_traffic_light
+    claim["traffic_light"] = compute_traffic_light(claim, claim["integrity_warnings"])
 
     return claim
 
@@ -177,7 +247,7 @@ def get_claim_graph(conn: sqlite3.Connection, claim_id: str, depth: int = 1) -> 
     marks = ",".join("?" for _ in visited)
     nodes = []
     for r in conn.execute(
-        f"SELECT id, template_type, l1_subject, l1_predicate, l1_object, l2_en, paper_id, verification_status "
+        f"SELECT id, template_type, l0_json, paper_id, verification_status "
         f"FROM claims WHERE id IN ({marks})",
         list(visited),
     ).fetchall():

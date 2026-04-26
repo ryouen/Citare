@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from citare_core.enums import (
     AuthorFraming,
+    ClaimStatus,
     DesignBasis,
     EquationStatus,
     EvidenceType,
@@ -53,6 +54,12 @@ class Paper(_StrictBase):
     default_causal_strength: "CausalStrength | None" = None
     default_method: "MethodMetadata | None" = None
 
+    # Task 71 — inclusion policy tier:
+    #   1 = curated (hand-picked, vetted gold standard)
+    #   2 = verified (passed batch LLM review)
+    #   3 = ungated (default — extracted but not yet promoted)
+    inclusion_policy_tier: int = 3
+
 
 # ----- JSON sub-structures ---------------------------------------------------
 
@@ -66,7 +73,13 @@ class CausalStrength(_StrictBase):
     Canonicalisation happens at a later stage, not at validation time.
     """
     design_basis: str | None = None
-    author_framing: str | None = None
+    # RENAMED (Task 66) — see enums.AuthorFraming docstring. Old name was
+    # ``author_framing``. The alias keeps backward compat with v0.13d JSON
+    # which still emits ``author_framing``. The renamed name makes the
+    # audit-only intent explicit at every call site.
+    author_framing_observed_only: str | None = Field(
+        default=None, alias="author_framing"
+    )
     temporal_precedence: str | None = None
     manipulation_of_iv: bool | None = None
 
@@ -160,12 +173,9 @@ class Claim(_StrictBase):
     template_type: TemplateType
     l0_json: dict[str, Any] | None = None
 
-    l1_subject: str | None = None
-    l1_predicate: str | None = None
-    l1_object: str | None = None
-
-    l2_en: str | None = None
-    l2_ja: str | None = None
+    # Task 65 — l1_subject/l1_predicate/l1_object and l2_en/l2_ja have been
+    # dropped. These were never populated by v0.13+ extractions and the FTS5
+    # index is now rebuilt around source_text only.
     l3_json: L3Json | None = None
 
     source_text: str | None = None
@@ -185,6 +195,11 @@ class Claim(_StrictBase):
 
     extraction_prompt_version: str | None = None
     status: Literal["active", "deprecated"] = "active"
+
+    # Task 64 — claim lifecycle. ``current`` is the ingest default; the
+    # other states are set by future review/retraction workflows.
+    claim_status: ClaimStatus = ClaimStatus.current
+    superseded_by_claim_id: str | None = None
 
     created_at: datetime | None = None
     updated_at: datetime | None = None

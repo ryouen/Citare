@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.swp
+.DS_Store
+node_modules
+data/citare.db.starter_bak
+data/*.bak.*
+docs/
+experiments/
+README.md
+LICENSE
+.dropbox_token
+.config

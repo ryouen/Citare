@@ -256,3 +256,167 @@ def resolve_citations(conn: sqlite3.Connection) -> ResolverReport:
 
     conn.commit()
     return report
+
+
+def _surname_tokens(authors: list[str] | None) -> set[str]:
+    """Extract a set of normalised surname tokens from a parsed_authors list.
+
+    Each author entry may already be a surname (e.g. "Edmondson") or a fuller
+    "Lastname, F." or "F. Lastname" form. We normalise to lowercase and strip
+    punctuation, then take the last whitespace-delimited token after stripping
+    trailing comma chunks (so "Edmondson, A." -> "edmondson").
+    """
+    out: set[str] = set()
+    for a in authors or []:
+        if not a:
+            continue
+        s = a.strip()
+        # Drop initials chunk after a comma: "Edmondson, A." -> "Edmondson"
+        if "," in s:
+            s = s.split(",", 1)[0]
+        s = _PUNCT_RE.sub(" ", s).strip().lower()
+        if not s:
+            continue
+        parts = s.split()
+        if not parts:
+            continue
+        # Heuristic: last token is the surname in Western names; if a single
+        # token is present, treat it as a surname directly.
+        out.add(parts[-1])
+    return out
+
+
+def _paper_author_tokens(paper_authors_json: str | None) -> set[str]:
+    """All tokens from a paper's authors list, normalised."""
+    if not paper_authors_json:
+        return set()
+    try:
+        authors = json.loads(paper_authors_json)
+    except json.JSONDecodeError:
+        return set()
+    out: set[str] = set()
+    for a in authors:
+        if not a:
+            continue
+        s = _PUNCT_RE.sub(" ", a).lower().strip()
+        for tok in s.split():
+            if len(tok) >= 2:  # drop single-letter initials
+                out.add(tok)
+    return out
+
+
+def resolve_pending_heuristic(conn: sqlite3.Connection) -> ResolverReport:
+    """Second-pass HEURISTIC resolver over unresolved pending_llm_review rows.
+
+    For each pending entry of type 'paper_reference_resolution' with no
+    resolved_at timestamp, attempt a relaxed triple match:
+      - same year (exact)
+      - >= 1 surname token from parsed_authors appears in candidate paper's
+        author tokens (normalised, lowercase, punctuation stripped)
+      - title token Jaccard >= 0.3
+
+    If exactly one candidate satisfies the above AND has title overlap >= 0.5,
+    insert into citation_edges (method='llm_batch' as the heuristic flag,
+    confidence=0.7, resolved_by='heuristic-resolver-v1') and mark the
+    pending row resolved. Multiple-candidate or zero-candidate cases are
+    left untouched so a future LLM pass can resolve them.
+
+    Returns a ResolverReport whose fields are reused as:
+      scanned             — pending rows examined
+      resolved_by_triple  — auto_resolved by heuristic
+      unresolved_after_chain — still pending after this run
+    """
+    report = ResolverReport()
+
+    paper_rows = conn.execute(
+        "SELECT id, canonical_title, year, authors FROM papers"
+    ).fetchall()
+    paper_index = []
+    for p in paper_rows:
+        paper_index.append((
+            p["id"],
+            p["canonical_title"] or "",
+            p["year"],
+            _paper_author_tokens(p["authors"]),
+        ))
+
+    pending = conn.execute(
+        "SELECT id, context_json FROM pending_llm_review "
+        "WHERE review_type = 'paper_reference_resolution' "
+        "  AND resolved_at IS NULL"
+    ).fetchall()
+
+    for prow in pending:
+        report.scanned += 1
+        try:
+            ctx = json.loads(prow["context_json"])
+        except json.JSONDecodeError:
+            report.unresolved_after_chain += 1
+            continue
+
+        ctid = ctx.get("citation_text_id")
+        citing_pid = ctx.get("citing_paper_id")
+        year = ctx.get("parsed_year")
+        title = ctx.get("parsed_title") or ""
+        authors = ctx.get("parsed_authors") or []
+
+        if not (ctid and year and title and authors):
+            report.unresolved_after_chain += 1
+            continue
+
+        # Skip if already has an edge (defensive: e.g. resolved by other means)
+        if _has_edge(conn, ctid):
+            report.already_resolved += 1
+            # Also mark the pending row resolved to keep state tidy
+            conn.execute(
+                "UPDATE pending_llm_review "
+                "SET resolved_at = CURRENT_TIMESTAMP, "
+                "    resolved_by_model = 'heuristic-v1', "
+                "    resolution_json = ? "
+                "WHERE id = ?",
+                (json.dumps({"already_resolved": True}), prow["id"]),
+            )
+            continue
+
+        cited_surnames = _surname_tokens(authors)
+        if not cited_surnames:
+            report.unresolved_after_chain += 1
+            continue
+
+        candidates = []
+        for pid, ptitle, pyear, ptoks in paper_index:
+            if pid == citing_pid:
+                continue
+            if pyear != year:
+                continue
+            if not (cited_surnames & ptoks):
+                continue
+            overlap = _title_overlap(title, ptitle)
+            if overlap >= 0.3:
+                candidates.append((pid, overlap))
+
+        if not candidates:
+            report.unresolved_after_chain += 1
+            continue
+
+        if len(candidates) == 1 and candidates[0][1] >= 0.5:
+            pid, ov = candidates[0]
+            _insert_edge(conn, ctid, pid, "llm_batch", 0.7,
+                         "heuristic-resolver-v1")
+            conn.execute(
+                "UPDATE pending_llm_review "
+                "SET resolved_at = CURRENT_TIMESTAMP, "
+                "    resolved_by_model = 'heuristic-v1', "
+                "    resolution_json = ? "
+                "WHERE id = ?",
+                (json.dumps({"resolved_paper_id": pid,
+                             "title_overlap": ov}), prow["id"]),
+            )
+            report.resolved_by_triple += 1
+            continue
+
+        # Ambiguous (multiple candidates) or single weak candidate — leave pending.
+        report.unresolved_after_chain += 1
+
+    conn.commit()
+    return report

@@ -41,6 +41,15 @@ class DesignBasis(str, Enum):
 
 
 class AuthorFraming(str, Enum):
+    """Stored for retrospective audit ONLY.
+
+    MUST NOT be used to derive safe_verbs or any citation-safety output.
+    Authors of cross-sectional studies routinely use causal language;
+    using this field for citation derivation re-imports the bias Citare
+    exists to filter. The model field has been renamed to
+    ``author_framing_observed_only`` to make this audit-only intent
+    explicit at the call site.
+    """
     causal = "causal"
     associational = "associational"
     suggestive = "suggestive"
@@ -66,16 +75,39 @@ class RelationType(str, Enum):
 
 
 class IncompletenessCategory(str, Enum):
-    """Five incompleteness categories.
+    """Open-vocabulary incompleteness categories.
 
     Used on claim_relations to warn citers about claims that cannot safely
-    stand alone. See design_spec §2.3.
+    stand alone. See design_spec §2.3. The SQL CHECK constraint has been
+    removed; canonical values + severity now live in the
+    ``incompleteness_vocabulary`` seeded table so future categories don't
+    need a code change.
     """
     effect_disappears_under_control = "effect_disappears_under_control"
     hub_component = "hub_component"
     boundary_condition = "boundary_condition"
     extends_prior_definition = "extends_prior_definition"
     none = "none"
+    failed_to_replicate = "failed_to_replicate"
+    retracted = "retracted"
+    disputed = "disputed"
+    underpowered = "underpowered"
+    preregistered_confirmed = "preregistered_confirmed"
+
+
+class ClaimStatus(str, Enum):
+    """Claim lifecycle status (Task 64).
+
+    Most claims are ``current``. ``superseded`` points to the replacing
+    claim via ``superseded_by_claim_id``. ``retracted``,
+    ``failed_to_replicate``, and ``contested`` are negative-integrity
+    signals that should propagate as warnings on cite_claim.
+    """
+    current = "current"
+    superseded = "superseded"
+    retracted = "retracted"
+    failed_to_replicate = "failed_to_replicate"
+    contested = "contested"
 
 
 class PaperType(str, Enum):

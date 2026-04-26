@@ -1,0 +1,89 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T052950Z_R61_v013d_watsoncrick_s2\\extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid (Watson & Crick, Nature 1953)",
+  "auditor_id": "watsoncrick_v013d_auditor_2",
+  "focus": "verification_status correctness; v0.13d regression check vs v0.13 (which over-tagged 5 claims as verified_in_paper)",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel3",
+      "what_extractor_says": "verification_status = 'proposed_in_paper' for the relation adenine_amount ~ thymine_amount (positive, ratio close to unity)",
+      "what_paper_says": "p.737: 'It has been found experimentally^{3,4} that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' The superscripts 3,4 cite Chargaff (Zamenhof et al. 1952) and Wyatt (1952). This is *prior empirical evidence* re-cited by Watson-Crick to support their model — it is neither proposed by them nor verified by them. The most accurate verification_status would be 'verified_elsewhere' (or a re-interpretation tag). Tagging it 'proposed_in_paper' subtly misattributes Chargaff's empirical finding to Watson-Crick.",
+      "severity": "low",
+      "evidence_quote": "It has been found experimentally^{3,4} that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid. (p.737, col 2)",
+      "note": "The extractor partially acknowledged this by setting evidence_type='re_interpretation', but verification_status='proposed_in_paper' is inconsistent with that. Not a v0.13 over-verification regression; a different (minor) misclass."
+    },
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel4",
+      "what_extractor_says": "verification_status = 'proposed_in_paper' for guanine_amount ~ cytosine_amount unity ratio",
+      "what_paper_says": "Same source sentence as rel3 (Chargaff/Wyatt prior findings). Same issue: verification_status='proposed_in_paper' is not the best fit for a re-interpreted prior empirical observation.",
+      "severity": "low",
+      "evidence_quote": "It has been found experimentally^{3,4} that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid. (p.737, col 2)",
+      "note": "Same nuance as rel3."
+    },
+    {
+      "category": 4,
+      "claim_id": "watson1953_def1",
+      "what_extractor_says": "verification_status = null for the molecular_dna_double_helix DEFINITION",
+      "what_paper_says": "The double-helix structure is the central novel proposal of this paper ('We wish to put forward a radically different structure...'). Setting verification_status to null may reflect a convention of leaving DEFINITION claims untagged, but the paper's framing is clearly proposal-oriented. If DEFINITIONs are eligible for the field, this should arguably be 'proposed_in_paper'. If the schema reserves verification_status for non-DEFINITION templates, the null is correct by convention.",
+      "severity": "informational",
+      "evidence_quote": "We wish to put forward a radically different structure for the salt of deoxyribose nucleic acid. (p.737, col 2)",
+      "note": "Schema-convention question, not a misattribution. Flag for protocol clarification, not as an error."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "watson1953_exist3",
+      "verified": "Structural numbers (3.4 A, 36 deg, 34 A, 10 A) correctly tagged 'proposed_in_paper'. Paper states 'We have assumed an angle of 36°...' — explicit assumption, not a measurement made by Watson-Crick (p.737, col 1-2)."
+    },
+    {
+      "claim_id": "watson1953_rel1",
+      "verified": "Keto-tautomer -> specific A:T, G:C base pairing correctly tagged 'proposed_in_paper'. Paper: 'If it is assumed that the bases only occur in the structure in the most plausible tautomeric forms... it is found that only specific pairs of bases can bond together.' Conditional/assumption-based proposal (p.737, col 2)."
+    },
+    {
+      "claim_id": "watson1953_rel2",
+      "verified": "Complementarity of base sequences across strands correctly tagged 'proposed_in_paper'. Paper: 'if only specific pairs of bases can be formed, it follows that if the sequence of bases on one chain is given, then the sequence on the other chain is automatically determined.' Theoretical derivation, not measured (p.737, col 2)."
+    },
+    {
+      "claim_id": "watson1953_exist6",
+      "verified": "Structure-unproved-pending-X-ray-data correctly tagged 'proposed_in_paper'. Paper explicitly self-describes as unverified: 'must be regarded as unproved until it has been checked against more exact results' (p.737, col 2)."
+    },
+    {
+      "claim_id": "watson1953_exist7",
+      "verified": "Implied copying mechanism correctly tagged 'proposed_in_paper'. Paper: 'It has not escaped our notice that the specific pairing we have postulated immediately suggests a possible copying mechanism for the genetic material.' Suggestive language, no demonstration (p.737, col 2)."
+    },
+    {
+      "claim_id": "watson1953_rel5",
+      "verified": "Phosphates-outside -> cation accessibility correctly 'proposed_in_paper'. Paper: 'As the phosphates are on the outside, cations have easy access to them.' Deductive consequence of the proposed model, no measurement (p.737, col 2)."
+    },
+    {
+      "claim_id": "watson1953_exist1",
+      "verified": "Pauling-Corey critique correctly 'proposed_in_paper'. Paper: 'In our opinion, this structure is unsatisfactory for two reasons...' — authors' own conceptual argument (p.737, col 1)."
+    },
+    {
+      "claim_id": "watson1953_meta1",
+      "verified": "Integrated model meta-claim correctly 'proposed_in_paper'. Synthesizes the model proposal."
+    }
+  ],
+  "v013_regression_check": {
+    "v013_baseline_issue": "v0.13 reportedly over-tagged 5 claims as 'verified_in_paper' on a paper that has no Results section",
+    "v013d_count_of_verified_in_paper": 0,
+    "v013d_count_of_proposed_in_paper": 13,
+    "v013d_count_of_null_verification_status_definitions": 3,
+    "regression_eliminated": true,
+    "over_correction_observed": false,
+    "comment": "v0.13d correctly recognizes Watson-Crick 1953 as a pure model-proposal paper and tags every non-DEFINITION claim as 'proposed_in_paper'. No 'verified_in_paper' tags appear. The paper has no Results section and the authors themselves write 'must be regarded as unproved', so this is the right outcome. No evidence of over-correction (e.g., 'proposed_in_paper' is not being applied to genuinely verified prior measurements at the wrong level — though see rel3/rel4 nuance about Chargaff data, which is a different category of issue rather than over-correction)."
+  },
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 8,
+    "issues_count": 3,
+    "high_severity_count": 0,
+    "medium_severity_count": 0,
+    "low_severity_count": 2,
+    "informational_count": 1,
+    "verdict": "trustworthy",
+    "headline_finding": "v0.13d eliminates the v0.13 over-verification regression on Watson-Crick 1953. All 13 non-DEFINITION claims are correctly 'proposed_in_paper'; zero false 'verified_in_paper' tags. Two minor low-severity nuances around the Chargaff ratio claims (rel3, rel4): the extractor correctly noted evidence_type='re_interpretation' but tagged verification_status='proposed_in_paper', which is internally inconsistent — these prior empirical findings would be better tagged 'verified_elsewhere'. One informational item: DEFINITIONs have verification_status=null, which may be schema-convention rather than an error. No over-correction detected."
+  }
+}

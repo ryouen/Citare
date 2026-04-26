@@ -7,10 +7,17 @@ dependencies = [
     "citare-core",
     "citare-db",
     "mcp>=1.0",
+    "uvicorn>=0.27",
+    "starlette>=0.36",
+    # Optional at runtime for the read-only container — only the admin
+    # container actually calls the Anthropic API. Pinned because the SDK
+    # ships frequent breaking changes; bump intentionally.
+    "anthropic>=0.45",
 ]
 
 [project.scripts]
 citare-mcp = "citare_mcp.server:main"
+citare-mcp-http = "citare_mcp.http_server:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -18,3 +25,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/citare_mcp"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/citare_mcp/assets/extraction_prompt_v0.13g.md" = "citare_mcp/assets/extraction_prompt_v0.13g.md"
+"src/citare_mcp/assets/pdf_acquisition_guide.md"    = "citare_mcp/assets/pdf_acquisition_guide.md"

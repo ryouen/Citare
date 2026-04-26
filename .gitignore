@@ -6,6 +6,7 @@ build/
 dist/
 experiments/runs/
 data/*.db
+data/*.db.*
 *.aux
 *.log
 *.out
@@ -16,7 +17,10 @@ T*.pdf
 pdfs/
 _ai_workspace/
 scripts/tmp/
-*.aux
-*.log
-*.out
+
+# Local working materials excluded from public repo
+presentation_discussion/
+submit/
+backups/
+docs/CITARE_STRATEGY_INTERNAL.md
 

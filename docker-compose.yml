@@ -1,0 +1,84 @@
+# Citare — Docker compose for the public read endpoint and the admin endpoint.
+#
+# Both services attach to an external network so the host's TLS-terminating
+# reverse proxy can reach them by container name. Configure the proxy to
+# forward citare.dev/sse to citare-mcp:8765 and citare.dev/admin/sse to
+# citare-mcp-admin:8766.
+#
+# To bring up:
+#   cd /home/ubuntu/citare
+#   docker compose up -d
+#
+# The data/ dir on the host is bind-mounted so backups/restores are simple
+# file-level operations. The DB seed lives at data/citare.db.
+
+services:
+
+  # Public endpoint — no auth, all 6 tools (read + guides + register_claims).
+  #
+  # The gate on register_claims is the Pydantic Extraction schema (v0.13d
+  # prompt output shape) — invalid JSON is rejected at model_validate(),
+  # WARNING-not-REJECT semantics handle soft issues. No Bearer required.
+  #
+  # Reachable from nginx as http://citare-mcp:8765
+  citare-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: citare-mcp:latest
+    container_name: citare-mcp
+    # Run as host UID 1000 so the bind-mounted DB is writable for register_claims.
+    user: "1000:1000"
+    restart: unless-stopped
+    environment:
+      - CITARE_DB=/app/data/citare.db
+      - CITARE_HOST=0.0.0.0
+      - CITARE_PORT=8765
+      # No CITARE_API_KEY / CITARE_KEY_REGISTRY → unauthenticated.
+      # No CITARE_READ_ONLY → register_claims is exposed.
+    volumes:
+      - ./data:/app/data
+    expose:
+      - "8765"
+    networks:
+      - default
+      - proxy
+
+  # Admin endpoint — Bearer auth via key registry. Exposes extract_and_register,
+  # the server-side PDF → Claude API → register path. Reachable via nginx at
+  # https://citare.dev/admin/sse (mounted under /admin/* prefix).
+  citare-mcp-admin:
+    image: citare-mcp:latest
+    depends_on:
+      - citare-mcp
+    container_name: citare-mcp-admin
+    user: "1000:1000"
+    restart: unless-stopped
+    environment:
+      - CITARE_DB=/app/data/citare.db
+      - CITARE_HOST=0.0.0.0
+      - CITARE_PORT=8766
+      - CITARE_KEY_REGISTRY=/app/data/api_keys.json
+      - CITARE_MOUNT_PREFIX=/admin
+      # Required for extract_and_register. Calls Claude API on behalf of
+      # users with the server_extract scope; cost is charged to their key.
+      # If unset, the container starts but extract_and_register fails with
+      # a clear "API key missing" error from the anthropic SDK. The auth /
+      # scope / budget plumbing is still testable without spending money.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+    expose:
+      - "8766"
+    networks:
+      - default
+      - proxy
+    command: ["citare-mcp-http", "--host", "0.0.0.0", "--port", "8766"]
+
+networks:
+  # Shared with the host's reverse proxy so it can reach citare-mcp /
+  # citare-mcp-admin by container name. Adjust `name:` to whatever your
+  # proxy network is called on this host.
+  proxy:
+    name: vps_project_default
+    external: true

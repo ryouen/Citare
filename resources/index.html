@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citare — Structured Paper Understanding for AI</title>
+<meta name="description" content="Citare is structured paper understanding for AI: claims, causal metadata, integrity warnings. Connect via MCP.">
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #eef0f3;
+    --surface2: #e6e8ec;
+    --border: #d5d8de;
+    --text: #2d3040;
+    --text2: #6b7280;
+    --text3: #9ca3af;
+    --accent: #4361ee;
+    --accent-light: #e8ebff;
+    --green: #059669;
+    --green-light: #e6f5ef;
+    --warn: #d97706;
+    --warn-light: #fef3c7;
+  }
+  [data-theme="dark"] {
+    --bg: #0a0b0f;
+    --surface: #13151c;
+    --surface2: #1a1d27;
+    --border: #262a36;
+    --text: #e4e7f0;
+    --text2: #8b91a5;
+    --text3: #5c6275;
+    --accent: #6c8cff;
+    --accent-light: #1a1d3a;
+    --green: #4ade80;
+    --green-light: #0a2a1a;
+    --warn: #fb923c;
+    --warn-light: #2a1a0a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Hiragino Sans', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+  .top-controls {
+    position: fixed; top: 1rem; right: 1rem;
+    display: flex; gap: 0.4rem; z-index: 10;
+  }
+  .top-controls button {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.4rem 0.65rem;
+    cursor: pointer; font-size: 0.8rem; color: var(--text2);
+    font-family: inherit;
+  }
+  .top-controls button:hover { border-color: var(--accent); color: var(--text); }
+  .lang-toggle button.active {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+
+  .hero { text-align: center; margin-bottom: 2rem; }
+  .hero h1 { font-size: 2.6rem; font-weight: 300; letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+  .hero h1 span { color: var(--accent); font-weight: 600; }
+  .hero .tagline { color: var(--text); font-size: 1.1rem; margin-bottom: 0.2rem; font-weight: 500; }
+  .hero .tagline-sub { color: var(--text2); font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .hero .motto { color: var(--text3); font-size: 0.8rem; font-style: italic; letter-spacing: 0.03em; }
+
+  .stats-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
+  .stat { text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 1.2rem; min-width: 110px; }
+  .stat .num { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+  .stat .delta { font-size: 0.7rem; color: var(--green); font-weight: 500; min-height: 0.95rem; }
+  .stat .label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  h2 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text2); margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  p { color: var(--text); margin-bottom: 0.8rem; font-size: 0.95rem; }
+
+  .demo-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
+  .demo-form { display: flex; gap: 0.6rem; }
+  .demo-form input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 0.9rem; color: var(--text); font-size: 0.95rem; font-family: inherit; }
+  .demo-form input:focus { outline: none; border-color: var(--accent); }
+  .demo-form button { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 0.7rem 1.2rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .demo-form button:hover { opacity: 0.9; }
+  .demo-form button:disabled { opacity: 0.5; cursor: wait; }
+  .demo-results { margin-top: 0.8rem; }
+  .demo-paper { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 0.9rem; margin-top: 0.55rem; font-size: 0.85rem; }
+  .demo-paper .paper-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem; gap: 0.5rem; flex-wrap: wrap; }
+  .demo-paper .paper-title { font-weight: 600; color: var(--text); font-size: 0.88rem; }
+  .demo-paper .paper-meta { color: var(--text2); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
+  .demo-claim { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.35rem 0; border-top: 1px dashed var(--border); }
+  .demo-claim:first-of-type { border-top: none; padding-top: 0.2rem; }
+  .demo-claim .claim-body { flex: 1; min-width: 0; }
+  .demo-claim .claim-id { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+  .demo-claim .claim-triple { color: var(--text); font-size: 0.83rem; line-height: 1.4; }
+  .demo-claim .claim-source { color: var(--text2); font-size: 0.75rem; line-height: 1.4; margin-top: 0.15rem; }
+  .demo-claim .design { display: inline-block; padding: 0.05rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; vertical-align: middle; margin-left: 0.3rem; }
+  .demo-claim .design.rct { background: var(--green-light); color: var(--green); }
+  .demo-claim .design.longitudinal,
+  .demo-claim .design.quasi_experimental { background: #dbeafe; color: #2563eb; }
+  .demo-claim .design.meta_analysis { background: #ede9fe; color: #7c3aed; }
+  .demo-claim .design.cross_sectional { background: var(--warn-light); color: var(--warn); }
+  .demo-claim .design.computational_demonstration { background: #cffafe; color: #0891b2; }
+  .demo-claim .design.theoretical { background: var(--surface2); color: var(--text2); }
+  [data-theme="dark"] .demo-claim .design.longitudinal,
+  [data-theme="dark"] .demo-claim .design.quasi_experimental { background: #1e3a5f; color: #93c5fd; }
+  [data-theme="dark"] .demo-claim .design.meta_analysis { background: #2e1065; color: #c4b5fd; }
+  [data-theme="dark"] .demo-claim .design.computational_demonstration { background: #164e63; color: #67e8f9; }
+  .demo-claim .graph-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 0.15rem 0.5rem; border-radius: 5px; cursor: pointer; font-size: 0.7rem; flex-shrink: 0; }
+  .demo-claim .graph-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  /* Traffic-light badge */
+  .tl-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; vertical-align: middle; border: 1px solid; user-select: none; }
+  .tl-badge .tl-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+  .tl-badge.green  { background: var(--green-light); color: var(--green);  border-color: var(--green); }
+  .tl-badge.green .tl-dot  { background: var(--green); }
+  .tl-badge.yellow { background: var(--warn-light);  color: var(--warn);   border-color: var(--warn); }
+  .tl-badge.yellow .tl-dot { background: var(--warn); }
+  .tl-badge.red    { background: #fee2e2; color: #dc2626; border-color: #dc2626; }
+  [data-theme="dark"] .tl-badge.red { background: #2a0a0a; color: #fca5a5; border-color: #fca5a5; }
+  .tl-badge.red .tl-dot   { background: #dc2626; }
+  [data-theme="dark"] .tl-badge.red .tl-dot { background: #fca5a5; }
+  .tl-badge:hover { filter: brightness(0.95); }
+  /* Reasons drawer (per-claim, expands inline) */
+  .tl-drawer { display: none; margin-top: 0.5rem; padding: 0.6rem 0.75rem; background: var(--surface2); border-radius: 6px; border-left: 3px solid var(--text3); font-size: 0.78rem; color: var(--text); }
+  .tl-drawer.open { display: block; }
+  .tl-drawer.green  { border-left-color: var(--green); }
+  .tl-drawer.yellow { border-left-color: var(--warn); }
+  .tl-drawer.red    { border-left-color: #dc2626; }
+  .tl-drawer .tl-summary { font-weight: 600; margin-bottom: 0.3rem; }
+  .tl-drawer ul { margin: 0.2rem 0 0.4rem 1.2rem; padding: 0; }
+  .tl-drawer li { margin: 0.15rem 0; line-height: 1.4; }
+  .tl-drawer .tl-meta { color: var(--text2); font-size: 0.72rem; margin-top: 0.4rem; padding-top: 0.3rem; border-top: 1px dashed var(--border); }
+  .tl-drawer code { background: var(--bg); color: var(--accent); padding: 0.05rem 0.3rem; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; }
+  .demo-empty { color: var(--text3); font-size: 0.85rem; padding: 0.7rem 0.2rem; }
+  .demo-hint { color: var(--text3); font-size: 0.75rem; margin-top: 0.5rem; text-align: right; }
+  .demo-suggest { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.55rem; align-items: center; }
+  .demo-suggest .label { font-size: 0.72rem; color: var(--text3); margin-right: 0.2rem; }
+  .demo-suggest .chip { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 0.2rem 0.6rem; border-radius: 999px; cursor: pointer; font-size: 0.72rem; font-family: inherit; }
+  .demo-suggest .chip:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+  /* Graph viewer (inline below demo) */
+  .graph-panel { margin-top: 0.7rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 0.8rem; display: none; }
+  .graph-panel.open { display: block; }
+  .graph-panel-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text2); margin-bottom: 0.4rem; }
+  .graph-panel-head .gp-title { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+  .graph-panel-head .gp-close { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 1.1rem; padding: 0; line-height: 1; }
+  .graph-panel-head .gp-close:hover { color: var(--text); }
+  .depth-toggle { display: inline-flex; align-items: center; gap: 0.25rem; }
+  .depth-toggle .depth-label { font-size: 0.7rem; color: var(--text3); margin-right: 0.2rem; }
+  .depth-toggle .dt-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 0.1rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.72rem; font-family: inherit; }
+  .depth-toggle .dt-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .depth-toggle .dt-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .graph-svg { display: block; width: 100%; height: 360px; user-select: none; }
+  .graph-svg .gn-circle { stroke: var(--text2); stroke-width: 1; cursor: pointer; transition: stroke-width 0.1s; }
+  .graph-svg .gn-circle:hover { stroke: var(--accent); stroke-width: 2; }
+  .graph-svg .gn-circle.center { stroke: var(--accent); stroke-width: 2.5; }
+  .graph-svg .gn-label { fill: var(--text); font-size: 10px; pointer-events: none; font-family: -apple-system, sans-serif; }
+  .graph-svg .ge-line { stroke-width: 1.5; opacity: 0.7; pointer-events: stroke; cursor: pointer; }
+  .graph-svg .ge-line:hover { opacity: 1; stroke-width: 3; }
+  .graph-legend { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.7rem; color: var(--text2); margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed var(--border); }
+  .graph-legend .leg-item { display: flex; align-items: center; gap: 0.2rem; }
+  .graph-legend .leg-swatch { width: 18px; height: 3px; display: inline-block; }
+
+  .try-cta { margin-top: 1.5rem; text-align: center; }
+  .try-cta button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 0.85rem 2rem; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(67, 97, 238, 0.18); }
+  .try-cta button:hover { opacity: 0.93; transform: translateY(-1px); }
+  .try-cta .sub { color: var(--text3); font-size: 0.78rem; margin-top: 0.5rem; }
+
+  .connect-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+  .connect-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1.05rem; }
+  .connect-card .platform { font-weight: 600; font-size: 0.92rem; }
+  .connect-card .method { font-size: 0.75rem; color: var(--text2); margin-bottom: 0.45rem; }
+  .connect-card .cmd-row { display: flex; align-items: center; gap: 0.5rem; background: var(--accent-light); padding: 0.45rem 0.65rem; border-radius: 6px; border: 1px solid var(--border); }
+  .connect-card .cmd-row code { flex: 1; color: var(--accent); font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8rem; word-break: break-all; }
+  .copy-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.7rem; white-space: nowrap; }
+  .copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .copy-btn.copied { background: var(--green-light); color: var(--green); border-color: var(--green); }
+
+  details.others { margin-top: 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 1rem; }
+  details.others summary { cursor: pointer; padding: 0.4rem 0; font-size: 0.85rem; color: var(--text2); font-weight: 500; list-style: none; }
+  details.others summary::-webkit-details-marker { display: none; }
+  details.others summary::before { content: "▸ "; transition: transform 0.15s; display: inline-block; color: var(--text3); }
+  details.others[open] summary::before { transform: rotate(90deg); }
+  details.others .connect-grid { margin-top: 0.5rem; padding-bottom: 0.5rem; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(10, 11, 15, 0.6); display: none; align-items: flex-start; justify-content: center; z-index: 100; overflow-y: auto; padding: 3rem 1rem; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; max-width: 600px; width: 100%; }
+  .modal h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .modal .modal-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 1rem; }
+  .modal .close-x { float: right; cursor: pointer; color: var(--text3); background: none; border: none; font-size: 1.4rem; line-height: 1; padding: 0; margin: -0.3rem 0 0 0; }
+  .modal .close-x:hover { color: var(--text); }
+
+  .tools-list { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+  .tools-list dl { margin: 0; }
+  .tools-list dt { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-top: 0.6rem; }
+  .tools-list dt:first-child { margin-top: 0; }
+  .tools-list dd { color: var(--text2); font-size: 0.83rem; margin: 0.15rem 0 0 0; padding-left: 0; }
+
+  .contribute { background: linear-gradient(135deg, var(--accent-light) 0%, var(--surface) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .contribute h3 { font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--text); }
+  .contribute .contribute-sub { color: var(--text2); font-size: 0.9rem; margin-bottom: 0.8rem; }
+  .contribute ol { margin: 0.6rem 0 0.8rem 1.4rem; color: var(--text); font-size: 0.88rem; }
+  .contribute ol li { margin-bottom: 0.3rem; }
+  .contribute code { background: var(--bg); color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+
+  .resources-list { color: var(--text); font-size: 0.92rem; line-height: 2; }
+  .resources-list a { color: var(--accent); text-decoration: none; }
+  .resources-list a:hover { text-decoration: underline; }
+
+  .footer { text-align: center; margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--border); color: var(--text3); font-size: 0.75rem; }
+  .footer .contact { margin-top: 0.4rem; color: var(--text3); }
+  .footer code { background: var(--accent-light); padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.72rem; color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.9rem; }
+    .demo-form { flex-direction: column; }
+    .connect-card .cmd-row { flex-direction: column; align-items: stretch; }
+    .top-controls { top: 0.5rem; right: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-controls">
+  <div class="lang-toggle">
+    <button data-lang="en" class="active" onclick="setLang('en')">EN</button>
+    <button data-lang="ja" onclick="setLang('ja')">日本語</button>
+  </div>
+  <button onclick="toggleTheme()" title="Toggle dark mode">🌓</button>
+</div>
+
+<div class="container">
+
+  <div class="hero">
+    <h1><span>Citare</span></h1>
+    <p class="tagline" data-i18n="tagline">Structured paper understanding for AI</p>
+    <p class="tagline-sub" data-i18n="tagline_sub">Claims · causal metadata · integrity warnings — for honest citation</p>
+    <p class="motto">DOI is for papers. Citare is for claims.</p>
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="papers-count">—</div><div class="delta" id="papers-delta"></div><div class="label">Papers</div></div>
+      <div class="stat"><div class="num" id="claims-count">—</div><div class="delta" id="claims-delta"></div><div class="label">Claims</div></div>
+      <div class="stat"><div class="num" id="relations-count">—</div><div class="delta"></div><div class="label">Relations</div></div>
+      <div class="stat"><div class="num" id="warnings-count">—</div><div class="delta"></div><div class="label">Integrity</div></div>
+    </div>
+  </div>
+
+  <p data-i18n-html="description">
+    Citare is a database of <strong>claims</strong> extracted from peer-reviewed academic papers.
+    Each claim carries <strong>causal-strength metadata</strong> (design basis, verification status)
+    and <strong>integrity warnings</strong> (mediator, boundary condition, effect-disappears-under-control),
+    so AI can cite findings honestly.
+  </p>
+
+  <h2 data-i18n="h_demo">① Try it now — search the graph</h2>
+
+  <div class="demo-box">
+    <form class="demo-form" onsubmit="return runDemo(event)">
+      <input id="demo-q" type="text" data-i18n-placeholder="demo_placeholder" placeholder="e.g., Claude Shannon, induction heads, MBCT..." value="Claude Shannon" autocomplete="off">
+      <button type="submit" id="demo-btn" data-i18n="demo_btn">Search</button>
+    </form>
+    <div class="demo-suggest">
+      <span class="label" data-i18n="demo_try_label">Try:</span>
+      <button type="button" class="chip" onclick="setQ('Claude Shannon')">Claude Shannon</button>
+      <button type="button" class="chip" onclick="setQ('induction heads')">induction heads</button>
+      <button type="button" class="chip" onclick="setQ('constitutional AI')">constitutional AI</button>
+      <button type="button" class="chip" onclick="setQ('MBCT depression')">MBCT depression</button>
+      <button type="button" class="chip" onclick="setQ('working memory')">working memory</button>
+    </div>
+    <div class="demo-results" id="demo-results">
+      <div class="demo-empty" data-i18n="demo_empty_loading">Loading…</div>
+    </div>
+    <div class="graph-panel" id="graph-panel">
+      <div class="graph-panel-head">
+        <span><span data-i18n="graph_panel_label">Claim graph:</span>
+              <span class="gp-title" id="gp-title">—</span></span>
+        <span class="depth-toggle">
+          <span class="depth-label" data-i18n="depth_label">depth:</span>
+          <button type="button" class="dt-btn" data-d="1" onclick="setGraphMode('depth',1)">1</button>
+          <button type="button" class="dt-btn active" data-d="2" onclick="setGraphMode('depth',2)">2</button>
+          <button type="button" class="dt-btn" data-d="paper" onclick="setGraphMode('paper')">paper</button>
+          <button class="gp-close" onclick="closeGraph()" title="Close" style="margin-left:0.5rem">×</button>
+        </span>
+      </div>
+      <svg class="graph-svg" id="graph-svg" viewBox="0 0 560 360" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="graph-legend">
+        <span data-i18n="legend_label">Edge color:</span>
+        <span class="leg-item"><span class="leg-swatch" style="background:#ef4444"></span><span data-i18n="legend_critical">effect_disappears / replication / retracted</span></span>
+        <span class="leg-item"><span class="leg-swatch" style="background:#f59e0b"></span>hub_component</span>
+        <span class="leg-item"><span class="leg-swatch" style="background:#fbbf24"></span>boundary_condition</span>
+        <span class="leg-item"><span class="leg-swatch" style="background:#6366f1"></span>extends_prior_definition</span>
+        <span class="leg-item"><span class="leg-swatch" style="background:#cbd5e1"></span>none</span>
+      </div>
+    </div>
+    <div class="demo-hint">
+      <span data-i18n="demo_hint">Powered by</span>
+      <code style="background:none;padding:0;color:var(--text3)">search_claims</code>
+      <span data-i18n="demo_hint_2">· grouped by paper · live data</span>
+    </div>
+  </div>
+
+  <h2 data-i18n="h_connect">② Connect to your AI</h2>
+
+  <div class="try-cta">
+    <button onclick="openConnectModal()" data-i18n="try_btn">▶ Try it in Claude</button>
+    <div class="sub" data-i18n="try_sub">Click to show connection methods</div>
+  </div>
+
+  <div class="connect-grid" style="margin-top: 1.2rem;">
+
+    <div class="connect-card">
+      <div class="platform">Claude Code</div>
+      <div class="method" data-i18n="method_cc">One command. No install.</div>
+      <div class="cmd-row">
+        <code id="cmd-claude-code">claude mcp add --transport sse citare https://citare.dev/sse</code>
+        <button class="copy-btn" onclick="copyCmd('cmd-claude-code', this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="connect-card">
+      <div class="platform">Claude.ai Web</div>
+      <div class="method" data-i18n-html="method_web">Customize → Connectors → + → Add custom connector → URL:</div>
+      <div class="cmd-row">
+        <code id="url-claude-ai">https://citare.dev/sse</code>
+        <button class="copy-btn" onclick="copyCmd('url-claude-ai', this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="connect-card">
+      <div class="platform">Claude Desktop</div>
+      <div class="method" data-i18n-html="method_desktop">Settings → Developer → Edit Config → add to <code style="background:none;padding:0;color:var(--accent)">mcpServers</code>:</div>
+      <div class="cmd-row">
+        <code id="cmd-claude-desktop">"citare": {"transport": "sse", "url": "https://citare.dev/sse"}</code>
+        <button class="copy-btn" onclick="copyCmd('cmd-claude-desktop', this)">Copy</button>
+      </div>
+    </div>
+
+    <details class="others">
+      <summary data-i18n="others_label">Other MCP clients (Codex, Gemini, ChatGPT, local stdio)</summary>
+      <div class="connect-grid">
+
+        <div class="connect-card">
+          <div class="platform">Codex</div>
+          <div class="cmd-row">
+            <code id="cmd-codex">codex mcp add citare --url https://citare.dev/sse --transport sse</code>
+            <button class="copy-btn" onclick="copyCmd('cmd-codex', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="connect-card">
+          <div class="platform">Gemini CLI</div>
+          <div class="method" data-i18n-html="method_gemini">Add to <code style="background:none;padding:0;color:var(--accent)">~/.gemini/settings.json</code>:</div>
+          <div class="cmd-row">
+            <code id="cmd-gemini">{"mcpServers": {"citare": {"url": "https://citare.dev/sse"}}}</code>
+            <button class="copy-btn" onclick="copyCmd('cmd-gemini', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="connect-card">
+          <div class="platform">ChatGPT Web</div>
+          <div class="method" data-i18n="method_chatgpt">Settings → Connectors → Create (Developer Mode required) → URL:</div>
+          <div class="cmd-row">
+            <code id="cmd-chatgpt">https://citare.dev/sse</code>
+            <button class="copy-btn" onclick="copyCmd('cmd-chatgpt', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="connect-card">
+          <div class="platform">Local install (stdio)</div>
+          <div class="cmd-row">
+            <code id="cmd-pip">pip install git+https://github.com/ryouen/citareMCP.git</code>
+            <button class="copy-btn" onclick="copyCmd('cmd-pip', this)">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+  </div>
+
+  <h2 data-i18n="h_tools">Tools</h2>
+
+  <div class="tools-list">
+    <dl>
+      <dt>search_claims</dt>
+      <dd data-i18n="tool_search_desc">Search by query, DOI, iv/dv, or template type. FTS5-backed.</dd>
+
+      <dt>cite_claim</dt>
+      <dd data-i18n="tool_cite_desc">Full citation bundle: source quote, page, integrity warnings, safe verbs derived from study design.</dd>
+
+      <dt>get_claim_graph</dt>
+      <dd data-i18n="tool_graph_desc">BFS the local neighbourhood of a claim — surface mediation, moderation, effect-disappears warnings.</dd>
+
+      <dt>get_extraction_prompt</dt>
+      <dd data-i18n="tool_xprompt_desc">The locked v0.13d production prompt + sub-agent invocation guide. Pass verbatim to a fresh context.</dd>
+
+      <dt>get_pdf_acquisition_guide</dt>
+      <dd data-i18n="tool_pguide_desc">7-stage PDF acquisition playbook: local search, OA publishers, Unpaywall, web search, Europe PMC, ask user.</dd>
+
+      <dt>register_claims</dt>
+      <dd data-i18n="tool_register_desc">Submit an extraction JSON to grow the graph. Quality-gated; no auth needed.</dd>
+    </dl>
+  </div>
+
+  <h2 data-i18n="h_contribute">③ Contribute — let's build the knowledge base for AI together</h2>
+
+  <div class="contribute">
+    <h3 data-i18n="contribute_h">Anyone can grow Citare.</h3>
+    <p class="contribute-sub" data-i18n-html="contribute_p1">
+      Extract a paper with the v0.13d prompt and call <code>register_claims</code>.
+      No auth required. Pydantic schema and the quality gate reject broken extractions.
+    </p>
+    <ol>
+      <li data-i18n-html="contribute_step1"><code>get_pdf_acquisition_guide()</code> → obtain the PDF</li>
+      <li data-i18n-html="contribute_step2"><code>get_extraction_prompt()</code> → fetch the v0.13d prompt and run extraction in a sub-agent</li>
+      <li data-i18n-html="contribute_step3"><code>register_claims(json_data=&lt;extracted JSON&gt;)</code> → register to the DB</li>
+      <li data-i18n-html="contribute_step4"><code>search_claims(doi=...)</code> → verify the registration</li>
+    </ol>
+    <p class="contribute-sub" style="margin-bottom:0;" data-i18n="contribute_p2">
+      Daily Dropbox backups + WARNING-not-REJECT design make it safe to experiment.
+    </p>
+  </div>
+
+  <h2 data-i18n="h_resources">Resources</h2>
+
+  <p class="resources-list">
+    <a href="/resources/citare_strategy.md" data-i18n="res_strategy">Strategy</a>
+    <span data-i18n="res_strategy_sub"> — mission, vision, and the commitments that follow</span><br>
+    <a href="/resources/citare_mcp_interaction_design.md" data-i18n="res_interaction">Interaction Design Document</a>
+    <span data-i18n="res_interaction_sub"> — how LLMs are designed to use Citare</span><br>
+    <a href="/resources/CITARE_DESIGN_REVIEW_FOR_BUILDERS.md" data-i18n="res_review">Design Review for Builders</a>
+    <span data-i18n="res_review_sub"> — feedback for those building similar systems</span><br>
+    <a href="https://github.com/ryouen/citareMCP" data-i18n="res_github">GitHub: citareMCP</a>
+    <span data-i18n="res_github_sub"> — MCP server source</span><br>
+    <a href="/stats" data-i18n="res_stats">Live API stats (JSON)</a>
+  </p>
+
+  <div class="footer">
+    <span data-i18n="footer_main">Citare — AI-native scholarly claim infrastructure</span><br>
+    <span data-i18n="footer_endpoint">MCP endpoint:</span>
+    <code>https://citare.dev/sse</code>
+  </div>
+
+</div>
+
+<div class="modal-backdrop" id="modal" onclick="if(event.target.id==='modal') closeModal()">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">×</button>
+    <h3 data-i18n="modal_h">Connect Citare to Claude</h3>
+    <p class="modal-sub" data-i18n="modal_sub">Copy any of the snippets below.</p>
+
+    <div class="connect-grid">
+      <div class="connect-card">
+        <div class="platform" data-i18n="modal_cc_label">Claude Code (one command)</div>
+        <div class="cmd-row">
+          <code id="cmd-modal-cc">claude mcp add --transport sse citare https://citare.dev/sse</code>
+          <button class="copy-btn" onclick="copyCmd('cmd-modal-cc', this)">Copy</button>
+        </div>
+      </div>
+      <div class="connect-card">
+        <div class="platform" data-i18n="modal_web_label">Claude.ai (paste URL)</div>
+        <div class="method" data-i18n="modal_web_method">Customize → Connectors → + → Add custom connector</div>
+        <div class="cmd-row">
+          <code id="cmd-modal-web">https://citare.dev/sse</code>
+          <button class="copy-btn" onclick="copyCmd('cmd-modal-web', this)">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:1rem;font-size:0.82rem;color:var(--text2);" data-i18n-html="modal_p">
+      After connecting, just chat naturally — like
+      "<em>look up Edmondson 1999 on psychological safety</em>".
+      The AI will autonomously call <code style="background:none;padding:0;color:var(--accent)">search_claims</code>,
+      <code style="background:none;padding:0;color:var(--accent)">cite_claim</code>, etc.
+    </p>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// i18n
+// ============================================================================
+const TRANS = {
+  en: {
+    title: 'Citare — Structured Paper Understanding for AI',
+    tagline: 'Structured paper understanding for AI',
+    tagline_sub: 'Claims · causal metadata · integrity warnings — for honest citation',
+    description: 'Citare is a database of <strong>claims</strong> extracted from peer-reviewed academic papers. Each claim carries <strong>causal-strength metadata</strong> (design basis, verification status) and <strong>integrity warnings</strong> (mediator, boundary condition, effect-disappears-under-control), so AI can cite findings honestly.',
+    h_demo: '① Try it now — search the graph',
+    demo_placeholder: 'e.g., psychological safety, chain of thought, attention...',
+    demo_btn: 'Search',
+    demo_searching: 'Searching…',
+    demo_empty_loading: 'Loading…',
+    demo_no_results_prefix: 'No results for',
+    demo_no_results_hint: 'Try: psychological safety, chain of thought, attention.',
+    demo_hint: 'Powered by',
+    demo_hint_2: '· grouped by paper · live data',
+    demo_try_label: 'Try:',
+    graph_panel_label: 'Claim graph:',
+    depth_label: 'depth:',
+    legend_label: 'Edge color:',
+    legend_critical: 'effect_disappears / replication / retracted',
+    h_connect: '② Connect to your AI',
+    try_btn: '▶ Try it in Claude',
+    try_sub: 'Click to show connection methods',
+    method_cc: 'One command. No install.',
+    method_web: 'Customize → Connectors → + → Add custom connector → URL:',
+    method_desktop: 'Settings → Developer → Edit Config → add to <code style="background:none;padding:0;color:var(--accent)">mcpServers</code>:',
+    others_label: 'Other MCP clients (Codex, Gemini, ChatGPT, local stdio)',
+    method_gemini: 'Add to <code style="background:none;padding:0;color:var(--accent)">~/.gemini/settings.json</code>:',
+    method_chatgpt: 'Settings → Connectors → Create (Developer Mode required) → URL:',
+    h_tools: 'Tools',
+    tool_search_desc: 'Search by query, DOI, iv/dv, or template type. FTS5-backed.',
+    tool_cite_desc: 'Full citation bundle: source quote, page, integrity warnings, safe verbs derived from study design.',
+    tool_graph_desc: 'BFS the local neighbourhood of a claim — surface mediation, moderation, effect-disappears warnings.',
+    tool_xprompt_desc: 'The locked v0.13d production prompt + sub-agent invocation guide. Pass verbatim to a fresh context.',
+    tool_pguide_desc: '7-stage PDF acquisition playbook: local search, OA publishers, Unpaywall, web search, Europe PMC, ask user.',
+    tool_register_desc: 'Submit an extraction JSON to grow the graph. Quality-gated; no auth needed.',
+    h_contribute: "③ Contribute — let's build the knowledge base for AI together",
+    contribute_h: 'Anyone can grow Citare.',
+    contribute_p1: 'Extract a paper with the v0.13d prompt and call <code>register_claims</code>. No auth required. Pydantic schema and the quality gate reject broken extractions.',
+    contribute_step1: '<code>get_pdf_acquisition_guide()</code> → obtain the PDF',
+    contribute_step2: '<code>get_extraction_prompt()</code> → fetch the v0.13d prompt and run extraction in a sub-agent',
+    contribute_step3: '<code>register_claims(json_data=&lt;extracted JSON&gt;)</code> → register to the DB',
+    contribute_step4: '<code>search_claims(doi=...)</code> → verify the registration',
+    contribute_p2: 'Daily Dropbox backups + WARNING-not-REJECT design make it safe to experiment.',
+    h_resources: 'Resources',
+    res_strategy: 'Strategy',
+    res_strategy_sub: ' — mission, vision, and the commitments that follow',
+    res_interaction: 'Interaction Design Document',
+    res_interaction_sub: ' — how LLMs are designed to use Citare',
+    res_review: 'Design Review for Builders',
+    res_review_sub: ' — feedback for those building similar systems',
+    res_github: 'GitHub: citareMCP',
+    res_github_sub: ' — MCP server source',
+    res_stats: 'Live API stats (JSON)',
+    footer_main: 'Citare — AI-native scholarly claim infrastructure',
+    footer_endpoint: 'MCP endpoint:',
+    modal_h: 'Connect Citare to Claude',
+    modal_sub: 'Copy any of the snippets below.',
+    modal_cc_label: 'Claude Code (one command)',
+    modal_web_label: 'Claude.ai (paste URL)',
+    modal_web_method: 'Customize → Connectors → + → Add custom connector',
+    modal_p: 'After connecting, just chat naturally — like "<em>look up Edmondson 1999 on psychological safety</em>". The AI will autonomously call <code style="background:none;padding:0;color:var(--accent)">search_claims</code>, <code style="background:none;padding:0;color:var(--accent)">cite_claim</code>, etc.',
+    week_suffix: 'this week',
+  },
+  ja: {
+    title: 'Citare — AI のための論文構造化理解ツール',
+    tagline: 'AIのための、論文構造化理解ツール',
+    tagline_sub: 'Structured paper understanding for AI',
+    description: 'Citare は査読付き学術論文から <strong>クレーム</strong> を抽出し、構造化して保存するデータベースです。各クレームには <strong>因果強度メタデータ</strong>（design basis、verification status）と <strong>integrity warnings</strong>（mediator、boundary condition、effect-disappears-under-control）が付与されており、AI が論文を正しく引用するための基盤になります。',
+    h_demo: '① 試す — グラフを検索',
+    demo_placeholder: '例: psychological safety, chain of thought, attention...',
+    demo_btn: '検索',
+    demo_searching: '検索中…',
+    demo_empty_loading: '読み込み中…',
+    demo_no_results_prefix: '結果なし:',
+    demo_no_results_hint: '試してみる: psychological safety, chain of thought, attention',
+    demo_hint: 'Powered by',
+    demo_hint_2: '· paper 別グループ表示 · ライブデータ',
+    demo_try_label: '例:',
+    graph_panel_label: 'クレーム関連グラフ:',
+    depth_label: '深さ:',
+    legend_label: 'エッジ色:',
+    legend_critical: 'effect_disappears / replication / retracted',
+    h_connect: '② AI と接続',
+    try_btn: '▶ Claude で試す',
+    try_sub: 'クリックで接続方法を表示',
+    method_cc: 'ワンコマンド。インストール不要。',
+    method_web: 'Customize → Connectors → + → カスタムコネクタ追加 → URL:',
+    method_desktop: 'Settings → Developer → Edit Config → <code style="background:none;padding:0;color:var(--accent)">mcpServers</code> に追加:',
+    others_label: 'その他の MCP クライアント (Codex, Gemini, ChatGPT, local stdio)',
+    method_gemini: '<code style="background:none;padding:0;color:var(--accent)">~/.gemini/settings.json</code> に追加:',
+    method_chatgpt: 'Settings → Connectors → Create（Developer Mode 必要）→ URL:',
+    h_tools: 'ツール一覧',
+    tool_search_desc: 'クエリ、DOI、iv/dv、テンプレートタイプで検索。FTS5 バックエンド。',
+    tool_cite_desc: '完全な引用バンドル: ソース引用、ページ番号、integrity warnings、研究デザインから導出された safe verbs。',
+    tool_graph_desc: 'クレームの近傍を BFS — mediation、moderation、effect-disappears 警告を表示。',
+    tool_xprompt_desc: 'ロックされた v0.13d 本番プロンプト + sub-agent 呼び出しガイド。新しいコンテキストにそのまま渡す。',
+    tool_pguide_desc: '7段階の PDF 取得手順: ローカル検索、OA出版社、Unpaywall、Web 検索、Europe PMC、ユーザーに依頼。',
+    tool_register_desc: '抽出 JSON を送信してグラフを拡張。Quality gate あり、認証不要。',
+    h_contribute: '③ 貢献 — みんなで AI のための知のデータベースをつくろう',
+    contribute_h: '誰でも Citare を育てられます。',
+    contribute_p1: '論文を v0.13d プロンプトで抽出し、結果の JSON を <code>register_claims</code> に渡すだけ。認証は要りません。Pydantic スキーマと quality gate が壊れた抽出を弾きます。',
+    contribute_step1: '<code>get_pdf_acquisition_guide()</code> → 論文 PDF を取得',
+    contribute_step2: '<code>get_extraction_prompt()</code> → v0.13d プロンプトを取得し、sub-agent で抽出',
+    contribute_step3: '<code>register_claims(json_data=&lt;抽出 JSON&gt;)</code> → DB に登録',
+    contribute_step4: '<code>search_claims(doi=...)</code> → 登録確認',
+    contribute_p2: '毎日の Dropbox バックアップ + WARNING-not-REJECT 設計で、安心して触れます。',
+    h_resources: 'リソース',
+    res_strategy: 'Strategy',
+    res_strategy_sub: ' — ミッション、ビジョン、そこから導かれるコミットメント',
+    res_interaction: 'Interaction Design Document',
+    res_interaction_sub: ' — LLM が Citare をどう使うかの設計思想',
+    res_review: 'Design Review for Builders',
+    res_review_sub: ' — 類似システムを作る人へのフィードバック',
+    res_github: 'GitHub: citareMCP',
+    res_github_sub: ' — MCP サーバーのソース',
+    res_stats: 'ライブ API 統計 (JSON)',
+    footer_main: 'Citare — AI ネイティブな学術クレーム基盤',
+    footer_endpoint: 'MCP エンドポイント:',
+    modal_h: 'Citare を Claude に接続',
+    modal_sub: '下のいずれかをコピーしてください。',
+    modal_cc_label: 'Claude Code (ワンコマンド)',
+    modal_web_label: 'Claude.ai (URL を貼る)',
+    modal_web_method: 'Customize → Connectors → + → Add custom connector',
+    modal_p: '接続後は「<em>edmondson 1999 で psychological safety を調べて</em>」のような自然文で OK。AI が <code style="background:none;padding:0;color:var(--accent)">search_claims</code> や <code style="background:none;padding:0;color:var(--accent)">cite_claim</code> を自律的に呼びます。',
+    week_suffix: '今週',
+  },
+};
+
+let currentLang = 'en';
+
+function applyLang(lang) {
+  const dict = TRANS[lang] || TRANS.en;
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.title = dict.title;
+  // Text content
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] != null) el.textContent = dict[key];
+  });
+  // HTML content (kept narrow on purpose — only translation strings, no user input)
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (dict[key] != null) el.innerHTML = dict[key];
+  });
+  // Placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key] != null) el.placeholder = dict[key];
+  });
+  // Toggle button active state
+  document.querySelectorAll('.lang-toggle button').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  // Re-apply the live counter "this week" suffix if present
+  refreshDeltas();
+}
+
+function setLang(lang) {
+  applyLang(lang);
+  localStorage.setItem('citare-lang', lang);
+}
+
+// ============================================================================
+// Theme
+// ============================================================================
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? '' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('citare-theme', next);
+}
+if (localStorage.getItem('citare-theme') === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+// ============================================================================
+// Modal
+// ============================================================================
+function openConnectModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// ============================================================================
+// Copy helper
+// ============================================================================
+function copyCmd(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+// ============================================================================
+// Live demo (REST shim)
+// ============================================================================
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function snakeToWords(s) { return String(s ?? '').replace(/_/g, ' '); }
+
+function setQ(q) {
+  document.getElementById('demo-q').value = q;
+  runDemo({preventDefault: () => {}});
+}
+
+function tripleHtml(r) {
+  const l0 = r.l0_json || {};
+  if (r.template_type === 'RELATION' && l0.iv && l0.dv) {
+    return `<strong>${escapeHtml(snakeToWords(l0.iv))}</strong> → ${escapeHtml(l0.relation || '?')} → <strong>${escapeHtml(snakeToWords(l0.dv))}</strong>`;
+  }
+  if (r.template_type === 'DEFINITION' && l0.concept) return `<strong>${escapeHtml(snakeToWords(l0.concept))}</strong> <em>(definition)</em>`;
+  if (r.template_type === 'EXISTENCE_CLAIM' && l0.phenomenon) return `<strong>${escapeHtml(snakeToWords(l0.phenomenon))}</strong> <em>(observed)</em>`;
+  return escapeHtml(r.template_type || '');
+}
+
+const TL_LABEL = { green: 'cite OK', yellow: 'with caveats', red: 'do not cite alone' };
+
+function renderClaim(r) {
+  const designClass = `design ${escapeHtml(r.design_basis || '')}`;
+  const designLabel = r.design_basis ? r.design_basis.replace(/_/g, ' ') : '';
+  const trunc = r.source_text_preview && r.source_text_preview.length >= 240 ? '…' : '';
+  const tl = r.traffic_light || 'green';
+  const tlLabel = TL_LABEL[tl] || tl;
+  const idEnc = encodeURIComponent(r.id);
+  return `
+    <div class="demo-claim">
+      <div class="claim-body">
+        <span class="tl-badge ${tl}" onclick="toggleTlDrawer('${idEnc}')" title="Click for reasons">
+          <span class="tl-dot"></span>${escapeHtml(tlLabel)}
+        </span>
+        <span class="claim-id">${escapeHtml(r.id)}</span>${r.source_page ? ` <span class="paper-meta">p.${r.source_page}</span>` : ''}${designLabel ? ` <span class="${designClass}">${escapeHtml(designLabel)}</span>` : ''}
+        <div class="claim-triple">${tripleHtml(r)}</div>
+        <div class="claim-source">${escapeHtml(r.source_text_preview || '')}${trunc}</div>
+        <div class="tl-drawer ${tl}" id="tl-drawer-${idEnc}"></div>
+      </div>
+      <button class="graph-btn" onclick="openGraph('${idEnc}')" title="Show neighbourhood graph">graph</button>
+    </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Traffic-light drawer: expand to show reasons + safe_verbs + paper reference
+// ---------------------------------------------------------------------------
+const _tlCache = new Map();  // claim_id → response (memoize across opens)
+
+function toggleTlDrawer(idEnc) {
+  const drawer = document.getElementById('tl-drawer-' + idEnc);
+  if (!drawer) return;
+  if (drawer.classList.contains('open')) {
+    drawer.classList.remove('open');
+    return;
+  }
+  drawer.classList.add('open');
+  const claimId = decodeURIComponent(idEnc);
+  if (_tlCache.has(claimId)) {
+    drawer.innerHTML = renderTlDrawer(_tlCache.get(claimId));
+    return;
+  }
+  drawer.innerHTML = `<span style="color:var(--text3)">Loading…</span>`;
+  fetch(`/api/cite?claim_id=${encodeURIComponent(claimId)}`)
+    .then(r => r.json())
+    .then(d => { _tlCache.set(claimId, d); drawer.innerHTML = renderTlDrawer(d); })
+    .catch(err => { drawer.innerHTML = `<span style="color:#ef4444">Error: ${escapeHtml(err.message)}</span>`; });
+}
+
+function renderTlDrawer(d) {
+  const tl = d.traffic_light || {};
+  const reasons = (tl.reasons || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+  const reasonsBlock = reasons ? `<ul>${reasons}</ul>` : `<div style="color:var(--text2); font-size:0.75rem">No specific warnings.</div>`;
+  const safe = d.safe_verbs ? d.safe_verbs.map(v => `<code>${escapeHtml(v)}</code>`).join(' / ') : '';
+  const paperRef = d.paper && d.paper.paper_reference ? `<div class="tl-meta"><strong>Reference:</strong> ${escapeHtml(d.paper.paper_reference)}</div>` : '';
+  const ecs = d.effective_causal_strength || {};
+  const meta = `<div class="tl-meta">design_basis: <code>${escapeHtml(ecs.design_basis || 'unknown')}</code> · safe_verbs: ${safe || '<em>n/a</em>'}</div>`;
+  return `<div class="tl-summary">${escapeHtml(tl.summary || '')}</div>${reasonsBlock}${meta}${paperRef}`;
+}
+
+function renderGroupedResults(results) {
+  const groups = new Map();
+  for (const r of results) {
+    const pid = r.paper_id || '?';
+    if (!groups.has(pid)) groups.set(pid, []);
+    groups.get(pid).push(r);
+  }
+  return [...groups.entries()].map(([pid, claims]) => `
+    <div class="demo-paper">
+      <div class="paper-head">
+        <span class="paper-title">${escapeHtml(pid)}</span>
+        <span class="paper-meta">${claims.length} claim${claims.length===1?'':'s'}</span>
+      </div>
+      ${claims.map(renderClaim).join('')}
+    </div>
+  `).join('');
+}
+
+function runDemo(e) {
+  e.preventDefault();
+  const q = document.getElementById('demo-q').value.trim();
+  const btn = document.getElementById('demo-btn');
+  const out = document.getElementById('demo-results');
+  const dict = TRANS[currentLang];
+  if (!q) return false;
+  closeGraph();
+  btn.disabled = true; btn.textContent = '…';
+  out.innerHTML = `<div class="demo-empty">${escapeHtml(dict.demo_searching)}</div>`;
+  fetch(`/api/search?q=${encodeURIComponent(q)}&limit=5`)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.results || d.results.length === 0) {
+        out.innerHTML = `<div class="demo-empty">${escapeHtml(dict.demo_no_results_prefix)} <code>${escapeHtml(q)}</code>. ${escapeHtml(dict.demo_no_results_hint)}</div>`;
+      } else {
+        out.innerHTML = renderGroupedResults(d.results);
+      }
+    })
+    .catch(err => { out.innerHTML = `<div class="demo-empty">Error: ${escapeHtml(err.message)}</div>`; })
+    .finally(() => { btn.disabled = false; btn.textContent = dict.demo_btn; });
+  return false;
+}
+
+// ============================================================================
+// Graph viewer (radial SVG, no external deps)
+// ============================================================================
+const EDGE_COLOR = {
+  effect_disappears_under_control: '#ef4444',
+  failed_to_replicate:             '#ef4444',
+  retracted:                       '#ef4444',
+  disputed:                        '#ef4444',
+  hub_component:                   '#f59e0b',
+  boundary_condition:              '#fbbf24',
+  underpowered:                    '#fbbf24',
+  extends_prior_definition:        '#6366f1',
+  preregistered_confirmed:         '#10b981',
+  none:                            '#cbd5e1',
+};
+const NODE_COLOR = {
+  rct: '#10b981',
+  longitudinal: '#3b82f6',
+  quasi_experimental: '#3b82f6',
+  meta_analysis: '#8b5cf6',
+  cross_sectional: '#f59e0b',
+  computational_demonstration: '#06b6d4',
+  theoretical: '#94a3b8',
+};
+
+// Track current graph context so the depth/paper toggle can re-fetch.
+let _graphCtx = { claimId: null, paperId: null, depth: 2 };
+
+function closeGraph() {
+  const p = document.getElementById('graph-panel');
+  if (p) p.classList.remove('open');
+}
+
+function _refreshGraph() {
+  const svg = document.getElementById('graph-svg');
+  const title = document.getElementById('gp-title');
+  const panel = document.getElementById('graph-panel');
+  panel.classList.add('open');
+  svg.innerHTML = `<text x="280" y="180" text-anchor="middle" fill="#888" font-size="13">Loading…</text>`;
+  let url, label;
+  if (_graphCtx.paperId) {
+    url = `/api/graph?paper_id=${encodeURIComponent(_graphCtx.paperId)}`;
+    label = `${_graphCtx.paperId} · paper`;
+  } else {
+    url = `/api/graph?claim_id=${encodeURIComponent(_graphCtx.claimId)}&depth=${_graphCtx.depth}`;
+    label = `${_graphCtx.claimId} · depth=${_graphCtx.depth}`;
+  }
+  title.textContent = label;
+  fetch(url)
+    .then(r => r.json())
+    .then(d => drawGraph(svg, d))
+    .catch(err => { svg.innerHTML = `<text x="280" y="180" text-anchor="middle" fill="#ef4444">Error: ${escapeHtml(err.message)}</text>`; });
+  // Update toggle button active state
+  document.querySelectorAll('.depth-toggle .dt-btn').forEach(b => {
+    const d = b.getAttribute('data-d');
+    const on = (_graphCtx.paperId && d === 'paper') || (!_graphCtx.paperId && d === String(_graphCtx.depth));
+    b.classList.toggle('active', on);
+  });
+  panel.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+
+function openGraph(claimIdEnc) {
+  _graphCtx = { claimId: decodeURIComponent(claimIdEnc), paperId: null, depth: 2 };
+  _refreshGraph();
+}
+
+function setGraphMode(kind, depth) {
+  if (kind === 'paper') {
+    // Need a paper_id. Resolve from the current claim's paper_id.
+    const cid = _graphCtx.claimId;
+    if (!cid) return;
+    // Look up the visible search result for this claim_id
+    const claimEl = [...document.querySelectorAll('.demo-claim')]
+      .find(el => el.textContent.includes(cid));
+    let pid = null;
+    if (claimEl) {
+      const paperEl = claimEl.closest('.demo-paper');
+      const titleEl = paperEl && paperEl.querySelector('.paper-title');
+      if (titleEl) pid = titleEl.textContent.trim();
+    }
+    if (!pid) {
+      // Fallback: ask the API for the claim's paper_id via /api/search by id?
+      // Easier: just tell user
+      alert("Couldn't resolve paper_id for this claim. Try clicking 'graph' on a fresh search result.");
+      return;
+    }
+    _graphCtx = { claimId: cid, paperId: pid, depth: 2 };
+  } else {
+    _graphCtx = { ..._graphCtx, paperId: null, depth: depth };
+  }
+  _refreshGraph();
+}
+
+// Layout helpers ---------------------------------------------------------
+function _radialLayout(nodes, edges, w, h) {
+  // Center node + remaining on a circle. Used when there's a clear center.
+  const cx = w/2, cy = h/2, R = Math.min(w, h) * 0.36;
+  const center = nodes.find(n => n.is_center);
+  const others = nodes.filter(n => !n.is_center);
+  const pos = new Map();
+  if (center) pos.set(center.id, [cx, cy]);
+  const MAX = 14;
+  const visible = others.slice(0, MAX);
+  visible.forEach((n, i) => {
+    const t = (i / Math.max(visible.length, 1)) * 2 * Math.PI - Math.PI/2;
+    pos.set(n.id, [cx + R*Math.cos(t), cy + R*Math.sin(t)]);
+  });
+  return { pos, hidden: Math.max(0, others.length - MAX) };
+}
+
+function _layeredLayout(nodes, edges, w, h) {
+  // Argument-chain layout for paper mode: rows by template_type so the
+  // logical structure (definitions → relations → meta) is readable instead
+  // of a hairball. Within each row, sort by claim id (sequence within paper).
+  const LAYERS = ['DEFINITION', 'RELATION', 'EXISTENCE_CLAIM', 'META_CLAIM'];
+  // Y centre per layer, leaving 30px header space at top
+  const yMargin = 50, yBottom = h - 30;
+  const layerCount = LAYERS.length;
+  const yStep = (yBottom - yMargin) / layerCount;
+  const layerY = {};
+  LAYERS.forEach((t, i) => { layerY[t] = yMargin + yStep * i + yStep/2; });
+
+  const buckets = {};
+  for (const t of LAYERS) buckets[t] = [];
+  buckets._other = [];
+  for (const n of nodes) {
+    const t = n.template_type;
+    if (LAYERS.includes(t)) buckets[t].push(n);
+    else buckets._other.push(n);
+  }
+  // Sort within bucket by id for deterministic placement
+  for (const k of Object.keys(buckets)) buckets[k].sort((a, b) => a.id.localeCompare(b.id));
+
+  const pos = new Map();
+  for (const t of LAYERS) {
+    const arr = buckets[t];
+    if (!arr.length) continue;
+    const n = arr.length;
+    const xStep = (w - 60) / (n + 1);
+    arr.forEach((node, i) => {
+      pos.set(node.id, [30 + xStep * (i + 1), layerY[t]]);
+    });
+  }
+  // Other (no template_type) → middle row, centered
+  buckets._other.forEach((n, i) => {
+    pos.set(n.id, [w/2 + (i - buckets._other.length/2) * 30, h/2]);
+  });
+
+  // Layer headers as decoration
+  const headers = LAYERS
+    .filter(t => buckets[t].length > 0)
+    .map(t => ({ text: t, x: 14, y: layerY[t] - 4, count: buckets[t].length }));
+  return { pos, hidden: 0, headers };
+}
+
+function _forceLayout(nodes, edges, w, h) {
+  // Tiny iterative force-directed layout for paper-mode (no center node).
+  // Repulsion between every pair + spring force on each edge + central pull.
+  // Cheap: O((iterations)·(N² + E)). At N=33, E=30, 100 iterations → ~110k ops.
+  const cx = w/2, cy = h/2;
+  const N = nodes.length;
+  const pos = new Map();
+  // Seed positions on a circle so the layout converges fast
+  nodes.forEach((n, i) => {
+    const t = i / N * 2 * Math.PI;
+    pos.set(n.id, [cx + (Math.min(w,h)*0.32) * Math.cos(t),
+                   cy + (Math.min(w,h)*0.32) * Math.sin(t)]);
+  });
+  const adj = new Map();  // id → set of neighbour ids
+  for (const n of nodes) adj.set(n.id, new Set());
+  for (const e of edges) {
+    if (adj.has(e.source) && adj.has(e.target)) {
+      adj.get(e.source).add(e.target);
+      adj.get(e.target).add(e.source);
+    }
+  }
+  const REPULSION = 1800, SPRING = 0.04, SPRING_LEN = 65, GRAVITY = 0.012, DAMPING = 0.85;
+  const vel = new Map();
+  for (const n of nodes) vel.set(n.id, [0, 0]);
+  const ITER = 90;
+  for (let it = 0; it < ITER; it++) {
+    // Pairwise repulsion
+    for (let i = 0; i < N; i++) {
+      const a = nodes[i], pa = pos.get(a.id);
+      let fx = 0, fy = 0;
+      for (let j = 0; j < N; j++) {
+        if (i === j) continue;
+        const pb = pos.get(nodes[j].id);
+        let dx = pa[0] - pb[0], dy = pa[1] - pb[1];
+        let d2 = dx*dx + dy*dy;
+        if (d2 < 1) d2 = 1;
+        const f = REPULSION / d2;
+        fx += dx / Math.sqrt(d2) * f;
+        fy += dy / Math.sqrt(d2) * f;
+      }
+      // Spring (attraction along edges)
+      for (const nb of adj.get(a.id)) {
+        const pb = pos.get(nb);
+        const dx = pb[0] - pa[0], dy = pb[1] - pa[1];
+        const d = Math.max(1, Math.sqrt(dx*dx + dy*dy));
+        const f = SPRING * (d - SPRING_LEN);
+        fx += dx / d * f;
+        fy += dy / d * f;
+      }
+      // Gravity pull to centre
+      fx += (cx - pa[0]) * GRAVITY;
+      fy += (cy - pa[1]) * GRAVITY;
+      const v = vel.get(a.id);
+      v[0] = (v[0] + fx) * DAMPING;
+      v[1] = (v[1] + fy) * DAMPING;
+    }
+    for (const n of nodes) {
+      const p = pos.get(n.id), v = vel.get(n.id);
+      p[0] += v[0]; p[1] += v[1];
+      // Soft bounds
+      p[0] = Math.max(20, Math.min(w-20, p[0]));
+      p[1] = Math.max(20, Math.min(h-20, p[1]));
+    }
+  }
+  return { pos, hidden: 0 };
+}
+
+function drawGraph(svg, d) {
+  svg.innerHTML = '';
+  const NS = 'http://www.w3.org/2000/svg';
+  const W = 560, H = 360;
+  // Choose layout: paper mode → layered (DEFINITION → RELATION → EXISTENCE → META)
+  // for argument-chain readability; claim mode → radial around center.
+  const hasCenter = d.nodes.some(n => n.is_center);
+  const layout = hasCenter
+    ? _radialLayout(d.nodes, d.edges, W, H)
+    : _layeredLayout(d.nodes, d.edges, W, H);
+  const positions = layout.pos;
+  const hidden = layout.hidden;
+
+  // Layer headers (paper mode only)
+  if (layout.headers) {
+    for (const h of layout.headers) {
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', h.x); t.setAttribute('y', h.y);
+      t.setAttribute('font-size', '10');
+      t.setAttribute('font-weight', '600');
+      t.setAttribute('fill', '#888');
+      t.setAttribute('letter-spacing', '0.05em');
+      t.textContent = `${h.text} · ${h.count}`;
+      svg.appendChild(t);
+    }
+  }
+
+  // Edges first (so nodes overlay)
+  for (const e of d.edges) {
+    const a = positions.get(e.source), b = positions.get(e.target);
+    if (!a || !b) continue;
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', a[0]); line.setAttribute('y1', a[1]);
+    line.setAttribute('x2', b[0]); line.setAttribute('y2', b[1]);
+    line.setAttribute('class', 'ge-line');
+    line.setAttribute('stroke', EDGE_COLOR[e.category] || '#cbd5e1');
+    const t = document.createElementNS(NS, 'title');
+    t.textContent = `${e.relation || '?'} (${e.category})`;
+    line.appendChild(t);
+    svg.appendChild(line);
+  }
+
+  // Nodes
+  const TL_STROKE = { green: '#10b981', yellow: '#d97706', red: '#dc2626' };
+  for (const n of d.nodes) {
+    const p = positions.get(n.id);
+    if (!p) continue;
+    const r = n.is_center ? 9 : (d.mode === 'paper' ? 5 : 7);
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', r);
+    c.setAttribute('class', 'gn-circle' + (n.is_center ? ' center' : ''));
+    c.setAttribute('fill', NODE_COLOR[n.design_basis] || '#cbd5e1');
+    // Traffic-light ring overrides default stroke
+    if (n.traffic_light && TL_STROKE[n.traffic_light]) {
+      c.setAttribute('stroke', TL_STROKE[n.traffic_light]);
+      c.setAttribute('stroke-width', n.is_center ? '3' : '2.2');
+    }
+    const t = document.createElementNS(NS, 'title');
+    t.textContent = `${n.id}\n${n.label}\n${n.template_type}${n.design_basis ? ' · '+n.design_basis : ''}`;
+    c.appendChild(t);
+    c.addEventListener('click', () => openGraph(encodeURIComponent(n.id)));
+    svg.appendChild(c);
+    // Label only when not too crowded
+    if (d.mode !== 'paper' || d.nodes.length <= 18) {
+      const lbl = document.createElementNS(NS, 'text');
+      lbl.setAttribute('x', p[0]); lbl.setAttribute('y', p[1] + r + 11);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('class', 'gn-label');
+      const cap = d.mode === 'paper' ? 22 : 32;
+      const truncated = (n.label || n.id).slice(0, cap);
+      lbl.textContent = truncated + (n.label && n.label.length > cap ? '…' : '');
+      svg.appendChild(lbl);
+    }
+  }
+
+  // Hint when neighbours were trimmed (radial mode only)
+  if (hidden > 0) {
+    const hint = document.createElementNS(NS, 'text');
+    hint.setAttribute('x', W/2); hint.setAttribute('y', H - 8);
+    hint.setAttribute('text-anchor', 'middle');
+    hint.setAttribute('fill', '#888'); hint.setAttribute('font-size', '10');
+    hint.textContent = `+${hidden} more nodes hidden — click any node to re-center`;
+    svg.appendChild(hint);
+  }
+
+  // For paper mode with many nodes, show count badge
+  if (d.mode === 'paper') {
+    const badge = document.createElementNS(NS, 'text');
+    badge.setAttribute('x', W - 12); badge.setAttribute('y', 16);
+    badge.setAttribute('text-anchor', 'end');
+    badge.setAttribute('fill', '#888'); badge.setAttribute('font-size', '11');
+    badge.textContent = `${d.nodes.length} claims · ${d.edges.length} relations`;
+    svg.appendChild(badge);
+  }
+}
+
+// ============================================================================
+// Live counters
+// ============================================================================
+let _statsCache = null;
+
+function refreshDeltas() {
+  if (!_statsCache) return;
+  const dict = TRANS[currentLang];
+  const r7 = _statsCache.recent_7d || {};
+  const pd = document.getElementById('papers-delta');
+  const cd = document.getElementById('claims-delta');
+  pd.textContent = r7.papers > 0 ? `+${r7.papers} ${dict.week_suffix}` : '';
+  cd.textContent = r7.claims > 0 ? `+${r7.claims} ${dict.week_suffix}` : '';
+}
+
+fetch('/stats')
+  .then(r => r.json())
+  .then(d => {
+    _statsCache = d;
+    document.getElementById('papers-count').textContent = (d.papers || 0).toLocaleString();
+    document.getElementById('claims-count').textContent = (d.claims || 0).toLocaleString();
+    document.getElementById('relations-count').textContent = (d.relations || 0).toLocaleString();
+    document.getElementById('warnings-count').textContent = (d.integrity_warnings || 0).toLocaleString();
+    refreshDeltas();
+  })
+  .catch(() => {});
+
+// ============================================================================
+// Init
+// ============================================================================
+const savedLang = localStorage.getItem('citare-lang') || 'en';
+applyLang(savedLang);
+document.addEventListener('DOMContentLoaded', () => { runDemo({preventDefault: () => {}}); });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "extraction_path": "D:/Dropbox/ai/CitareOpus47/experiments/runs/20260425T052950Z_R61_v013d_watsoncrick_s2/extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid (Watson & Crick, 1953)",
+  "auditor_id": "watsoncrick_v013d_auditor_3",
+  "audit_focus": "v0.13d hedging-gate fix verification + general extraction quality (definitions, IV/DV, source_text verbatim)",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel3",
+      "what_extractor_says": "RELATION adenine_amount -> thymine_amount, relation='positive', author_framing='associational', verification_status='proposed_in_paper'",
+      "what_paper_says": "The paper reports the A:T and G:C ~unity ratios as a previously established empirical finding by Chargaff/Wyatt (refs 3,4): 'It has been found experimentally^{3,4} that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' Watson & Crick are not proposing this ratio themselves; they cite it. Marking it 'proposed_in_paper' is a minor mis-framing — the prior-literature finding is being re-used, not proposed. However, since W&C invoke it within their own argument, 'proposed_in_paper' is defensible (and certainly not 'verified_in_paper'). Severity is low; the hedging-gate fix did not introduce error here, the issue is conceptual.",
+      "severity": "low",
+      "evidence_quote": "p.737: 'It has been found experimentally^{3,4} that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' (Refs 3 = Chargaff/Zamenhof 1952; 4 = Wyatt 1952.)"
+    },
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel4",
+      "what_extractor_says": "Same as rel3 but for guanine -> cytosine.",
+      "what_paper_says": "Same prior-literature provenance issue as rel3. evidence_type='re_interpretation' acknowledges that this is borrowed empirical evidence, so framing is acceptable. Author_framing='associational' is correct (the paper makes no causal claim about the ratio).",
+      "severity": "low",
+      "evidence_quote": "Same sentence on p.737, refs 3,4."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "watson1953_def1 (DNA double helix)",
+      "verified": "key_elements (two helical chains, antiparallel right-handed helices, dyad perpendicular to fibre axis, phosphate-sugar backbone outside, bases inside, 3'-5' linkages, 10 residues per turn, 3.4 A spacing, 34 A repeat, P atom 10 A from axis) all match p.737 verbatim. distinguished_from list correctly cites Pauling-Corey, Fraser, Furberg models. source_text is verbatim. verification_status=null is appropriate for DEFINITION template. No misattribution."
+    },
+    {
+      "claim_id": "watson1953_def2 (base pairing)",
+      "verified": "key_elements correctly capture purine-pyrimidine pairing, perpendicular base planes, identical z-coordinates, H-bonds at positions 1-1 and 6-6, A-T / G-C specific pairs in keto form. source_text verbatim from p.737. Hedging-gate correctly does NOT fire because verification_status=null (DEFINITION). Correct behavior."
+    },
+    {
+      "claim_id": "watson1953_exist1 (Pauling-Corey limitations)",
+      "verified": "Hedging gate correctly applied: source_text begins 'In our opinion, this structure is unsatisfactory for two reasons: (1) We believe...' — explicit hedging language ('In our opinion', 'We believe'). verification_status='proposed_in_paper' is correct per protocol rule 3."
+    },
+    {
+      "claim_id": "watson1953_exist3 (assumed geometric parameters)",
+      "verified": "source_text contains 'We have assumed an angle of 36°...' — explicit 'assumed' hedging language. verification_status='proposed_in_paper' is correct. Numeric values (36°, 3.4 A, 10 residues, 34 A, P at 10 A) all match p.737 verbatim."
+    },
+    {
+      "claim_id": "watson1953_exist6 (structure unproved)",
+      "verified": "source_text contains 'must be regarded as unproved' — paper itself explicitly says the structure is NOT verified. verification_status='proposed_in_paper' is correct (extractor would have been wrong to mark this 'verified_in_paper'). Hedging gate working correctly."
+    },
+    {
+      "claim_id": "watson1953_exist7 (copying mechanism)",
+      "verified": "Famous understatement: 'It has not escaped our notice that the specific pairing we have postulated immediately suggests a possible copying mechanism for the genetic material.' Hedging words: 'postulated', 'suggests', 'possible'. verification_status='proposed_in_paper' is correctly applied. Source text verbatim."
+    },
+    {
+      "claim_id": "watson1953_rel1 (keto tautomer -> specific pairs)",
+      "verified": "IV=keto_tautomer_assumption, DV=specific_base_pair_identity, relation='conditional' is correct. source_text begins 'If it is assumed that the bases only occur...' — explicit hedging. verification_status='proposed_in_paper' is correct. No IV/DV swap."
+    },
+    {
+      "claim_id": "watson1953_rel2 (sequence determines complementary sequence)",
+      "verified": "IV=base_sequence_one_strand, DV=base_sequence_complementary_strand, mediator=specific_base_pairing — correct directionality. source_text 'if the sequence of bases on one chain is given, then the sequence on the other chain is automatically determined' supports the IV/DV assignment. Hedged via conditional 'if'; verification_status='proposed_in_paper' is correct."
+    }
+  ],
+  "hedging_gate_audit": {
+    "claims_with_hedging_language_in_source": [
+      "watson1953_exist1 ('In our opinion', 'We believe')",
+      "watson1953_exist2 ('has also been suggested')",
+      "watson1953_exist3 ('We have assumed')",
+      "watson1953_exist4 ('we would expect')",
+      "watson1953_exist5 ('It is probably impossible')",
+      "watson1953_exist6 ('must be regarded as unproved')",
+      "watson1953_exist7 ('we have postulated', 'suggests a possible')",
+      "watson1953_rel1 ('If it is assumed')",
+      "watson1953_rel2 ('if...then')",
+      "watson1953_rel5 (descriptive of proposed model)",
+      "watson1953_meta1 ('We wish to put forward', 'novel feature')"
+    ],
+    "all_correctly_marked_proposed_in_paper": true,
+    "claims_with_verified_in_paper": [],
+    "note": "ZERO claims are marked 'verified_in_paper'. This is correct: the entire paper is a model proposal explicitly described by the authors as 'unproved'. v0.13d hedging-gate fix is functioning correctly on this paper; no false 'verified' attributions, and all hedged claims correctly carry 'proposed_in_paper'. Definitions (def1-3) carry verification_status=null which is the appropriate non-applicable value for the DEFINITION template."
+  },
+  "claim_count_comparison": {
+    "v013d_total_claims": 16,
+    "breakdown": "3 DEFINITION + 7 EXISTENCE_CLAIM + 5 RELATION + 1 META_CLAIM",
+    "baseline_v013_range": "14-17",
+    "within_baseline": true,
+    "comment": "Claim count (16) is within the v0.13 baseline range. No regression in claim coverage from the hedging-gate fix."
+  },
+  "source_text_verbatim_audit": {
+    "checked_claims": ["def1", "def2", "exist1", "exist3", "exist6", "exist7", "rel1", "rel2"],
+    "all_verbatim": true,
+    "minor_notes": "Ellipses are used appropriately to elide intervening text. No paraphrasing detected. The PDF OCR has some artifacts (e.g., 'cl1ain', 'es~aped', 'irrimediately') but the extraction has cleaned these to the canonical Nature text correctly."
+  },
+  "iv_dv_audit": {
+    "checked_relations": ["rel1", "rel2", "rel3", "rel4", "rel5"],
+    "all_directionally_correct": true,
+    "notes": "rel1 (keto assumption -> pair identity), rel2 (one strand sequence -> complementary sequence with base-pairing as mediator), rel3/rel4 (Chargaff ratios — IV/DV symmetric since 'ratio close to unity'; positive direction is correct), rel5 (phosphate position -> cation accessibility). No IV/DV swaps. No mediator/moderator confusion."
+  },
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 8,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "verdict": "trustworthy",
+    "verdict_rationale": "The v0.13d hedging-gate fix is working correctly on the Watson-Crick 1953 paper. All RELATION and EXISTENCE_CLAIM verification_status values are 'proposed_in_paper', which is the correct outcome given that this paper proposes a model the authors explicitly call 'unproved'. ZERO false 'verified_in_paper' attributions. Source texts are verbatim. IV/DV assignments are correct. Definitions cleanly distinguish the three concepts (double helix structure, base pairing, dyad symmetry) without merging. Claim count (16) sits within the v0.13 baseline (14-17), so the fix did not silently drop claims. The two flagged 'issues' are minor framing notes about Chargaff-ratio claims (rel3/rel4) being prior-literature evidence rather than W&C originals; this is a classification nuance, not a hedging-gate regression. No new errors introduced by the v0.13d fix were detected."
+  }
+}

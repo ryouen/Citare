@@ -10,6 +10,7 @@ from citare_core.enums import (
     IncompletenessCategory,
     PaperType,
     EquationStatus,
+    ClaimStatus,
 )
 from citare_core.models import (
     Paper,
@@ -42,6 +43,7 @@ __all__ = [
     "IncompletenessCategory",
     "PaperType",
     "EquationStatus",
+    "ClaimStatus",
     "Paper",
     "CausalStrength",
     "MethodMetadata",

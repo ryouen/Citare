@@ -1,0 +1,75 @@
+{
+  "extraction_path": "D:\\Dropbox\\ai\\CitareOpus47\\experiments\\runs\\20260425T052950Z_R61_v013d_watsoncrick_s2\\extraction.json",
+  "paper_title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid (Watson & Crick, Nature 1953)",
+  "auditor_id": "watsoncrick_v013d_auditor_1",
+  "audit_focus": "Whether v0.13 -> v0.13d hedging-language gate fix correctly re-tagged previously over-confident verified_in_paper claims to proposed_in_paper, without over-correcting genuine demonstrations.",
+  "issues_found": [
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel3",
+      "what_extractor_says": "verification_status='proposed_in_paper'; evidence_type='re_interpretation'; author_framing='associational' for adenine~thymine ratio.",
+      "what_paper_says": "Page 737, second column: 'It has been found experimentally(3,4) that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' Refs 3 and 4 are Chargaff (Zamenhof, Brawerman & Chargaff 1952) and Wyatt 1952.",
+      "severity": "low",
+      "evidence_quote": "'It has been found experimentally that the ratio of the amounts of adenine to thymine, and the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' (p.737, col. 2)",
+      "comment": "The empirical 1:1 ratio is itself an established experimental finding cited from Chargaff/Wyatt -- not proposed BY Watson & Crick, and not verified BY Watson & Crick. 'proposed_in_paper' is therefore slightly misleading: the ratio is neither proposed nor verified inside this paper, it is invoked as background empirical support. A status like 'cited_from_prior_work' or 'verified_elsewhere' would be more precise. However, given the v0.13d schema appears to use only 'verified_in_paper' / 'proposed_in_paper', the chosen label correctly avoids the v0.13 error of claiming Watson-Crick verified it, so this is at most a minor residual issue and reflects a schema-vocabulary limitation rather than an extractor mistake. The paper's W&C usage is best characterized as 're_interpretation' which the extractor did capture in evidence_type."
+    },
+    {
+      "category": 4,
+      "claim_id": "watson1953_rel4",
+      "what_extractor_says": "Same as rel3, applied to guanine~cytosine.",
+      "what_paper_says": "Same source sentence, p.737 col.2, cited to Chargaff/Wyatt (refs 3,4).",
+      "severity": "low",
+      "evidence_quote": "'...the ratio of guanine to cytosine, are always very close to unity for deoxyribose nucleic acid.' (p.737, col. 2)",
+      "comment": "Same residual concern as rel3: status is correctly NOT 'verified_in_paper' (v0.13 bug fixed), but 'proposed_in_paper' is still imperfect because W&C neither propose nor verify this -- they cite it. Schema-level limitation, not an extractor regression."
+    }
+  ],
+  "spot_checks_passed": [
+    {
+      "claim_id": "watson1953_exist3",
+      "verified": "v0.13 -> v0.13d FIX CONFIRMED. The 3.4 A spacing, 36 deg residue angle, 34 A repeat, 10 A phosphorus radial distance are now correctly tagged 'proposed_in_paper'. Paper text on p.737 col.2 explicitly says 'We have assumed an angle of 36 deg between adjacent residues in the same chain, so that the structure repeats after 10 residues on each chain, that is, after 34 A.' The phrase 'We have assumed' is decisive hedging language; the v0.13d gate correctly caught it."
+    },
+    {
+      "claim_id": "watson1953_exist6",
+      "verified": "Correctly 'proposed_in_paper'. Paper says verbatim 'it must be regarded as unproved until it has been checked against more exact results' (p.737, col.2). This is the strongest possible self-disclaimer of non-verification; tag is right."
+    },
+    {
+      "claim_id": "watson1953_exist7",
+      "verified": "Correctly 'proposed_in_paper'. The famous sentence 'It has not escaped our notice that the specific pairing we have postulated immediately suggests a possible copying mechanism for the genetic material' (p.737, col.2) is explicitly framed as a suggestion ('postulated', 'suggests', 'possible'). v0.13d tag is correct."
+    },
+    {
+      "claim_id": "watson1953_rel1",
+      "verified": "Correctly 'proposed_in_paper'. Paper opens this paragraph with 'If it is assumed that the bases only occur in the structure in the most plausible tautomeric forms...' (p.737, col.2). 'If it is assumed' is a conditional hedge; specific A-T / G-C pairing is derived under an assumption, not demonstrated. Tag is right."
+    },
+    {
+      "claim_id": "watson1953_rel2",
+      "verified": "Correctly 'proposed_in_paper'. 'However, if only specific pairs of bases can be formed, it follows that if the sequence of bases on one chain is given, then the sequence on the other chain is automatically determined' (p.737, col.2). This is a deductive consequence of the proposed model, not an empirical verification. Tag is right."
+    },
+    {
+      "claim_id": "watson1953_exist1",
+      "verified": "Correctly 'proposed_in_paper'. The critique of Pauling-Corey is explicitly framed as the authors' opinion: 'In our opinion, this structure is unsatisfactory for two reasons...' (p.737, col.1). Argumentative, not verified by new data. Tag is right."
+    },
+    {
+      "claim_id": "watson1953_meta1",
+      "verified": "Correctly 'proposed_in_paper'. The integrated double-helix model is the central proposal of the paper; the authors state up-front 'WE wish to suggest a structure for the salt of deoxyribose nucleic acid' (p.737, col.1) and later 'We wish to put forward a radically different structure...'. The whole paper is in suggestive register; tag is right."
+    }
+  ],
+  "fix_assessment": {
+    "v013_known_bugs_resolved": [
+      "exist3 (assumed 3.4/36/34/10 geometry): v0.13 mistag 'verified_in_paper' -> v0.13d 'proposed_in_paper' CONFIRMED FIXED (verbatim 'We have assumed' in PDF).",
+      "exist2-equivalent / Chargaff ratios (rel3, rel4): v0.13 mistag 'verified_in_paper' -> v0.13d 'proposed_in_paper' CONFIRMED FIXED (paper cites refs 3,4 Chargaff/Wyatt rather than verifying)."
+    ],
+    "remaining_verified_in_paper_that_should_flip": "NONE. Every EXISTENCE_CLAIM and RELATION in the v0.13d extraction is now tagged 'proposed_in_paper'. No residual 'verified_in_paper' over-confidence detected.",
+    "over_correction_check": "NONE. There is no claim in the paper that genuinely deserves 'verified_in_paper' but was demoted. Watson & Crick 1953 is a one-page theoretical/structural proposal: the paper itself states 'it must be regarded as unproved' and 'rests mainly though not entirely on published experimental data and stereochemical arguments'. By the paper's own framing, no claim is 'verified_in_paper' -- so unanimous 'proposed_in_paper' tagging is the substantively correct outcome, not an over-correction.",
+    "schema_observation": "DEFINITION claims (def1, def2, def3) carry verification_status=null. This is acceptable if the v0.13d schema reserves verification_status for EXISTENCE_CLAIM and RELATION only; auditor flagged no inconsistency."
+  },
+  "summary": {
+    "total_claims_in_extraction": 16,
+    "claims_spot_checked": 7,
+    "issues_count": 2,
+    "high_severity_count": 0,
+    "medium_severity_count": 0,
+    "low_severity_count": 2,
+    "verdict": "trustworthy"
+  },
+  "verdict_rationale": "The v0.13 -> v0.13d hedging-language gate is a clear success for this paper. The previously reported five medium-severity 'verified_in_paper' errors are all corrected: the assumed geometric parameters (exist3) and the Chargaff-cited base ratios (rel3, rel4) are now 'proposed_in_paper', matching the paper's actual framing ('We have assumed', 'It has been found experimentally [refs 3,4]'). The fix did not over-correct: Watson & Crick themselves explicitly state the structure 'must be regarded as unproved', so unanimous proposed_in_paper tagging is faithful to author intent. The two low-severity residual issues on rel3/rel4 are vocabulary-level (the paper invokes prior empirical work, which the binary verified/proposed schema cannot perfectly express) and are not extractor regressions."
+}

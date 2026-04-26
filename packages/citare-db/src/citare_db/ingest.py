@@ -38,6 +38,57 @@ from citare_core import Extraction
 _IDENTIFIER_PRIORITY = ("doi", "arxiv_doi", "arxiv", "pmid", "isbn", "internal_synthetic")
 
 
+def _l0_concepts_text(l0_json: dict | None, template_type: str) -> str:
+    """Flatten l0_json's conceptual fields into FTS-searchable text.
+
+    Snake_case is converted to space-separated for tokenizer-friendliness:
+    ``team_psychological_safety`` → ``team psychological safety``. This lets
+    the unicode61 tokenizer match natural-language queries like
+    ``psychological safety`` against snake_case concept keys.
+
+    Per template_type, indexes the conceptual fields (not source_text — that
+    is already a separate FTS column):
+
+    * DEFINITION:     concept, key_elements, distinguished_from
+    * RELATION:       iv, dv, relation, mediator, moderator
+    * EXISTENCE_CLAIM: phenomenon, evidence
+    * META_CLAIM:     integrated_finding, scope
+    """
+    if not l0_json:
+        return ""
+    parts: list[str] = []
+
+    def _norm(s: Any) -> str:
+        if not isinstance(s, str):
+            return ""
+        return s.replace("_", " ").strip()
+
+    def _add(v: Any) -> None:
+        if isinstance(v, str):
+            parts.append(_norm(v))
+        elif isinstance(v, list):
+            parts.extend(_norm(x) for x in v if isinstance(x, str))
+
+    if template_type == "DEFINITION":
+        _add(l0_json.get("concept"))
+        _add(l0_json.get("key_elements"))
+        _add(l0_json.get("distinguished_from"))
+    elif template_type == "RELATION":
+        _add(l0_json.get("iv"))
+        _add(l0_json.get("dv"))
+        _add(l0_json.get("relation"))
+        _add(l0_json.get("mediator"))
+        _add(l0_json.get("moderator"))
+    elif template_type == "EXISTENCE_CLAIM":
+        _add(l0_json.get("phenomenon"))
+        _add(l0_json.get("evidence"))
+    elif template_type == "META_CLAIM":
+        _add(l0_json.get("integrated_finding"))
+        _add(l0_json.get("scope"))
+
+    return " ".join(p for p in parts if p)
+
+
 @dataclass
 class IngestReport:
     """Result of ingesting one extraction."""
@@ -250,6 +301,59 @@ def _jsonify(obj: Any) -> str | None:
     return json.dumps(obj, ensure_ascii=False)
 
 
+def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -> dict:
+    """Tolerate known LLM-output quirks before Pydantic validation.
+
+    Observed quirks (each reduces the otherwise-good extraction to a
+    PyDantic ValidationError that drops the whole paper):
+
+    1. **l3_json.additional as string** (todd2024function R72). The model
+       sometimes puts a single sentence directly into ``additional``
+       instead of a dict. Coerce: wrap as ``{"summary": <str>}``.
+
+    2. **claims[*].source_page as string** (dellacqua_2023 R83 emits
+       ``"Appendix C"``, ``"Appendix E"``). Pydantic ``int | None`` rejects.
+       Coerce: extract leading digits if any, otherwise null the field
+       and stash the original in ``source_page_note``.
+
+    Both are consistent with WARNING-not-REJECT: we don't lose evidence
+    because of a model formatting quirk on per-claim fields.
+    """
+    import re as _re
+    fixes_l3 = 0
+    fixes_page = 0
+    for c in raw.get("claims", []) or []:
+        # Quirk 1
+        l3 = c.get("l3_json")
+        if isinstance(l3, dict):
+            v = l3.get("additional")
+            if isinstance(v, str) and v.strip():
+                l3["additional"] = {"summary": v}
+                fixes_l3 += 1
+        # Quirk 2
+        sp = c.get("source_page")
+        if isinstance(sp, str):
+            m = _re.search(r"\d+", sp)
+            if m:
+                c["source_page"] = int(m.group(0))
+                c["source_page_note"] = sp
+            else:
+                c["source_page"] = None
+                c["source_page_note"] = sp
+            fixes_page += 1
+    if report is not None:
+        if fixes_l3:
+            report.warn("l3_additional_string_coerced", count=fixes_l3)
+        if fixes_page:
+            report.warn("source_page_string_coerced", count=fixes_page)
+    return raw
+
+
+# Backward-compat alias for any external callers (the old name was specific
+# to the l3 quirk; we keep it pointing at the broader coercer).
+_coerce_l3_quirks = _coerce_extraction_quirks
+
+
 def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> IngestReport:
     p = extraction.paper
     idents = collect_paper_identifiers(extraction)
@@ -278,8 +382,9 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
                 """
                 INSERT INTO papers (id, canonical_title, authors, year, venue, paper_type,
                                     domain, content_hash,
-                                    default_causal_strength, default_method)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    default_causal_strength, default_method,
+                                    inclusion_policy_tier)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     new_id, p.title,
@@ -290,6 +395,8 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
                     chash,
                     _jsonify(p.default_causal_strength),
                     _jsonify(p.default_method),
+                    # Task 71 — default to 3 (ungated) if model lacks the field
+                    getattr(p, "inclusion_policy_tier", 3) or 3,
                 ),
             )
             existing_paper_id = new_id
@@ -298,7 +405,8 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
     else:
         # Existing paper — update bibliographic fields (title/year may have
         # improved with a better extraction). Authors / defaults only overwrite
-        # if the new value is non-null.
+        # if the new value is non-null. Inclusion tier monotonically improves
+        # via MIN: a paper that was ever curated stays curated.
         report = IngestReport(paper_id=existing_paper_id, created_paper=False)
         conn.execute(
             """
@@ -310,7 +418,8 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
                    domain = COALESCE(?, domain),
                    default_causal_strength = COALESCE(?, default_causal_strength),
                    default_method = COALESCE(?, default_method),
-                   content_hash = ?
+                   content_hash = ?,
+                   inclusion_policy_tier = MIN(inclusion_policy_tier, ?)
              WHERE id = ?
             """,
             (
@@ -320,6 +429,7 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
                 _jsonify(p.default_causal_strength),
                 _jsonify(p.default_method),
                 chash,
+                getattr(p, "inclusion_policy_tier", 3) or 3,
                 existing_paper_id,
             ),
         )
@@ -365,24 +475,31 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
         if c.id in existing_claim_ids:
             report.warn("claim_overwrite", claim_id=c.id)
 
+        # Task 64 — claim lifecycle. Old extractions that lack these fields
+        # default to 'current' / NULL; new extractions populate them.
+        claim_status_val = (
+            c.claim_status.value if hasattr(c, "claim_status") and c.claim_status
+            else "current"
+        )
+        superseded_by = getattr(c, "superseded_by_claim_id", None)
+
         conn.execute(
             """
             INSERT INTO claims (
                 id, paper_id, template_type,
-                l0_json, l1_subject, l1_predicate, l1_object,
-                l2_en, l2_ja, l3_json,
+                l0_json, l3_json,
                 source_text, source_page, source_section, source_paragraph,
                 evidence_type, verification_status,
                 causal_strength, method_metadata,
                 model_hub, confidence_level, confidence_score,
-                extraction_prompt_version, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                extraction_prompt_version, status,
+                claim_status, superseded_by_claim_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               paper_id = excluded.paper_id,
               template_type = excluded.template_type,
               l0_json = excluded.l0_json,
-              l1_subject = excluded.l1_subject, l1_predicate = excluded.l1_predicate, l1_object = excluded.l1_object,
-              l2_en = excluded.l2_en, l2_ja = excluded.l2_ja, l3_json = excluded.l3_json,
+              l3_json = excluded.l3_json,
               source_text = excluded.source_text, source_page = excluded.source_page,
               source_section = excluded.source_section, source_paragraph = excluded.source_paragraph,
               evidence_type = excluded.evidence_type, verification_status = excluded.verification_status,
@@ -390,25 +507,41 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
               model_hub = excluded.model_hub, confidence_level = excluded.confidence_level,
               confidence_score = excluded.confidence_score,
               extraction_prompt_version = excluded.extraction_prompt_version,
+              claim_status = excluded.claim_status,
+              superseded_by_claim_id = excluded.superseded_by_claim_id,
               updated_at = CURRENT_TIMESTAMP
             """,
             (
                 c.id, existing_paper_id, c.template_type.value,
-                _jsonify(c.l0_json), c.l1_subject, c.l1_predicate, c.l1_object,
-                c.l2_en, c.l2_ja, _jsonify(c.l3_json),
+                _jsonify(c.l0_json), _jsonify(c.l3_json),
                 c.source_text, c.source_page, c.source_section, c.source_paragraph,
                 c.evidence_type,
                 c.verification_status.value if c.verification_status else None,
                 _jsonify(c.causal_strength), _jsonify(c.method_metadata),
                 int(c.model_hub), c.confidence_level, c.confidence_score,
                 c.extraction_prompt_version, c.status,
+                claim_status_val, superseded_by,
             ),
         )
-        # FTS5 index
+        # FTS5 index — three columns. source_text holds the verbatim quote;
+        # l0_concepts holds the normalised conceptual fields from l0_json
+        # so natural-language queries can match snake_case concept keys;
+        # paper_meta holds "{authors} {year} {title}" so the common
+        # research-flow query "Author Year" finds every claim from that
+        # paper (year tokens rarely appear in source_text).
+        _paper_meta = " ".join(filter(None, [
+            " ".join(p.authors or []),
+            str(p.year) if p.year else "",
+            p.title or "",
+        ]))
         conn.execute(
-            "INSERT INTO claims_fts (claim_id, source_text, l2_en, l1_subject, l1_object) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (c.id, c.source_text or "", c.l2_en or "", c.l1_subject or "", c.l1_object or ""),
+            "INSERT INTO claims_fts (claim_id, source_text, l0_concepts, paper_meta) VALUES (?, ?, ?, ?)",
+            (
+                c.id,
+                c.source_text or "",
+                _l0_concepts_text(c.l0_json, c.template_type.value),
+                _paper_meta,
+            ),
         )
 
     # Relations
@@ -488,5 +621,9 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
 def ingest_extraction_file(conn: sqlite3.Connection, path: str | Path) -> IngestReport:
     p = Path(path)
     data = json.loads(p.read_text(encoding="utf-8"))
+    # Pre-validation coercion for known LLM-output quirks. We do this before
+    # Pydantic so an otherwise-good extraction isn't dropped over a single
+    # field where the model put a string instead of a dict / int.
+    data = _coerce_extraction_quirks(data)
     ext = Extraction.model_validate(data)
     return ingest_extraction(conn, ext)

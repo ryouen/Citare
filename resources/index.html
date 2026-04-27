@@ -176,6 +176,11 @@
   .try-cta button:hover { opacity: 0.93; transform: translateY(-1px); }
   .try-cta .sub { color: var(--text3); font-size: 0.78rem; margin-top: 0.5rem; }
 
+  .update-banner { background: linear-gradient(90deg, var(--accent-light) 0%, var(--surface) 100%); border: 1px solid var(--accent); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.75rem 1rem; margin: 0 0 1.2rem 0; font-size: 0.85rem; color: var(--text); }
+  .update-banner .label { display: inline-block; background: var(--accent); color: #fff; font-weight: 600; font-size: 0.7rem; padding: 0.1rem 0.5rem; border-radius: 4px; margin-right: 0.5rem; vertical-align: middle; letter-spacing: 0.03em; }
+  .update-banner code { background: rgba(67, 97, 238, 0.08); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.78rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  .update-banner .date { color: var(--text3); font-size: 0.75rem; margin-left: 0.4rem; }
+
   .connect-grid { display: flex; flex-direction: column; gap: 0.6rem; }
   .connect-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1.05rem; }
   .connect-card .platform { font-weight: 600; font-size: 0.92rem; }
@@ -241,6 +246,12 @@
 </div>
 
 <div class="container">
+
+  <div class="update-banner">
+    <span class="label">UPDATE</span>
+    <span data-i18n-html="update_news_2026_04_28">New endpoint: <code>https://citare.dev/mcp</code> (Streamable HTTP, race-free). The legacy <code>/sse</code> still works during the migration window — see the Connect section below for the new copy-paste snippets.</span>
+    <span class="date">2026-04-28</span>
+  </div>
 
   <div class="hero">
     <h1><span>Citare</span></h1>
@@ -322,7 +333,7 @@
       <div class="platform">Claude Code</div>
       <div class="method" data-i18n="method_cc">One command. No install.</div>
       <div class="cmd-row">
-        <code id="cmd-claude-code">claude mcp add --transport sse citare https://citare.dev/sse</code>
+        <code id="cmd-claude-code">claude mcp add --transport http citare https://citare.dev/mcp</code>
         <button class="copy-btn" onclick="copyCmd('cmd-claude-code', this)">Copy</button>
       </div>
     </div>
@@ -331,7 +342,7 @@
       <div class="platform">Claude.ai Web</div>
       <div class="method" data-i18n-html="method_web">Customize → Connectors → + → Add custom connector → URL:</div>
       <div class="cmd-row">
-        <code id="url-claude-ai">https://citare.dev/sse</code>
+        <code id="url-claude-ai">https://citare.dev/mcp</code>
         <button class="copy-btn" onclick="copyCmd('url-claude-ai', this)">Copy</button>
       </div>
     </div>
@@ -340,19 +351,19 @@
       <div class="platform">Claude Desktop</div>
       <div class="method" data-i18n-html="method_desktop">Settings → Developer → Edit Config → add to <code style="background:none;padding:0;color:var(--accent)">mcpServers</code>:</div>
       <div class="cmd-row">
-        <code id="cmd-claude-desktop">"citare": {"transport": "sse", "url": "https://citare.dev/sse"}</code>
+        <code id="cmd-claude-desktop">"citare": {"transport": "http", "url": "https://citare.dev/mcp"}</code>
         <button class="copy-btn" onclick="copyCmd('cmd-claude-desktop', this)">Copy</button>
       </div>
     </div>
 
     <details class="others">
-      <summary data-i18n="others_label">Other MCP clients (Codex, Gemini, ChatGPT, local stdio)</summary>
+      <summary data-i18n="others_label">Other MCP clients (Codex, Gemini, ChatGPT, legacy SSE)</summary>
       <div class="connect-grid">
 
         <div class="connect-card">
           <div class="platform">Codex</div>
           <div class="cmd-row">
-            <code id="cmd-codex">codex mcp add citare --url https://citare.dev/sse --transport sse</code>
+            <code id="cmd-codex">codex mcp add citare --url https://citare.dev/mcp --transport http</code>
             <button class="copy-btn" onclick="copyCmd('cmd-codex', this)">Copy</button>
           </div>
         </div>
@@ -361,7 +372,7 @@
           <div class="platform">Gemini CLI</div>
           <div class="method" data-i18n-html="method_gemini">Add to <code style="background:none;padding:0;color:var(--accent)">~/.gemini/settings.json</code>:</div>
           <div class="cmd-row">
-            <code id="cmd-gemini">{"mcpServers": {"citare": {"url": "https://citare.dev/sse"}}}</code>
+            <code id="cmd-gemini">{"mcpServers": {"citare": {"url": "https://citare.dev/mcp"}}}</code>
             <button class="copy-btn" onclick="copyCmd('cmd-gemini', this)">Copy</button>
           </div>
         </div>
@@ -370,16 +381,17 @@
           <div class="platform">ChatGPT Web</div>
           <div class="method" data-i18n="method_chatgpt">Settings → Connectors → Create (Developer Mode required) → URL:</div>
           <div class="cmd-row">
-            <code id="cmd-chatgpt">https://citare.dev/sse</code>
+            <code id="cmd-chatgpt">https://citare.dev/mcp</code>
             <button class="copy-btn" onclick="copyCmd('cmd-chatgpt', this)">Copy</button>
           </div>
         </div>
 
         <div class="connect-card">
-          <div class="platform">Local install (stdio)</div>
+          <div class="platform">Legacy SSE endpoint</div>
+          <div class="method" data-i18n="method_sse_legacy">Deprecated — kept for clients that haven't migrated yet. New users should use <code style="background:none;padding:0;color:var(--accent)">/mcp</code> above.</div>
           <div class="cmd-row">
-            <code id="cmd-pip">pip install git+https://github.com/ryouen/citareMCP.git</code>
-            <button class="copy-btn" onclick="copyCmd('cmd-pip', this)">Copy</button>
+            <code id="cmd-sse-legacy">https://citare.dev/sse</code>
+            <button class="copy-btn" onclick="copyCmd('cmd-sse-legacy', this)">Copy</button>
           </div>
         </div>
 
@@ -448,7 +460,7 @@
   <div class="footer">
     <span data-i18n="footer_main">Citare — AI-native scholarly claim infrastructure</span><br>
     <span data-i18n="footer_endpoint">MCP endpoint:</span>
-    <code>https://citare.dev/sse</code>
+    <code>https://citare.dev/mcp</code>
   </div>
 
 </div>
@@ -463,7 +475,7 @@
       <div class="connect-card">
         <div class="platform" data-i18n="modal_cc_label">Claude Code (one command)</div>
         <div class="cmd-row">
-          <code id="cmd-modal-cc">claude mcp add --transport sse citare https://citare.dev/sse</code>
+          <code id="cmd-modal-cc">claude mcp add --transport http citare https://citare.dev/mcp</code>
           <button class="copy-btn" onclick="copyCmd('cmd-modal-cc', this)">Copy</button>
         </div>
       </div>
@@ -471,7 +483,7 @@
         <div class="platform" data-i18n="modal_web_label">Claude.ai (paste URL)</div>
         <div class="method" data-i18n="modal_web_method">Customize → Connectors → + → Add custom connector</div>
         <div class="cmd-row">
-          <code id="cmd-modal-web">https://citare.dev/sse</code>
+          <code id="cmd-modal-web">https://citare.dev/mcp</code>
           <button class="copy-btn" onclick="copyCmd('cmd-modal-web', this)">Copy</button>
         </div>
       </div>
@@ -553,6 +565,7 @@ const TRANS = {
     modal_web_method: 'Customize → Connectors → + → Add custom connector',
     modal_p: 'After connecting, just chat naturally — like "<em>look up Edmondson 1999 on psychological safety</em>". The AI will autonomously call <code style="background:none;padding:0;color:var(--accent)">search_claims</code>, <code style="background:none;padding:0;color:var(--accent)">cite_claim</code>, etc.',
     week_suffix: 'this week',
+    update_news_2026_04_28: 'New endpoint: <code>https://citare.dev/mcp</code> (Streamable HTTP, race-free). The legacy <code>/sse</code> still works during the migration window — see the Connect section below for the new copy-paste snippets.',
   },
   ja: {
     title: 'Citare — AI のための論文構造化理解ツール',
@@ -616,6 +629,7 @@ const TRANS = {
     modal_web_method: 'Customize → Connectors → + → Add custom connector',
     modal_p: '接続後は「<em>edmondson 1999 で psychological safety を調べて</em>」のような自然文で OK。AI が <code style="background:none;padding:0;color:var(--accent)">search_claims</code> や <code style="background:none;padding:0;color:var(--accent)">cite_claim</code> を自律的に呼びます。',
     week_suffix: '今週',
+    update_news_2026_04_28: '新エンドポイント: <code>https://citare.dev/mcp</code> (Streamable HTTP, race-free)。旧 <code>/sse</code> も移行期間中は引き続き利用可能 — 下の Connect セクションに新しいスニペットあり。',
   },
 };
 

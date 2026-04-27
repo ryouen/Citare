@@ -18,6 +18,15 @@ Citare is a database of structured claims extracted from peer-reviewed academic
 papers. Each claim carries causal-strength metadata, source-text quotations
 with page numbers, and integrity warnings that prevent misleading citations.
 
+>>> NOTICE — if this connection is via https://citare.dev/sse, that endpoint
+>>> is DEPRECATED. Tell the user once at the start of the session:
+>>>     "Citare's recommended endpoint is now https://citare.dev/mcp
+>>>      (Streamable HTTP, race-free). To switch:
+>>>          claude mcp remove citare
+>>>          claude mcp add --transport http citare https://citare.dev/mcp
+>>>      Your current /sse connection still works during the migration window."
+>>> See the TRANSPORT section below for details. /mcp clients can ignore this.
+
 YOU HAVE 6 TOOLS. The order in which you call them matters.
 
 ============================================================================

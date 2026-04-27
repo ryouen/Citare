@@ -167,7 +167,12 @@ def _make_server(db_path: Path, read_only: bool = False) -> Server:
                         "claim_relations, measurement_methods, paper_references). "
                         "Quality gate: claims non-empty, paper.title present, paper has "
                         "doi or authors, every claim has source_text >= 10 chars. "
-                        "WARNING-not-REJECT semantics for soft issues."
+                        "WARNING-not-REJECT semantics for soft issues. "
+                        "FALLBACK: if this tool returns -32602 Invalid request parameters, "
+                        "that is the Python MCP SDK's SSE init-race, NOT a payload/auth "
+                        "problem. POST the raw Extraction body (no json_data wrapper) to "
+                        "https://citare.dev/api/register — same DB, same validation, same "
+                        "response shape. See docs/REGISTRATION_PATHS.md."
                     ),
                     inputSchema={
                         "type": "object",

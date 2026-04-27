@@ -76,19 +76,52 @@ def _upload(local: Path, dbx_path: str) -> dict:
         return json.loads(r.read())
 
 
+def _retention_decision(d: _dt.date, today: _dt.date) -> tuple[bool, str]:
+    """Tiered retention: should the backup taken on date `d` be kept today?
+
+    Tiers (a backup is kept if ANY tier wants it):
+      - daily   : last 30 days
+      - weekly  : Sunday backups, last 12 weeks (84 days)
+      - monthly : 1st-of-month backups, last 12 months (365 days)
+      - yearly  : Jan 1 backups, kept indefinitely
+
+    Rationale: storage of one Citare backup is ~5 MB compressed, so a year
+    of weekly + monthly + the yearly anchors costs <100 MB total — trivial
+    on Dropbox. The point of tiering isn't to save bytes; it's to give us
+    a useful timeline for "go back N months" recovery without storing 365
+    daily files. The current uniform 30-day retention loses everything
+    older than a month, which is the wrong cliff.
+    """
+    age = (today - d).days
+    if age <= 30:
+        return True, "daily"
+    if d.weekday() == 6 and age <= 84:        # Sunday=6 in Python's calendar
+        return True, "weekly"
+    if d.day == 1 and age <= 365:
+        return True, "monthly"
+    if d.day == 1 and d.month == 1:
+        return True, "yearly"
+    return False, "expired"
+
+
 def _prune(retain_days: int) -> int:
-    """Delete remote backups older than `retain_days` days. Returns count deleted."""
-    cutoff = _dt.date.today() - _dt.timedelta(days=retain_days)
+    """Apply the tiered retention policy to remote backups. Returns count deleted.
+
+    `retain_days` is kept as the function arg for backward compat with the env
+    var, but it no longer drives the policy directly — the tier table above
+    does. The 30-day daily tier is the spiritual successor of `retain_days`.
+    """
+    today = _dt.date.today()
     try:
         entries = dbx.list_folder(DBX_BACKUP_DIR)
     except Exception:
         return 0
     deleted = 0
+    kept_summary: dict[str, int] = {"daily": 0, "weekly": 0, "monthly": 0, "yearly": 0}
     for e in entries:
         if e[".tag"] != "file":
             continue
         name = e["name"]
-        # Expect filename: citare.YYYY-MM-DD.db.gz
         if not (name.startswith("citare.") and name.endswith(".db.gz")):
             continue
         try:
@@ -96,13 +129,17 @@ def _prune(retain_days: int) -> int:
             d = _dt.date.fromisoformat(datepart)
         except ValueError:
             continue
-        if d < cutoff:
-            try:
-                dbx.rpc("files/delete_v2", {"path": e["path_display"]})
-                deleted += 1
-                print(f"  pruned: {name}")
-            except Exception as ex:
-                print(f"  prune failed for {name}: {ex}", file=sys.stderr)
+        keep, tier = _retention_decision(d, today)
+        if keep:
+            kept_summary[tier] = kept_summary.get(tier, 0) + 1
+            continue
+        try:
+            dbx.rpc("files/delete_v2", {"path": e["path_display"]})
+            deleted += 1
+            print(f"  pruned ({tier}): {name}")
+        except Exception as ex:
+            print(f"  prune failed for {name}: {ex}", file=sys.stderr)
+    print(f"  retention kept: " + ", ".join(f"{k}={v}" for k, v in kept_summary.items()))
     return deleted
 
 

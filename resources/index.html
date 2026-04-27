@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Citare — Structured Paper Understanding for AI</title>
 <meta name="description" content="Citare is structured paper understanding for AI: claims, causal metadata, integrity warnings. Connect via MCP.">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4N3Y37R9J1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-4N3Y37R9J1');
+</script>
 <style>
   :root {
     --bg: #f5f6f8;
@@ -258,12 +266,12 @@
 
   <div class="demo-box">
     <form class="demo-form" onsubmit="return runDemo(event)">
-      <input id="demo-q" type="text" data-i18n-placeholder="demo_placeholder" placeholder="e.g., Claude Shannon, induction heads, MBCT..." value="Claude Shannon" autocomplete="off">
+      <input id="demo-q" type="text" data-i18n-placeholder="demo_placeholder" placeholder="e.g., Shannon, induction heads, MBCT..." value="Shannon" autocomplete="off">
       <button type="submit" id="demo-btn" data-i18n="demo_btn">Search</button>
     </form>
     <div class="demo-suggest">
       <span class="label" data-i18n="demo_try_label">Try:</span>
-      <button type="button" class="chip" onclick="setQ('Claude Shannon')">Claude Shannon</button>
+      <button type="button" class="chip" onclick="setQ('Shannon')">Shannon</button>
       <button type="button" class="chip" onclick="setQ('induction heads')">induction heads</button>
       <button type="button" class="chip" onclick="setQ('constitutional AI')">constitutional AI</button>
       <button type="button" class="chip" onclick="setQ('MBCT depression')">MBCT depression</button>

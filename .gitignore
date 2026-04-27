@@ -24,3 +24,11 @@ submit/
 backups/
 docs/CITARE_STRATEGY_INTERNAL.md
 
+# Secrets — never commit
+.env
+.env.*
+*.key
+secrets.*
+credentials.*
+data/api_keys.json
+data/*.bak

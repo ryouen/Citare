@@ -84,6 +84,40 @@ CHECKS: list[tuple[str, Path, list[str]]] = [
             "citare-mcp-fastmcp-http",
         ],
     ),
+    (
+        "shared quality_gate exists with the WARN-not-REJECT logic",
+        REPO_ROOT / "packages/citare-mcp/src/citare_mcp/quality_gate.py",
+        [
+            "def evaluate_quality",
+            "MIN_CLAIMS_FOR_SHORT_PAPER",
+            "SIZE_FLOOR_KB",
+            "Treated as",  # the WARN message for legitimately short papers
+        ],
+    ),
+    (
+        "all three register paths call evaluate_quality (no inline gate logic)",
+        REPO_ROOT / "packages/citare-mcp/src/citare_mcp/server.py",
+        ["evaluate_quality"],
+    ),
+    (
+        "fastmcp register also calls evaluate_quality",
+        REPO_ROOT / "packages/citare-mcp/src/citare_mcp/fastmcp_server.py",
+        ["evaluate_quality"],
+    ),
+    (
+        "REST register also calls evaluate_quality",
+        REPO_ROOT / "packages/citare-mcp/src/citare_mcp/http_server.py",
+        ["evaluate_quality"],
+    ),
+    (
+        "ingest coercer covers source_page AND sample_size string quirks",
+        REPO_ROOT / "packages/citare-db/src/citare_db/ingest.py",
+        [
+            "source_page_string_coerced",
+            "sample_size_string_coerced",
+            "sample_size_note",
+        ],
+    ),
 ]
 
 

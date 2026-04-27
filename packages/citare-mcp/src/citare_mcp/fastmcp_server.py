@@ -37,6 +37,7 @@ from citare_mcp.discovery import enrich_zero_result
 from citare_mcp.guides import get_extraction_prompt as _get_extraction_prompt
 from citare_mcp.guides import get_pdf_acquisition_guide as _get_pdf_acquisition_guide
 from citare_mcp.instructions import INSTRUCTIONS
+from citare_mcp.quality_gate import evaluate_quality
 from citare_mcp.queries import cite_claim as _cite_claim
 from citare_mcp.queries import get_claim_graph as _get_claim_graph
 from citare_mcp.queries import search_claims as _search_claims
@@ -175,37 +176,14 @@ def _do_register_claims(json_data: str) -> dict[str, Any]:
     """Validate + ingest an Extraction envelope. Pure function (no MCP types).
 
     Mirrors server.py's `register_claims` branch verbatim so the legacy /sse
-    path and the new /mcp path produce identical responses.
+    path and the new /mcp path produce identical responses. The actual
+    quality-gate rules live in citare_mcp.quality_gate so all three
+    register paths (/sse, /mcp, /api/register) share one source of truth.
     """
     payload = json.loads(json_data)
     ext = Extraction.model_validate(payload)
-
-    problems: list[str] = []
-    warnings_size: list[str] = []
-
     payload_kb = len(json_data) / 1024
-    if payload_kb < 25:
-        problems.append(
-            f"payload is only {payload_kb:.1f} KB — v0.13g typical is 30-100 KB. "
-            "The model almost certainly missed claims. Re-run v0.13g, omit `thinking`/`effort`."
-        )
-    elif payload_kb > 200:
-        warnings_size.append(
-            f"payload is {payload_kb:.1f} KB — much larger than the 30-100 KB norm. "
-            "Possible over-extraction; review before promoting tier."
-        )
-    if not ext.claims:
-        problems.append("payload has zero claims (v0.13g minimum: 5 empirical, 8 conceptual)")
-    if not ext.paper.title or len(ext.paper.title.strip()) < 5:
-        problems.append("paper.title missing or too short (<5 chars)")
-    if not ext.paper.doi and not ext.paper.authors:
-        problems.append("paper has neither doi nor authors — cannot identify the work")
-    no_quote = [c.id for c in ext.claims if not (c.source_text and len(c.source_text.strip()) >= 10)]
-    if no_quote:
-        problems.append(
-            f"{len(no_quote)} claim(s) missing source_text: "
-            + ", ".join(no_quote[:5]) + ("..." if len(no_quote) > 5 else "")
-        )
+    problems, warnings_size = evaluate_quality(ext, payload_kb)
     if problems:
         return {
             "error": "extraction_quality_gate",

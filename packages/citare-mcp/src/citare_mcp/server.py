@@ -269,44 +269,18 @@ def _make_server(db_path: Path, read_only: bool = False) -> Server:
                 payload = json.loads(arguments["json_data"])
                 ext = Extraction.model_validate(payload)
 
-                # Quality gate: prevent garbage payloads from creating phantom
-                # papers. Pydantic alone is too lenient (most fields default to
-                # None / [] / "") so we add minimum-content checks here. The
-                # rule of thumb: if the LLM ran v0.13g × effort=none on a
-                # real PDF, all of these are populated. If they aren't, the
-                # extraction failed and the caller should re-run, not register.
-                _problems: list[str] = []
-                _warnings: list[str] = []
-                # Size sanity check. R82 panel showed v0.13g × none averages
-                # 30-100 KB per paper (avg 38 claims, 16.7 EXIST claims).
+                # Single source of truth for the rule logic — the same
+                # function powers /mcp and /api/register so all three paths
+                # produce identical reject/warn decisions.
+                from citare_mcp.quality_gate import evaluate_quality
                 _payload_kb = len(arguments["json_data"]) / 1024
-                if _payload_kb < 25:
-                    _problems.append(
-                        f"payload is only {_payload_kb:.1f} KB — v0.13g typical is 30-100 KB. "
-                        "The model almost certainly missed claims. Re-run with v0.13g + omit `thinking` and `effort` parameters."
-                    )
-                elif _payload_kb > 200:
-                    _warnings.append(
-                        f"payload is {_payload_kb:.1f} KB — much larger than the 30-100 KB norm. "
-                        "Possible over-extraction / hallucination; review before promoting tier."
-                    )
-                if not ext.claims:
-                    _problems.append("payload has zero claims (v0.13g minimum: 5 for empirical, 8 for conceptual)")
-                if not ext.paper.title or len(ext.paper.title.strip()) < 5:
-                    _problems.append("paper.title missing or too short (<5 chars)")
-                if not ext.paper.doi and not ext.paper.authors:
-                    _problems.append("paper has neither doi nor authors — cannot identify the work")
-                _no_quote = [c.id for c in ext.claims if not (c.source_text and len(c.source_text.strip()) >= 10)]
-                if _no_quote:
-                    _problems.append(
-                        f"{len(_no_quote)} claim(s) missing source_text (Citare requires verbatim quotes for citation safety): "
-                        + ", ".join(_no_quote[:5]) + ("..." if len(_no_quote) > 5 else "")
-                    )
+                _problems, _warnings = evaluate_quality(ext, _payload_kb)
                 if _problems:
                     return [TextContent(type="text", text=json.dumps({
                         "error": "extraction_quality_gate",
                         "detail": "Pydantic validated the JSON shape, but the content does not look like a real v0.13g extraction. Fix the issues below and resubmit.",
                         "problems": _problems,
+                        "warnings": _warnings,
                         "see": "Call get_extraction_prompt and re-run with the locked v0.13g prompt verbatim, omitting `thinking` and `effort` parameters.",
                     }, ensure_ascii=False, indent=2))]
 

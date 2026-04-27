@@ -316,12 +316,18 @@ def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -
        Coerce: extract leading digits if any, otherwise null the field
        and stash the original in ``source_page_note``.
 
-    Both are consistent with WARNING-not-REJECT: we don't lose evidence
-    because of a model formatting quirk on per-claim fields.
+    3. **claims[*].method_metadata.sample_size as string** (grant2025
+       representational R89 emits ``"varied"``). Pydantic ``int | None``
+       rejects. Coerce: extract leading digits if any, otherwise null +
+       stash original in ``sample_size_note``. Same shape as Quirk 2.
+
+    All quirks are consistent with WARNING-not-REJECT: we don't lose
+    evidence because of a model formatting quirk on per-claim fields.
     """
     import re as _re
     fixes_l3 = 0
     fixes_page = 0
+    fixes_sample = 0
     for c in raw.get("claims", []) or []:
         # Quirk 1
         l3 = c.get("l3_json")
@@ -341,11 +347,26 @@ def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -
                 c["source_page"] = None
                 c["source_page_note"] = sp
             fixes_page += 1
+        # Quirk 3 — method_metadata.sample_size as string ("varied", "N≈100")
+        mm = c.get("method_metadata")
+        if isinstance(mm, dict):
+            ss = mm.get("sample_size")
+            if isinstance(ss, str):
+                m = _re.search(r"\d+", ss)
+                if m:
+                    mm["sample_size"] = int(m.group(0))
+                    mm["sample_size_note"] = ss
+                else:
+                    mm["sample_size"] = None
+                    mm["sample_size_note"] = ss
+                fixes_sample += 1
     if report is not None:
         if fixes_l3:
             report.warn("l3_additional_string_coerced", count=fixes_l3)
         if fixes_page:
             report.warn("source_page_string_coerced", count=fixes_page)
+        if fixes_sample:
+            report.warn("sample_size_string_coerced", count=fixes_sample)
     return raw
 
 

@@ -534,34 +534,14 @@ def build_app(
                 headers={"Access-Control-Allow-Origin": "*"},
             )
 
-        # Quality gate (mirror server.py logic)
-        problems: list[str] = []
-        warnings: list[str] = []
+        # Quality gate — single source of truth, shared with /sse and /mcp paths.
+        from citare_mcp.quality_gate import evaluate_quality
         kb = len(body_str) / 1024
-        if kb < 25:
-            problems.append(
-                f"payload is only {kb:.1f} KB — v0.13g typical is 30-100 KB. "
-                "The model almost certainly missed claims."
-            )
-        elif kb > 200:
-            warnings.append(
-                f"payload is {kb:.1f} KB — much larger than the 30-100 KB norm; possible over-extraction."
-            )
-        if not ext.claims:
-            problems.append("payload has zero claims")
-        if not ext.paper.title or len(ext.paper.title.strip()) < 5:
-            problems.append("paper.title missing or too short (<5 chars)")
-        if not ext.paper.doi and not ext.paper.authors:
-            problems.append("paper has neither doi nor authors")
-        no_quote = [c.id for c in ext.claims if not (c.source_text and len(c.source_text.strip()) >= 10)]
-        if no_quote:
-            problems.append(
-                f"{len(no_quote)} claim(s) missing source_text: "
-                + ", ".join(no_quote[:5]) + ("..." if len(no_quote) > 5 else "")
-            )
+        problems, warnings = evaluate_quality(ext, kb)
         if problems:
             return JSONResponse(
                 {"error": "extraction_quality_gate", "problems": problems,
+                 "warnings": warnings,
                  "see": "Re-run extraction with v0.13g + omit `thinking` and `effort` parameters."},
                 status_code=422,
                 headers={"Access-Control-Allow-Origin": "*"},

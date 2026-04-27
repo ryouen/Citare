@@ -127,11 +127,13 @@ class KeyRegistry:
         }
         tmp = self.path.with_suffix(self.path.suffix + ".tmp")
         tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        # 0o644: owner rw, group/other r. The file lives under /home/ubuntu
-        # (parent dir 0o750) on the VPS, so "other" cannot reach it from the
-        # filesystem; mode 0o644 is needed so the container user (different
-        # UID) can read via the bind-mount. Do NOT relax parent dir.
-        os.chmod(tmp, 0o644)
+        # 0o600: owner rw, no group/other. The container runs as UID 1000
+        # (matches the host `ubuntu` user that owns the bind-mounted data/),
+        # so the same uid sees the file from both sides — no need for group
+        # or world bits. Earlier code used 0o644 with a comment saying the
+        # parent dir restricts visibility, which was true but redundant —
+        # least-privilege at the file level too.
+        os.chmod(tmp, 0o600)
         tmp.replace(self.path)
 
     # ---- public API --------------------------------------------------------

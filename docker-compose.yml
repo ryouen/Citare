@@ -44,6 +44,36 @@ services:
       - default
       - proxy
 
+  # FastMCP / Streamable HTTP endpoint — race-free transport on /mcp.
+  #
+  # Why a parallel container: the SDK 1.27 SSE transport in `citare-mcp`
+  # has a known init-race that fires under concurrent / reconnect load
+  # (see docs/REGISTRATION_PATHS.md). FastMCP with stateless_http=True
+  # has no per-session state on the server, so the race is structurally
+  # impossible. Run both during the migration window so existing /sse
+  # clients keep working while new clients adopt /mcp.
+  #
+  # Reachable from nginx as http://citare-mcp-fastmcp:8767
+  citare-mcp-fastmcp:
+    image: citare-mcp:latest
+    depends_on:
+      - citare-mcp
+    container_name: citare-mcp-fastmcp
+    user: "1000:1000"
+    restart: unless-stopped
+    environment:
+      - CITARE_DB=/app/data/citare.db
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8767
+    volumes:
+      - ./data:/app/data
+    expose:
+      - "8767"
+    networks:
+      - default
+      - proxy
+    command: ["citare-mcp-fastmcp-http", "--host", "0.0.0.0", "--port", "8767", "--path", "/mcp"]
+
   # Admin endpoint — Bearer auth via key registry. Exposes extract_and_register,
   # the server-side PDF → Claude API → register path. Reachable via nginx at
   # https://citare.dev/admin/sse (mounted under /admin/* prefix).

@@ -134,41 +134,31 @@ HARD RULES (do not violate)
   when speaking to the user.
 
 ============================================================================
-FAILURE MODES (read this BEFORE assuming a permission/schema bug)
+TRANSPORT (which URL to connect to)
 ============================================================================
 
-`register_claims` -> `-32602 Invalid request parameters`:
-  This is almost always the Python MCP SDK's SSE session-init race, NOT
-  a problem with your payload, your auth, or the server's read-only
-  flag. The server side is unauthenticated and writeable; the SDK's
-  client-side `initialized` flag has gone out of sync (often after a
-  /clear, an interrupted call, or a long-idle SSE socket). Server logs
-  show the matching warning: `Failed to validate request: Received
-  request before initialization was complete`.
+PRIMARY: `https://citare.dev/mcp` — Streamable HTTP, race-free.
+  Connect with: `claude mcp add --transport http citare https://citare.dev/mcp`
+  This endpoint is stateless on the server side, so concurrent
+  / reconnect scenarios behave correctly. All 6 tools work here.
 
-  Workaround — use the REST escape hatch:
+LEGACY (deprecated, do not adopt for new clients):
+  `https://citare.dev/sse` — kept temporarily so existing connections
+  continue to work during migration. Will be removed once clients have
+  switched. The SDK's SSE transport has a known init-race that surfaces
+  as `-32602 Invalid request parameters` on register_claims after
+  /clear, interrupts, or long-idle reuse. Switch to /mcp to avoid it.
 
-      POST https://citare.dev/api/register
-      Content-Type: application/json
-      Body: the raw Extraction JSON envelope (NOT wrapped in
-            {"json_data": "..."} — that wrapper is only for the MCP
-            tool form).
+REST (always available, no MCP at all):
+  `POST https://citare.dev/api/register` with the raw Extraction body
+  (NOT wrapped in {"json_data": "..."}) is a transport-independent
+  fallback. Useful for batch dispatchers and non-MCP clients. Returns
+  the same response shape as the MCP register_claims tool.
 
-  Same database, same Pydantic gate, same WARNING-not-REJECT semantics,
-  same response shape (paper_id, claims_added, warnings, next_steps).
-  Use this for any non-trivial / batch use; the MCP path is convenient
-  but unreliable for writes.
-
-  The canonical reference is `docs/REGISTRATION_PATHS.md` in the repo.
-
-`register_claims` returns nothing / hangs:
-  Same root cause as -32602. After a timeout, fall back to REST. Then
-  call `search_claims(doi=<the DOI you tried to register>)` to verify
-  whether the original write actually landed before retrying — silent
-  successes do happen.
+The canonical transport reference is `docs/REGISTRATION_PATHS.md`.
 
 Empty / 0-result `search_claims` for a paper you just registered:
   FTS index is updated synchronously, so this should not happen on a
   successful write. If it does, the registration silently failed; check
-  the response payload for `error` and re-register via REST.
+  the response payload for `error` and re-register.
 """

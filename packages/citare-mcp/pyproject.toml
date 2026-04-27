@@ -9,6 +9,10 @@ dependencies = [
     "mcp>=1.0",
     "uvicorn>=0.27",
     "starlette>=0.36",
+    # FastMCP is the higher-level wrapper used by the new /mcp Streamable HTTP
+    # entry point. The previous production Citare ran on 2.10+ with no SSE
+    # init-race; pinned at 2.x for API stability vs the 3.x line.
+    "fastmcp>=2.10,<3.0",
     # Optional at runtime for the read-only container — only the admin
     # container actually calls the Anthropic API. Pinned because the SDK
     # ships frequent breaking changes; bump intentionally.
@@ -18,6 +22,7 @@ dependencies = [
 [project.scripts]
 citare-mcp = "citare_mcp.server:main"
 citare-mcp-http = "citare_mcp.http_server:main"
+citare-mcp-fastmcp-http = "citare_mcp.fastmcp_server:main"
 
 [build-system]
 requires = ["hatchling"]

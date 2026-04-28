@@ -7,7 +7,7 @@
 > *DOI is for papers. Citare is for claims.*
 
 Live MCP endpoint: **`https://citare.dev/mcp`** (Streamable HTTP, no auth required).
-Built during the *Built with Opus 4.7* hackathon (April 2026); now in active production.
+Built during the *Built with Opus 4.7* hackathon (April 2026).
 
 ## The problem
 
@@ -110,7 +110,7 @@ python scripts/seed_citare_db.py --db data/citare.db
 citare-mcp-fastmcp-http --db data/citare.db --port 8765
 ```
 
-## Hackathon status (current as of 2026-04-28)
+## Hackathon status
 
 - **Model**: Opus 4.7 (1M-context) for every extraction and every tournament run
 - **Prompt revisions**: 43 tracked versions (v0.1 → v0.13g), production locked at **v0.13g**
@@ -118,7 +118,7 @@ citare-mcp-fastmcp-http --db data/citare.db --port 8765
 - **Tokens consumed**: 150M+ across all runs
 - **Production corpus**: **131 papers, 4,632 claims, 4,651 claim-relations** with integrity warnings (live counts at https://citare.dev/stats)
 - **Live endpoints**: `https://citare.dev/mcp` (primary), `https://citare.dev/sse` (deprecated, kept for backwards compat), `https://citare.dev/api/register` (REST)
-- **Status**: production — citare-core + citare-db + citare-mcp all functional end-to-end, MCP server serving live traffic, daily backups to Dropbox with weekly restore-verification
+- **Status**: MVP complete — citare-core + citare-db + citare-mcp all functional end-to-end, MCP server live at citare.dev, daily backups to Dropbox
 
 ## Evidence that the extraction works
 
@@ -139,4 +139,4 @@ The R82 production-config grid (n=72, paper × prompt × effort) showed v0.13g �
 
 ## License
 
-MIT — see [LICENSE](./LICENSE). All code, prompts, and synthetic trap papers in this repository were written from scratch during the Built-with-Opus-4.7 hackathon (2026-04-21 → 2026-04-26) and have continued to evolve in production since.
+MIT — see [LICENSE](./LICENSE). All code, prompts, and synthetic trap papers in this repository were written from scratch during the Built-with-Opus-4.7 hackathon (2026-04-21 → 2026-04-26).

@@ -1,6 +1,6 @@
 """Two MCP read-tools that hand back the prompts an LLM needs to grow Citare.
 
-`get_extraction_prompt` returns the locked production prompt (v0.13g) plus
+`get_extraction_prompt` returns the locked production prompt (v0.13d) plus
 sub-agent invocation guidance. `get_pdf_acquisition_guide` returns the PDF
 collection playbook. Both ship as package data so they survive packaging
 without depending on the source repo layout.
@@ -42,6 +42,79 @@ confuse what the user wrote with what the paper says, and your context
 window fills up fast.
 
 **Always spawn a separate agent / context for extraction.**
+
+## Three valid invocation patterns — in order of preference
+
+### Pattern 1 (RECOMMENDED): Sub-agent fetches the prompt itself via MCP
+
+The cleanest approach. The parent dispatches a sub-agent with only:
+  - The PDF path
+  - The instruction "fetch the canonical extraction prompt via
+    get_extraction_prompt and apply it verbatim, then call
+    register_claims with the result"
+
+The sub-agent calls `get_extraction_prompt` itself, receives the
+canonical bytes directly, and there is **zero human/agent transcription
+at any point**. The 2026-05-11 incident root-caused into this: when the
+parent transcribed the prompt manually, two transcription errors (a
+duplicated `national_/dyadic_` and a lost HTML comment) propagated into
+every dispatched sub-agent. Pattern 1 eliminates that entire class of
+failure.
+
+### Pattern 2 (ACCEPTABLE): Parent inlines the verbatim string
+
+Parent fetches `get_extraction_prompt` once, then pastes the verbatim
+`result.prompt` into each sub-agent's dispatch prompt. Use ONLY when
+sub-agents lack MCP access (e.g., constrained-tool agent definitions).
+
+Risk: parent transcription errors at any character. Mitigation: SHA-256
+compare the pasted block against `get_extraction_prompt().sha256` (when
+available) or against a fresh canonical fetch immediately before
+dispatch. Any byte difference rejects the dispatch.
+
+### Pattern 3 (USE WITH CARE): File-based reference
+
+Parent writes the prompt to disk, sub-agent reads the file. This looks
+efficient (no re-transmission per dispatch) but has the same risks as
+Pattern 2 plus:
+  - File save/load can introduce encoding errors (line endings, BOMs)
+  - File access counts against sub-agent context anyway
+  - "Do not modify" rule still applies to the file content
+  - If the file is shared across many dispatches, a single corruption
+    poisons them all
+
+Acceptable IF the file content is SHA-256-verified against the canonical
+both at write time AND inside each sub-agent before applying. Otherwise
+prefer Pattern 1.
+
+## ⚠ One sub-agent per PDF — DO NOT batch multiple papers
+
+A sub-agent processing more than one paper sequentially will exhaust
+its context budget and may then:
+  - Truncate later papers' claims to fit (NEVER acceptable — fails the
+    verbatim rule and triggers the paper_quality `LOW_CLAIM_COUNT` /
+    `LOW_DENSITY` gates)
+  - Abandon remaining papers silently
+  - Submit a "summary" claim count instead of the real one
+
+The 2026-05-11 Batch-1 incident (47 papers under-registered) happened
+exactly because one sub-agent was given a list of papers to register
+back-to-back. The fix was 1-sub-agent-per-paper with 15-way parallelism.
+
+For the registration phase: 1 sub-agent = 1 JSON, full stop. This
+applies whether you are extracting OR re-registering an existing JSON.
+
+## What to do if a sub-agent cannot complete
+
+The correct action is NOT to compress, drop, or summarize. It is:
+1. STOP generation.
+2. CALL `report_extraction_failure(paper_doi=..., stage=...,
+   claims_completed=..., reason=...)`. This is the third option Citare
+   provides specifically so that context-pressure failures need not
+   become silent under-registrations.
+3. The parent orchestrator receives a `retry_strategy_code` and can
+   re-dispatch with reduced scope.
+
 
 ## ⚠ DO NOT TUNE — these are calibrated values, not defaults
 
@@ -165,16 +238,35 @@ output:
 
 
 def get_extraction_prompt() -> dict[str, Any]:
-    """Return the locked v0.13g extraction prompt with sub-agent guidance."""
+    """Return the locked v0.13g extraction prompt with sub-agent guidance.
+
+    The `sha256` field lets callers verify byte-identity against the canonical
+    when using Pattern 2 (inline transcription) or Pattern 3 (file reference) —
+    see sub_agent_template. Pattern 1 (sub-agent fetches directly via MCP)
+    needs no verification because there is no transcription step.
+    """
+    import hashlib
+    prompt_text = _load_asset(EXTRACTION_PROMPT_ASSET)
     return {
         "version": EXTRACTION_PROMPT_VERSION,
-        "prompt": _load_asset(EXTRACTION_PROMPT_ASSET),
+        "prompt": prompt_text,
+        "sha256": hashlib.sha256(prompt_text.encode("utf-8")).hexdigest(),
         "sub_agent_template": _SUB_AGENT_TEMPLATE,
+        "downstream_impact_note": (
+            "Claims registered via this prompt are stored permanently and "
+            "become citation sources for downstream researchers and AI agents. "
+            "Modifications are detected at registration time via the "
+            "paper_quality gate (LOW_CLAIM_COUNT, LOW_DENSITY, "
+            "LOW_MEAN_CONFIDENCE) and trigger a recommended_action=RE_EXTRACT "
+            "on the paper."
+        ),
         "usage": (
             "Pass the 'prompt' field VERBATIM to a sub-agent reading the PDF. "
-            "After the sub-agent returns JSON, call register_claims(json_data=...). "
-            "The 'sub_agent_template' field explains how to invoke the sub-agent and "
-            "what to do with the output."
+            "Pattern 1 (RECOMMENDED): have the sub-agent call this tool itself. "
+            "Pattern 2/3: SHA-256 verify against the 'sha256' field before "
+            "dispatch. After the sub-agent returns JSON, call register_claims. "
+            "If the sub-agent runs out of context, it MUST call "
+            "report_extraction_failure rather than compress or abandon silently."
         ),
         "rationale": (
             "v0.13g × effort=none is the pt.3 production lock (2026-04-26). "

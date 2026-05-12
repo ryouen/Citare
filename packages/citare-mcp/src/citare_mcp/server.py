@@ -301,6 +301,8 @@ def _make_server(db_path: Path, read_only: bool = False) -> Server:
                     "OR target_id IN (SELECT id FROM claims WHERE paper_id = ?)",
                     (report.paper_id, report.paper_id),
                 ).fetchone()[0]
+                from citare_mcp.quality_flags import compute_paper_quality_from_db
+                paper_quality = compute_paper_quality_from_db(conn, report.paper_id)
                 claims_in_payload = len(ext.claims)
                 claims_added = max(0, post_count - pre_count_before)
                 claims_updated = max(0, claims_in_payload - claims_added)
@@ -334,6 +336,7 @@ def _make_server(db_path: Path, read_only: bool = False) -> Server:
                     "warnings": report.warnings,
                     "potential_duplicate_claims": report.potential_duplicate_claims,
                     "next_steps": next_steps,
+                    "paper_quality": paper_quality,
                 }
             elif name == "extract_and_register":
                 if read_only:

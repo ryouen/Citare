@@ -27,7 +27,11 @@ with page numbers, and integrity warnings that prevent misleading citations.
 >>>      Your current /sse connection still works during the migration window."
 >>> See the TRANSPORT section below for details. /mcp clients can ignore this.
 
-YOU HAVE 6 TOOLS. The order in which you call them matters.
+YOU HAVE 8 TOOLS. The order in which you call them matters.
+
+Read tools:       search_claims, get_claim_graph, cite_claim, audit_papers
+Acquire/extract:  get_pdf_acquisition_guide, get_extraction_prompt
+Write:            register_claims, report_extraction_failure
 
 ============================================================================
 WORKFLOW: Checking a citation in a manuscript
@@ -91,6 +95,43 @@ WORKFLOW: Paper not in Citare (search returned 0 hits)
 5. Re-run `search_claims(doi=...)` to verify the registration worked.
 
 ============================================================================
+WORKFLOW: Bulk citation audit (manuscript with many references)
+============================================================================
+
+When checking a paper draft that cites 20-200 prior works, do NOT loop
+`search_claims` N times. Use:
+
+1. `audit_papers(dois=[...])` — up to 200 DOIs per call. Returns each
+   paper's registration status, claim_count, confidence_tier, and
+   recommended_action. The `summary.by_tier` field tells you at a glance
+   how many references are HIGH/MEDIUM/LOW quality and how many are not
+   in Citare at all.
+
+2. For tier=LOW results with recommended_action=RE_EXTRACT, the entry is
+   likely truncated and should be re-extracted before being trusted as a
+   citation source. Drill in with `cite_claim` to confirm.
+
+3. For status=NOT_REGISTERED, use `get_pdf_acquisition_guide` + the
+   extraction flow to add the paper.
+
+============================================================================
+WORKFLOW: Sub-agent ran out of context mid-extraction
+============================================================================
+
+If you are a sub-agent extracting from a PDF and your context budget is
+running out, DO NOT compress claims, DO NOT abandon silently. Call:
+
+`report_extraction_failure(paper_doi=..., stage=..., claims_completed=N,
+ reason=...)`
+
+The server records the incident and returns a `retry_strategy_code`
+(SECTION_FILTERED / SMALLER_PAPER / NO_RETRY) plus the tokens estimated
+for retry. The parent orchestrator uses this to dispatch a smaller-scope
+retry. A clean failure is structurally more valuable than a truncated
+"success" — see the 2026-05-11 incident where the latter under-registered
+47 papers.
+
+============================================================================
 WORKFLOW: Topic search ("what does the literature say about X?")
 ============================================================================
 
@@ -127,10 +168,14 @@ HARD RULES (do not violate)
   Specifically: do not minify, do not "trim" claims you think are
   redundant, do not shorten source_text, do not drop fields you don't
   recognise. The server's quality gate measures the raw JSON you pass
-  in (25 KB lower bound) and validates the full v0.13g schema. Pretty-
-  printed 30-100 KB JSON straight from the sub-agent is exactly what's
-  expected. If you "compress" claims to fit a context budget, you will
-  trigger extraction_quality_gate and the registration will be rejected.
+  in (25 KB lower bound), validates the full v0.13g schema, AND runs a
+  paper_quality scoring pass (LOW_CLAIM_COUNT, LOW_DENSITY vs paper_type
+  baseline, LOW_MEAN_CONFIDENCE). A "compressed" payload that passes
+  size validation will still be tier=LOW with recommended_action=
+  RE_EXTRACT — surface that to the user. Pretty-printed 30-100 KB JSON
+  straight from the sub-agent is exactly what's expected. If you cannot
+  fit the full output in your context, call report_extraction_failure
+  instead of compressing.
 
 - After calling register_claims, READ the response, do not assume
   success. Successful response has `paper_id` and `claims_added > 0`.
@@ -149,7 +194,7 @@ TRANSPORT (which URL to connect to)
 PRIMARY: `https://citare.dev/mcp` — Streamable HTTP, race-free.
   Connect with: `claude mcp add --transport http citare https://citare.dev/mcp`
   This endpoint is stateless on the server side, so concurrent
-  / reconnect scenarios behave correctly. All 6 tools work here.
+  / reconnect scenarios behave correctly. All 8 tools work here.
 
 LEGACY (deprecated, do not adopt for new clients):
   `https://citare.dev/sse` — kept temporarily so existing connections

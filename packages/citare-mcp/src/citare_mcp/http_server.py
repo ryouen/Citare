@@ -560,6 +560,8 @@ def build_app(
             post = conn.execute(
                 "SELECT COUNT(*) FROM claims WHERE paper_id = ?", (report.paper_id,)
             ).fetchone()[0]
+            from citare_mcp.quality_flags import compute_paper_quality_from_db
+            paper_quality = compute_paper_quality_from_db(conn, report.paper_id)
         finally:
             conn.close()
 
@@ -587,6 +589,7 @@ def build_app(
                 "warnings": report.warnings,
                 "potential_duplicate_claims": report.potential_duplicate_claims,
                 "next_steps": next_steps,
+                "paper_quality": paper_quality,
             },
             headers={"Access-Control-Allow-Origin": "*"},
         )

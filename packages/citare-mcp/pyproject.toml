@@ -34,3 +34,4 @@ packages = ["src/citare_mcp"]
 [tool.hatch.build.targets.wheel.force-include]
 "src/citare_mcp/assets/extraction_prompt_v0.13g.md" = "citare_mcp/assets/extraction_prompt_v0.13g.md"
 "src/citare_mcp/assets/pdf_acquisition_guide.md"    = "citare_mcp/assets/pdf_acquisition_guide.md"
+"src/citare_mcp/assets/quality_baseline.json"       = "citare_mcp/assets/quality_baseline.json"

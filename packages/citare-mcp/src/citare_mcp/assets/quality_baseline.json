@@ -1,0 +1,67 @@
+{
+  "db_path": "/home/ubuntu/citare/data/citare.db",
+  "total_papers_considered": 255,
+  "skipped_due_to_pages": 2,
+  "by_paper_type": {
+    "empirical": {
+      "n": 153,
+      "density_mean": 3.146,
+      "density_median": 2.615,
+      "density_stddev": 1.937,
+      "conf_mean": 0.93,
+      "reliability": "OK"
+    },
+    "conceptual": {
+      "n": 70,
+      "density_mean": 3.386,
+      "density_median": 2.359,
+      "density_stddev": 2.932,
+      "conf_mean": 0.9222,
+      "reliability": "OK"
+    },
+    "review": {
+      "n": 23,
+      "density_mean": 3.874,
+      "density_median": 3.6,
+      "density_stddev": 1.97,
+      "conf_mean": 0.9079,
+      "reliability": "OK"
+    },
+    "meta_analysis": {
+      "n": 3,
+      "density_mean": 3.684,
+      "density_median": 4.091,
+      "density_stddev": 2.148,
+      "conf_mean": 0.9267,
+      "reliability": "INSUFFICIENT_SAMPLE",
+      "fallback_to": "empirical"
+    },
+    "book": {
+      "n": 1,
+      "density_mean": 0.48,
+      "density_median": 0.48,
+      "density_stddev": 0.0,
+      "conf_mean": 0.9472,
+      "reliability": "INSUFFICIENT_SAMPLE",
+      "fallback_to": "empirical"
+    },
+    "book_chapter": {
+      "n": 3,
+      "density_mean": 1.488,
+      "density_median": 1.522,
+      "density_stddev": 0.141,
+      "conf_mean": 0.9026,
+      "reliability": "INSUFFICIENT_SAMPLE",
+      "fallback_to": "empirical"
+    }
+  },
+  "thresholds": {
+    "density_z_strong": -1.5,
+    "density_z_warn": -1.0,
+    "mean_conf_strong": 0.7,
+    "mean_conf_warn": 0.85,
+    "claim_count_strong": 5,
+    "claim_count_warn": 10
+  },
+  "version": 1
+}

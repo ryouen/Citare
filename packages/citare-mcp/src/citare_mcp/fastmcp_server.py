@@ -155,6 +155,193 @@ def get_pdf_acquisition_guide() -> dict[str, Any]:
 
 
 @mcp.tool
+def audit_papers(dois: list[str]) -> dict[str, Any]:
+    """Batch-check Citare registration status and quality for many DOIs.
+
+    Replaces N round-trip search_claims calls when an orchestrator needs to
+    check status of many papers (e.g., a 50-reference draft, a 132-paper
+    project audit, or the citation list of a literature review).
+
+    Each DOI in the input is checked against the papers table. For registered
+    papers, claim_count and `paper_quality` (the same shape as
+    register_claims' paper_quality field) are returned so the caller can
+    decide whether the entry is trustworthy or warrants RE_EXTRACT.
+
+    Args:
+        dois: list of DOIs, up to 200 items per call.
+
+    Returns:
+        {
+          "results": [
+            {"doi": "...", "status": "REGISTERED"|"NOT_REGISTERED",
+             "paper_id": <id or null>, "claim_count": <int>,
+             "confidence_tier": "HIGH"|"MEDIUM"|"LOW"|null,
+             "recommended_action": "RE_EXTRACT"|"ACQUIRE_AND_REGISTER"|null}
+          ],
+          "summary": {"total": N, "by_tier": {...}, "action_required_count": M}
+        }
+    """
+    if not isinstance(dois, list) or not dois:
+        return {"error": "dois must be a non-empty list of strings"}
+    if len(dois) > 200:
+        return {"error": f"too many DOIs ({len(dois)}); split into batches of <= 200"}
+
+    from citare_mcp.quality_flags import compute_paper_quality_from_db
+
+    conn = _open_conn()
+    try:
+        results: list[dict[str, Any]] = []
+        for doi in dois:
+            if not isinstance(doi, str) or not doi.strip():
+                results.append({
+                    "doi": doi,
+                    "status": "NOT_REGISTERED",
+                    "paper_id": None,
+                    "claim_count": 0,
+                    "confidence_tier": None,
+                    "recommended_action": "ACQUIRE_AND_REGISTER",
+                })
+                continue
+            doi = doi.strip()
+            paper_row = conn.execute(
+                "SELECT id FROM papers WHERE id = ? OR id IN "
+                "(SELECT paper_id FROM paper_identifiers WHERE identifier_value = ?)",
+                (doi, doi),
+            ).fetchone()
+            if paper_row is None:
+                results.append({
+                    "doi": doi,
+                    "status": "NOT_REGISTERED",
+                    "paper_id": None,
+                    "claim_count": 0,
+                    "confidence_tier": None,
+                    "recommended_action": "ACQUIRE_AND_REGISTER",
+                })
+                continue
+            paper_id = paper_row["id"]
+            quality = compute_paper_quality_from_db(conn, paper_id)
+            results.append({
+                "doi": doi,
+                "status": "REGISTERED",
+                "paper_id": paper_id,
+                "claim_count": quality["claim_count"],
+                "confidence_tier": quality["confidence_tier"],
+                "recommended_action": quality["recommended_action"],
+                "flags_count": len(quality["flags"]),
+            })
+    finally:
+        conn.close()
+
+    by_tier: dict[str, int] = {"HIGH": 0, "MEDIUM": 0, "LOW": 0, "NOT_REGISTERED": 0}
+    action_required = 0
+    for r in results:
+        if r["status"] == "NOT_REGISTERED":
+            by_tier["NOT_REGISTERED"] += 1
+        else:
+            by_tier[r["confidence_tier"]] = by_tier.get(r["confidence_tier"], 0) + 1
+        if r["recommended_action"] is not None:
+            action_required += 1
+
+    return {
+        "results": results,
+        "summary": {
+            "total": len(results),
+            "by_tier": by_tier,
+            "action_required_count": action_required,
+        },
+    }
+
+
+@mcp.tool
+def report_extraction_failure(
+    paper_doi: str,
+    stage: str,
+    claims_completed: int,
+    reason: str,
+    partial_extraction_available: bool = False,
+) -> dict[str, Any]:
+    """Report a structured extraction failure instead of compressing or abandoning silently.
+
+    This is the THIRD OPTION for a sub-agent that has run out of context budget
+    mid-extraction. The first two options — silently compressing claims to fit, or
+    abandoning the paper with no record — are both anti-patterns that caused the
+    2026-05-11 incident in which 47 papers were under-registered.
+
+    Calling this tool:
+      - Records the incident with an ID (appended to /app/data/extraction_incidents.jsonl)
+      - Returns a structured retry strategy the parent orchestrator can act on
+      - Does NOT register any partial claims (all-or-nothing semantics preserved)
+
+    Args:
+        paper_doi: the paper that could not be completed
+        stage: free-form description of where you stopped (e.g.,
+            "extracting_section_4_discussion", "computing_l3_for_claim_17")
+        claims_completed: how many claims you successfully drafted before stopping
+        reason: free-form description of why (e.g., "context budget exhausted at page 19/30")
+        partial_extraction_available: false unless you wrote the partial JSON to disk
+            (rarely useful; the orchestrator usually wants a clean retry)
+
+    Returns:
+        {"acknowledged": true, "incident_id": "...", "no_partial_registration": true,
+         "advice_for_parent": {"retry_strategy_code": "SECTION_FILTERED"|"SMALLER_PAPER"|"NO_RETRY",
+                               "retry_parameters": {...}, "estimated_tokens_for_retry": <int>}}
+    """
+    import datetime
+    import os
+    import uuid
+
+    incident_id = f"I-{datetime.date.today().isoformat()}-{uuid.uuid4().hex[:6].upper()}"
+    record = {
+        "incident_id": incident_id,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        "paper_doi": paper_doi,
+        "stage": stage,
+        "claims_completed": int(claims_completed) if claims_completed is not None else 0,
+        "reason": reason,
+        "partial_extraction_available": bool(partial_extraction_available),
+    }
+    log_dir = Path(os.environ.get("CITARE_DB", "/app/data/citare.db")).parent
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "extraction_incidents.jsonl"
+    try:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as e:
+        return {
+            "acknowledged": False,
+            "error": "incident_log_write_failed",
+            "detail": str(e),
+        }
+
+    if claims_completed and claims_completed >= 5:
+        strategy_code = "SECTION_FILTERED"
+        retry_params = {
+            "sections_to_extract_next": ["sections_after_" + stage],
+            "claims_already_completed": claims_completed,
+        }
+        estimated_tokens = 50000
+    elif claims_completed and claims_completed > 0:
+        strategy_code = "SMALLER_PAPER"
+        retry_params = {"reduce_context_or_use_higher_capacity_model": True}
+        estimated_tokens = 80000
+    else:
+        strategy_code = "NO_RETRY"
+        retry_params = {"investigate_root_cause": True}
+        estimated_tokens = 0
+
+    return {
+        "acknowledged": True,
+        "incident_id": incident_id,
+        "no_partial_registration": True,
+        "advice_for_parent": {
+            "retry_strategy_code": strategy_code,
+            "retry_parameters": retry_params,
+            "estimated_tokens_for_retry": estimated_tokens,
+        },
+    }
+
+
+@mcp.tool
 def register_claims(json_data: str) -> dict[str, Any]:
     """Register an LLM-extracted claim bundle into Citare.
 
@@ -211,6 +398,8 @@ def _do_register_claims(json_data: str) -> dict[str, Any]:
             "OR target_id IN (SELECT id FROM claims WHERE paper_id = ?)",
             (report.paper_id, report.paper_id),
         ).fetchone()[0]
+        from citare_mcp.quality_flags import compute_paper_quality_from_db
+        paper_quality = compute_paper_quality_from_db(conn, report.paper_id)
     finally:
         conn.close()
 
@@ -245,6 +434,7 @@ def _do_register_claims(json_data: str) -> dict[str, Any]:
         "warnings": report.warnings,
         "potential_duplicate_claims": report.potential_duplicate_claims,
         "next_steps": next_steps,
+        "paper_quality": paper_quality,
     }
 
 

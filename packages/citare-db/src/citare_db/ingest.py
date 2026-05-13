@@ -530,6 +530,59 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
         if r["iv_idx"] and r["dv_idx"]:
             existing_iv_dv.setdefault((r["iv_idx"], r["dv_idx"]), []).append(r["id"])
 
+    # Cross-paper claim_id collision guard
+    # ------------------------------------------------------------------
+    # The v0.13g prompt produces claim IDs of the form
+    # ``{first_author_surname_lowercase}{year}_{template}{number}``. Two
+    # papers by the same author in the same year (e.g., kjell2021_def1
+    # appearing in both "Computational Language Assessments of Harmony
+    # in Life" 10.3389/fpsyg.2021.601679 AND "Freely Generated Word
+    # Responses Analyzed With Artificial Intelligence" 10.3389/fpsyg.
+    # 2021.602581) collide on the global ``claims.id`` primary key.
+    #
+    # Without this guard, the UPSERT below sets ``paper_id = excluded.
+    # paper_id`` on conflict, which *reparents* the previously-registered
+    # claim away from its rightful paper. The 2026-05-13 incident saw
+    # harmony lose 37/44 claims to 602581 and Levy 2006a's registration
+    # similarly damaged Levy 2006b.
+    #
+    # The fix: detect any incoming claim whose ID already exists on a
+    # DIFFERENT paper, and rewrite it to be paper-scoped by appending a
+    # short paper-id hash. Caller's reference graph (claim_relations
+    # source_id/target_id) is rewritten consistently. Original ID is
+    # preserved in source_paragraph as ``original_id=<x>`` so audit
+    # never loses the link, and a warning fires.
+    import hashlib as _hashlib
+    _renames: dict[str, str] = {}
+    for c in extraction.claims:
+        if c.id in existing_claim_ids:
+            continue  # same paper: legitimate overwrite, no rename
+        owner = conn.execute(
+            "SELECT paper_id FROM claims WHERE id = ?", (c.id,)
+        ).fetchone()
+        if owner is None or owner[0] == existing_paper_id:
+            continue
+        # Collision with a different paper — rename the incoming id.
+        _suffix = _hashlib.md5(existing_paper_id.encode("utf-8")).hexdigest()[:6]
+        _new = f"{c.id}_{_suffix}"
+        _renames[c.id] = _new
+        report.warn(
+            "claim_id_cross_paper_collision_renamed",
+            original_id=c.id,
+            new_id=_new,
+            owner_paper_id=owner[0],
+        )
+    # Apply renames atomically to both claims and claim_relations.
+    if _renames:
+        for c in extraction.claims:
+            if c.id in _renames:
+                c.id = _renames[c.id]
+        for cr in extraction.claim_relations:
+            if cr.source_id in _renames:
+                cr.source_id = _renames[cr.source_id]
+            if cr.target_id in _renames:
+                cr.target_id = _renames[cr.target_id]
+
     for c in extraction.claims:
         # (iv, dv) duplicate detection (informational, not blocking)
         l0 = c.l0_json or {}

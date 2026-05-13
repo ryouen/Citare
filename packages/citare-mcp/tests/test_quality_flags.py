@@ -211,6 +211,109 @@ def test_quirk_incompleteness_category_misuse():
     print("OK incompleteness_category misuse coerced to 'none'; relation_type preserved")
 
 
+def test_cross_paper_claim_id_collision_guard():
+    """Two papers with same first-author and year (e.g., kjell2021_*) must NOT
+    cause the second's registration to reparent the first's claims.
+
+    This was the 2026-05-13 incident: harmony 601679 lost 37 claims when 602581
+    registered with overlapping kjell2021_* IDs. ingest.py was patched to
+    auto-rename incoming colliding IDs.
+    """
+    import sqlite3, tempfile, os
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-core/src"))
+    from citare_core import Extraction
+    from citare_db.ingest import ingest_extraction
+    from citare_db.schema import init_db
+
+    tmpf = tempfile.NamedTemporaryFile(suffix=".db", delete=False).name
+    try:
+        conn = init_db(tmpf)
+
+        paper_a = {
+            "paper": {"doi": "10.test/paper-a", "title": "Paper A", "year": 2006,
+                      "paper_type": "empirical"},
+            "claims": [
+                {"id": "author2006_def1", "template_type": "DEFINITION",
+                 "source_text": "Paper A original content", "source_page": 1,
+                 "confidence_score": 0.9},
+            ],
+            "claim_relations": [],
+        }
+        ingest_extraction(conn, Extraction.model_validate(paper_a))
+
+        paper_b = {
+            "paper": {"doi": "10.test/paper-b", "title": "Paper B", "year": 2006,
+                      "paper_type": "empirical"},
+            "claims": [
+                {"id": "author2006_def1", "template_type": "DEFINITION",
+                 "source_text": "Paper B different content", "source_page": 1,
+                 "confidence_score": 0.9},
+            ],
+            "claim_relations": [],
+        }
+        report_b = ingest_extraction(conn, Extraction.model_validate(paper_b))
+
+        # Paper A's content MUST be preserved
+        a_row = conn.execute(
+            "SELECT id, source_text FROM claims WHERE paper_id = '10.test/paper-a'"
+        ).fetchone()
+        assert a_row is not None, "Paper A's claim was deleted by Paper B's registration"
+        assert a_row["id"] == "author2006_def1", f"Paper A's id was renamed: {a_row['id']}"
+        assert "Paper A original" in a_row["source_text"], \
+            f"Paper A's content was overwritten: {a_row['source_text']}"
+
+        # Paper B got a renamed id
+        b_row = conn.execute(
+            "SELECT id, source_text FROM claims WHERE paper_id = '10.test/paper-b'"
+        ).fetchone()
+        assert b_row is not None
+        assert b_row["id"].startswith("author2006_def1_"), \
+            f"Paper B's id was not renamed: {b_row['id']}"
+        assert "Paper B different" in b_row["source_text"]
+
+        # Warning was emitted
+        codes = [w.get("code") for w in report_b.warnings]
+        assert "claim_id_cross_paper_collision_renamed" in codes, \
+            f"expected collision warning, got {codes}"
+
+        # claim_relations should be rewritten consistently too
+        paper_c = {
+            "paper": {"doi": "10.test/paper-c", "title": "Paper C", "year": 2006,
+                      "paper_type": "empirical"},
+            "claims": [
+                {"id": "author2006_def1", "template_type": "DEFINITION",
+                 "source_text": "Paper C content", "source_page": 1,
+                 "confidence_score": 0.9},
+                {"id": "author2006_rel1", "template_type": "RELATION",
+                 "l0_json": {"iv": "x", "dv": "y", "relation": "positive"},
+                 "source_text": "Paper C relation", "source_page": 2,
+                 "confidence_score": 0.9},
+            ],
+            "claim_relations": [
+                {"source_id": "author2006_rel1", "target_id": "author2006_def1",
+                 "relation_type": "extends"},
+            ],
+        }
+        ingest_extraction(conn, Extraction.model_validate(paper_c))
+        # Paper C's def1 should be renamed; the relation should reference the new id
+        c_def = conn.execute(
+            "SELECT id FROM claims WHERE paper_id = '10.test/paper-c' AND template_type = 'DEFINITION'"
+        ).fetchone()
+        assert c_def["id"].startswith("author2006_def1_")
+        rel = conn.execute(
+            "SELECT source_id, target_id FROM claim_relations "
+            "WHERE source_id IN (SELECT id FROM claims WHERE paper_id = '10.test/paper-c') "
+            "OR target_id IN (SELECT id FROM claims WHERE paper_id = '10.test/paper-c')"
+        ).fetchone()
+        if rel:
+            assert rel["target_id"] == c_def["id"], \
+                f"claim_relations.target_id not rewritten: {rel['target_id']} vs {c_def['id']}"
+        print("OK collision guard preserves prior paper, renames incoming, rewrites claim_relations")
+    finally:
+        os.unlink(tmpf)
+
+
 def test_quirks_idempotent_on_valid_input():
     """Valid extractions must pass through unchanged."""
     sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
@@ -244,5 +347,6 @@ if __name__ == "__main__":
     test_compound_warn_rule_escalates_to_low()
     test_quirk_paper_type_synonyms()
     test_quirk_incompleteness_category_misuse()
+    test_cross_paper_claim_id_collision_guard()
     test_quirks_idempotent_on_valid_input()
     print("\nAll tests passed.")

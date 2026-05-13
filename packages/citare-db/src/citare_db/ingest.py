@@ -739,6 +739,25 @@ def ingest_extraction(conn: sqlite3.Connection, extraction: Extraction) -> Inges
             ),
         )
 
+    # Silent-damage detection — update peak_claim_count monotonically.
+    # If this submission grew the paper, the new count becomes the new peak.
+    # If the count dropped (e.g., a smaller follow-up submission, or
+    # post-collision re-extraction), peak stays at the prior high so that
+    # quality_flags can later flag the gap as SILENT_DAMAGE_SUSPECTED.
+    current_count = conn.execute(
+        "SELECT COUNT(*) FROM claims WHERE paper_id = ?", (existing_paper_id,)
+    ).fetchone()[0]
+    prior_peak = conn.execute(
+        "SELECT peak_claim_count FROM papers WHERE id = ?", (existing_paper_id,)
+    ).fetchone()
+    prior_peak = prior_peak[0] if prior_peak else 0
+    if current_count > prior_peak:
+        conn.execute(
+            "UPDATE papers SET peak_claim_count = ?, "
+            "peak_claim_count_recorded_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (current_count, existing_paper_id),
+        )
+
     conn.commit()
     return report
 

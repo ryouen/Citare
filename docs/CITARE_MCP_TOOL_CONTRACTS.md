@@ -1,10 +1,23 @@
 # Citare MCP Tool Contracts
 
-Formal per-tool contracts for the four MCP tools exposed by the Citare server (`packages/citare-mcp/src/citare_mcp/server.py`). Examples are real responses from `data/citare.db` (starter snapshot 2026-04-26: 13 benchmark papers, 419 claims, 340 relations; manifest contains 81 papers total — re-run `scripts/ingest_v013d_champions.py` to grow the DB).
+Formal per-tool contracts for the MCP tools exposed by the Citare server. The /mcp surface (`packages/citare-mcp/src/citare_mcp/fastmcp_server.py`) exposes **8 tools** as of 2026-05-13. This document covers the original four in depth; the four added since are covered briefly at the end, with source code as the canonical contract.
 
-**Companion docs**: `CITARE_MCP_DEPLOYMENT_BRIEF.md` (deployment posture), `CITARE_SYSTEM_DESIGN.md` (full design).
+**Companion docs**: `CITARE_MCP_DEPLOYMENT_BRIEF.md` (deployment posture), `CITARE_SYSTEM_DESIGN.md` (full design), `REGISTRATION_PATHS.md` (the three register paths /sse, /mcp, /api/register).
 
-**Read-vs-write convention**: Tools are split into read (`search_claims`, `cite_claim`, `get_claim_graph`) and write (`register_claims`). The HTTP server's `--read-only` flag hides `register_claims` from `tools/list` and rejects it at `tools/call`. Public deployments should set `--read-only`; trusted ingest goes through a separate non-read-only instance (or local stdio).
+**Tool catalogue** (all exposed on `/mcp` Streamable HTTP):
+
+| Tool | Kind | Section in this doc |
+|------|------|---------------------|
+| `search_claims` | Read | §1 |
+| `cite_claim` | Read | §2 |
+| `get_claim_graph` | Read | §3 |
+| `register_claims` | Write | §4 |
+| `get_extraction_prompt` | Read | §5 |
+| `get_pdf_acquisition_guide` | Read | §6 |
+| `audit_papers` | Read (new 2026-05-13) | §7 |
+| `report_extraction_failure` | Write (new 2026-05-13) | §8 |
+
+**Read-vs-write convention**: Read tools (`search_claims`, `cite_claim`, `get_claim_graph`, `get_extraction_prompt`, `get_pdf_acquisition_guide`, `audit_papers`) are side-effect-free. Write tools (`register_claims`, `report_extraction_failure`) mutate state (the DB and the incident log respectively). The HTTP server's `--read-only` flag hides `register_claims` from `tools/list` and rejects it at `tools/call`. Public deployments should set `--read-only`; trusted ingest goes through a separate non-read-only instance (or local stdio).
 
 ---
 
@@ -435,6 +448,105 @@ After re-running the same call, response becomes:
 
 ### Performance contract
 No SLA. A typical paper (~30 claims, ~25 relations, ~20 references) takes 50-200 ms. Very large extractions (200+ claims) may take seconds. Long-tail latency dominated by FTS5 index updates.
+
+---
+
+## 5. `get_extraction_prompt`
+
+Returns the canonical v0.13g extraction prompt verbatim, plus sub-agent invocation guidance and SHA-256 (for Pattern 2 / Pattern 3 transcription verification). No input parameters. See `packages/citare-mcp/src/citare_mcp/guides.py:get_extraction_prompt` for the response shape; the prompt itself is at `packages/citare-mcp/src/citare_mcp/assets/extraction_prompt_v0.13g.md` (Pattern 1: sub-agent fetches via MCP — recommended). The response includes a `downstream_impact_note` and `usage` field describing how to dispatch a sub-agent.
+
+## 6. `get_pdf_acquisition_guide`
+
+Returns the PDF acquisition playbook (Stages 0-7: local search → direct OA → CrossRef → Unpaywall → web search → site-specific gotchas). No input parameters. Used when `search_claims` returns 0 hits and the orchestrator needs to acquire a PDF before extraction.
+
+## 7. `audit_papers`
+
+**Added 2026-05-13.** Batch-checks Citare registration status for up to 200 DOIs in a single call. Replaces N round-trip `search_claims` calls for citation-checking workflows.
+
+### Input
+```json
+{"dois": ["10.xxx/yyy", "10.aaa/bbb", ...]}
+```
+
+### Output
+```json
+{
+  "results": [{
+    "doi": "10.xxx/yyy",
+    "status": "REGISTERED" | "NOT_REGISTERED",
+    "paper_id": "...",        // if REGISTERED
+    "claim_count": 47,
+    "confidence_tier": "HIGH" | "MEDIUM" | "LOW",
+    "recommended_action": "RE_EXTRACT" | "ACQUIRE_AND_REGISTER" | null,
+    "flags_count": 0,
+    "paper_versions": { ... }  // only if a paper_equivalence is registered
+  }, ...],
+  "summary": {
+    "total": 47,
+    "by_tier": {"HIGH": 31, "MEDIUM": 8, "LOW": 4, "NOT_REGISTERED": 4},
+    "action_required_count": 8
+  }
+}
+```
+
+Quality tier and recommended action use the same `compute_paper_quality_from_db` logic as `register_claims`' response, including SILENT_DAMAGE_SUSPECTED (added 2026-05-14) which compares current claim_count to the paper's all-time peak.
+
+## 8. `report_extraction_failure`
+
+**Added 2026-05-13.** Third option for a sub-agent that has run out of context budget mid-extraction. Lets the agent report the failure structurally instead of compressing claims (anti-pattern) or abandoning silently (anti-pattern).
+
+### Input
+```json
+{
+  "paper_doi": "10.xxx/yyy",
+  "stage": "extracting_section_4_discussion",
+  "claims_completed": 23,
+  "reason": "context budget exhausted at page 19/30",
+  "partial_extraction_available": false
+}
+```
+
+### Output
+```json
+{
+  "acknowledged": true,
+  "incident_id": "I-2026-05-13-0042",
+  "no_partial_registration": true,
+  "advice_for_parent": {
+    "retry_strategy_code": "SECTION_FILTERED" | "SMALLER_PAPER" | "NO_RETRY",
+    "retry_parameters": {...},
+    "estimated_tokens_for_retry": 50000
+  }
+}
+```
+
+Records the incident to `data/extraction_incidents.jsonl` (bind-mounted, persists across container restarts). No partial DB writes are made — all-or-nothing semantics of `register_claims` are preserved.
+
+## Additions to `register_claims` responses (2026-05-13 / 2026-05-14)
+
+The `register_claims` response gained a `paper_quality` block since the original contract above:
+
+```json
+"paper_quality": {
+  "confidence_tier": "HIGH" | "MEDIUM" | "LOW",
+  "observation_count": 1,
+  "claim_count": 47,
+  "flags": [
+    {"code": "LOW_CLAIM_COUNT" | "LOW_MEAN_CONFIDENCE" | "LOW_DENSITY" |
+              "DISPUTED_CLAIMS" | "SILENT_DAMAGE_SUSPECTED",
+     "severity": "WARN" | "STRONG", ...numerical context...}
+  ],
+  "recommended_action": "RE_EXTRACT" | "ACQUIRE_AND_REGISTER" |
+                        "REVIEW_DISPUTED_CLAIMS" | null
+}
+```
+
+Additional `warnings` codes that may appear (all non-blocking, server-side normalisations):
+- `claim_id_cross_paper_collision_renamed`: incoming claim_id collided with another paper; renamed to `<id>_<paper-hash>`
+- `paper_type_synonym_coerced`, `incompleteness_category_misuse_coerced`: enum normalisation
+- `source_page_string_coerced`, `sample_size_string_coerced`, `l3_additional_string_coerced`: type coercion
+
+`paper_versions` block (since 2026-05-13): if the paper has a registered `paper_equivalence` (preprint/published pair, duplicate, reissue), the response — and `search_claims` / `cite_claim` / `audit_papers` results — include a `paper_versions` field with `this_paper_role`, `canonical_paper_id`, `alternate_versions`, and an `advisory` string for the consumer to surface.
 
 ---
 

@@ -1,22 +1,22 @@
 {
   "db_path": "/home/ubuntu/citare/data/citare.db",
-  "total_papers_considered": 255,
+  "total_papers_considered": 257,
   "skipped_due_to_pages": 2,
   "by_paper_type": {
     "empirical": {
-      "n": 153,
-      "density_mean": 3.146,
-      "density_median": 2.615,
-      "density_stddev": 1.937,
-      "conf_mean": 0.93,
+      "n": 121,
+      "density_mean": 3.473,
+      "density_median": 3.154,
+      "density_stddev": 1.997,
+      "conf_mean": 0.9305,
       "reliability": "OK"
     },
     "conceptual": {
-      "n": 70,
-      "density_mean": 3.386,
-      "density_median": 2.359,
-      "density_stddev": 2.932,
-      "conf_mean": 0.9222,
+      "n": 64,
+      "density_mean": 3.507,
+      "density_median": 2.442,
+      "density_stddev": 3.02,
+      "conf_mean": 0.9225,
       "reliability": "OK"
     },
     "review": {
@@ -55,13 +55,21 @@
       "fallback_to": "empirical"
     }
   },
+  "arxiv": {
+    "n": 40,
+    "density_mean": 2.051,
+    "density_median": 1.714,
+    "density_stddev": 1.077,
+    "conf_mean": 0.9275,
+    "reliability": "OK"
+  },
   "thresholds": {
     "density_z_strong": -1.5,
-    "density_z_warn": -1.0,
+    "density_z_warn": -1.2,
     "mean_conf_strong": 0.7,
     "mean_conf_warn": 0.85,
     "claim_count_strong": 5,
     "claim_count_warn": 10
   },
-  "version": 1
+  "version": 2
 }

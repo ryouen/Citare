@@ -314,6 +314,91 @@ def test_cross_paper_claim_id_collision_guard():
         os.unlink(tmpf)
 
 
+def test_arxiv_baseline_skips_false_positive_density_flags():
+    """A 35-page arXiv paper with 35 claims (density 1.0) has z=-1.10
+    against the empirical baseline (mean 3.47, stddev 2.00) and would
+    fire LOW_DENSITY WARN. Using the arxiv-specific baseline
+    (mean 2.05, stddev 1.08), z=(1.0-2.05)/1.08 = -0.97 — no flag.
+    """
+    bl = _baseline()
+    # 35 claims across span 35 → density 1.0
+    claims = [
+        {"confidence_score": 0.93, "source_page": p}
+        for p in list(range(1, 36))
+    ]
+    # Without is_arxiv: would flag against empirical baseline
+    q_journal = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        is_arxiv=False, baseline=bl,
+    )
+    # With is_arxiv: uses arxiv baseline (mean ~2.05)
+    q_arxiv = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        is_arxiv=True, baseline=bl,
+    )
+    # The arxiv variant should have fewer LOW_DENSITY flags (or none) than journal
+    journal_density_flags = [f for f in q_journal["flags"] if f["code"] == "LOW_DENSITY"]
+    arxiv_density_flags = [f for f in q_arxiv["flags"] if f["code"] == "LOW_DENSITY"]
+    assert len(arxiv_density_flags) <= len(journal_density_flags), (
+        f"arxiv baseline should be at least as permissive; "
+        f"journal flags={journal_density_flags}, arxiv flags={arxiv_density_flags}"
+    )
+    print(f"OK arXiv baseline: journal would flag {len(journal_density_flags)} LOW_DENSITY, "
+          f"arxiv-aware flags {len(arxiv_density_flags)}")
+
+
+def test_silent_damage_suspected_when_count_drops_below_peak():
+    """A paper that previously held many more claims must be flagged
+    SILENT_DAMAGE_SUSPECTED so the consumer doesn't trust the degraded entry.
+    This is the safety net for events like the 2026-05-13 cross-paper
+    collision incident (Levy 2006b: 47 → 14 claims with all other quality
+    signals still HIGH).
+    """
+    bl = _baseline()
+    # 14 claims, healthy density, healthy confidence — would normally be HIGH.
+    claims = [
+        {"confidence_score": 0.93, "source_page": p}
+        for p in list(range(1, 15))
+    ]
+    # WARN case (30% drop): peak=20, current=14 -> drop=30%
+    q = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        peak_claim_count=20, baseline=bl,
+    )
+    silent = [f for f in q["flags"] if f["code"] == "SILENT_DAMAGE_SUSPECTED"]
+    assert len(silent) == 1
+    assert silent[0]["severity"] == "WARN", silent
+    print(f"OK silent-damage WARN at 30% drop: tier={q['confidence_tier']}, action={q['recommended_action']}")
+
+    # STRONG case (50% drop): peak=47, current=14 -> drop=70%
+    q = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        peak_claim_count=47, baseline=bl,
+    )
+    silent = [f for f in q["flags"] if f["code"] == "SILENT_DAMAGE_SUSPECTED"]
+    assert len(silent) == 1
+    assert silent[0]["severity"] == "STRONG", silent
+    assert q["confidence_tier"] == "LOW"
+    assert q["recommended_action"] == "RE_EXTRACT"
+    print(f"OK silent-damage STRONG at 70% drop: tier={q['confidence_tier']}, action={q['recommended_action']}")
+
+    # No-flag case: count == peak (normal state)
+    q = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        peak_claim_count=14, baseline=bl,
+    )
+    assert not any(f["code"] == "SILENT_DAMAGE_SUSPECTED" for f in q["flags"])
+    print(f"OK no silent-damage when current == peak")
+
+    # No-flag case: peak unknown (legacy paper not yet backfilled)
+    q = compute_paper_quality(
+        paper_type="empirical", claims=claims, observation_count=1,
+        peak_claim_count=0, baseline=bl,
+    )
+    assert not any(f["code"] == "SILENT_DAMAGE_SUSPECTED" for f in q["flags"])
+    print(f"OK no silent-damage when peak=0 (legacy / pre-migration)")
+
+
 def test_paper_versions_preprint_published_pair():
     """When a paper has a registered preprint_published equivalence, both
     cite_claim and search_claims responses must annotate the relationship.
@@ -449,6 +534,8 @@ if __name__ == "__main__":
     test_quirk_paper_type_synonyms()
     test_quirk_incompleteness_category_misuse()
     test_cross_paper_claim_id_collision_guard()
+    test_silent_damage_suspected_when_count_drops_below_peak()
+    test_arxiv_baseline_skips_false_positive_density_flags()
     test_paper_versions_preprint_published_pair()
     test_quirks_idempotent_on_valid_input()
     print("\nAll tests passed.")

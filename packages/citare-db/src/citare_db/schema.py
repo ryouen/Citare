@@ -43,6 +43,17 @@ CREATE TABLE IF NOT EXISTS papers (
     --   3 = ungated (default — extracted but not yet promoted)
     inclusion_policy_tier INTEGER NOT NULL DEFAULT 3
         CHECK(inclusion_policy_tier IN (1,2,3)),
+    -- Silent-damage detection (Task 2026-05-14).
+    --   peak_claim_count tracks the highest claim count this paper has
+    --   ever held in this DB, monotonically. If a subsequent registration
+    --   takes the claim count significantly below the peak (e.g., due to
+    --   a cross-paper claim_id collision, a truncated extraction, or an
+    --   accidental upsert with a smaller payload), the quality_flags layer
+    --   surfaces SILENT_DAMAGE_SUSPECTED so the consumer doesn't trust the
+    --   degraded entry blindly. Updated by ingest_extraction only when
+    --   the post-ingest count exceeds the prior peak.
+    peak_claim_count INTEGER NOT NULL DEFAULT 0,
+    peak_claim_count_recorded_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_papers_content_hash ON papers(content_hash);

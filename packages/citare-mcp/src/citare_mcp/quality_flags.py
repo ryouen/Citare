@@ -48,6 +48,7 @@ class FlagCode:
     LOW_MEAN_CONFIDENCE = "LOW_MEAN_CONFIDENCE"
     LOW_DENSITY = "LOW_DENSITY"
     DISPUTED_CLAIMS = "DISPUTED_CLAIMS"
+    SILENT_DAMAGE_SUSPECTED = "SILENT_DAMAGE_SUSPECTED"
 
 
 class Severity:
@@ -69,6 +70,8 @@ def compute_paper_quality(
     claims: list[dict],
     observation_count: int = 1,
     disputed_claims_count: int = 0,
+    peak_claim_count: int = 0,
+    is_arxiv: bool = False,
     baseline: dict | None = None,
 ) -> dict:
     """Compute the `paper_quality` block for a register_claims response.
@@ -140,10 +143,20 @@ def compute_paper_quality(
         span = max(pages) - min(pages) + 1
         if 1 <= span <= 200:
             density = claim_count / span
-            bl = baseline["by_paper_type"].get(paper_type or "")
-            if not bl or bl.get("reliability") == "INSUFFICIENT_SAMPLE":
-                fallback_key = bl["fallback_to"] if bl else "empirical"
-                bl = baseline["by_paper_type"].get(fallback_key)
+            # arXiv preprints are systematically longer than journal articles
+            # for the same claim count. Use the arxiv-specific baseline
+            # (computed separately by compute_baseline.py v2+) when available
+            # to avoid false-positive LOW_DENSITY flags on legitimate long
+            # preprints. Falls through to paper_type baseline if the
+            # baseline.json predates v2 (no `arxiv` key).
+            bl = None
+            if is_arxiv and baseline.get("arxiv") and baseline["arxiv"].get("reliability") == "OK":
+                bl = baseline["arxiv"]
+            if bl is None:
+                bl = baseline["by_paper_type"].get(paper_type or "")
+                if not bl or bl.get("reliability") == "INSUFFICIENT_SAMPLE":
+                    fallback_key = bl["fallback_to"] if bl else "empirical"
+                    bl = baseline["by_paper_type"].get(fallback_key)
             if bl and bl["density_stddev"] > 0:
                 z = (density - bl["density_mean"]) / bl["density_stddev"]
                 if z < th["density_z_strong"]:
@@ -177,6 +190,36 @@ def compute_paper_quality(
             "measured": disputed_claims_count,
         })
 
+    # ---- SILENT_DAMAGE_SUSPECTED (peak vs current) ----
+    # Compares this paper's claim_count to its all-time peak. A significant
+    # drop suggests the paper lost claims to a cross-paper claim_id collision,
+    # an upsert with a smaller payload, or some other regression that the
+    # other flags wouldn't catch (the absolute count + density may still
+    # pass their thresholds). Thresholds chosen so normal extraction variance
+    # (<30% drop between extractors) does not fire.
+    #   drop >= 50% (current < peak * 0.5)  → STRONG
+    #   drop >= 30% (current < peak * 0.7)  → WARN
+    # peak_claim_count == 0 means the migration hasn't backfilled this paper
+    # yet, or it's a fresh registration — skip the check.
+    if peak_claim_count > 0 and claim_count < peak_claim_count:
+        drop_ratio = 1 - (claim_count / peak_claim_count)
+        if drop_ratio >= 0.5:
+            flags.append({
+                "code": FlagCode.SILENT_DAMAGE_SUSPECTED,
+                "severity": Severity.STRONG,
+                "measured": claim_count,
+                "peak_claim_count": peak_claim_count,
+                "drop_ratio": round(drop_ratio, 3),
+            })
+        elif drop_ratio >= 0.3:
+            flags.append({
+                "code": FlagCode.SILENT_DAMAGE_SUSPECTED,
+                "severity": Severity.WARN,
+                "measured": claim_count,
+                "peak_claim_count": peak_claim_count,
+                "drop_ratio": round(drop_ratio, 3),
+            })
+
     # ---- Compound tier rule ----
     # 1 STRONG OR 2+ WARN → LOW. 1 WARN → MEDIUM. 0 → HIGH.
     strong_count = sum(1 for f in flags if f["severity"] == Severity.STRONG)
@@ -191,6 +234,13 @@ def compute_paper_quality(
     # ---- Recommended action ----
     if any(f["code"] == FlagCode.DISPUTED_CLAIMS for f in flags):
         action = RecommendedAction.REVIEW_DISPUTED_CLAIMS
+    elif any(f["code"] == FlagCode.SILENT_DAMAGE_SUSPECTED for f in flags):
+        # The paper used to have many more claims. Re-extracting from the
+        # canonical PDF (or restoring from a prior extraction file) is the
+        # right repair. This takes priority over plain RE_EXTRACT because
+        # the cause is structural (collision / bad upsert), not extraction
+        # quality.
+        action = RecommendedAction.RE_EXTRACT
     elif tier == "LOW" and claim_count == 0:
         # Skeleton paper — record exists (probably as a reference target) but
         # was never extracted. The right action is acquisition, not re-extraction.
@@ -235,9 +285,18 @@ def compute_paper_quality_from_db(
     Returns:
         Same shape as compute_paper_quality().
     """
-    paper_row = conn.execute(
-        "SELECT paper_type FROM papers WHERE id = ?", (paper_id,)
-    ).fetchone()
+    is_arxiv = bool(paper_id and (paper_id.startswith("10.48550/arXiv.")))
+    # Tolerate older schemas that lack the peak_claim_count column.
+    try:
+        paper_row = conn.execute(
+            "SELECT paper_type, peak_claim_count, venue FROM papers WHERE id = ?", (paper_id,)
+        ).fetchone()
+        peak_available = True
+    except Exception:
+        paper_row = conn.execute(
+            "SELECT paper_type, NULL AS peak_claim_count, venue FROM papers WHERE id = ?", (paper_id,)
+        ).fetchone()
+        peak_available = False
     if paper_row is None:
         return compute_paper_quality(
             paper_type=None,
@@ -246,6 +305,12 @@ def compute_paper_quality_from_db(
             disputed_claims_count=disputed_claims_count,
         )
     paper_type = paper_row[0] if not hasattr(paper_row, "keys") else paper_row["paper_type"]
+    peak = 0
+    if peak_available:
+        peak = (paper_row[1] if not hasattr(paper_row, "keys") else paper_row["peak_claim_count"]) or 0
+    venue = paper_row[2] if not hasattr(paper_row, "keys") else paper_row["venue"]
+    if not is_arxiv and venue and "arxiv" in venue.lower():
+        is_arxiv = True
 
     claim_rows = conn.execute(
         "SELECT confidence_score, source_page FROM claims WHERE paper_id = ?",
@@ -263,4 +328,6 @@ def compute_paper_quality_from_db(
         claims=claims,
         observation_count=observation_count,
         disputed_claims_count=disputed_claims_count,
+        peak_claim_count=peak,
+        is_arxiv=is_arxiv,
     )

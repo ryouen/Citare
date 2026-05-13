@@ -220,7 +220,9 @@ def audit_papers(dois: list[str]) -> dict[str, Any]:
                 continue
             paper_id = paper_row["id"]
             quality = compute_paper_quality_from_db(conn, paper_id)
-            results.append({
+            from citare_mcp.queries import lookup_paper_versions
+            versions = lookup_paper_versions(conn, paper_id)
+            entry = {
                 "doi": doi,
                 "status": "REGISTERED",
                 "paper_id": paper_id,
@@ -228,7 +230,10 @@ def audit_papers(dois: list[str]) -> dict[str, Any]:
                 "confidence_tier": quality["confidence_tier"],
                 "recommended_action": quality["recommended_action"],
                 "flags_count": len(quality["flags"]),
-            })
+            }
+            if versions is not None:
+                entry["paper_versions"] = versions
+            results.append(entry)
     finally:
         conn.close()
 

@@ -314,6 +314,107 @@ def test_cross_paper_claim_id_collision_guard():
         os.unlink(tmpf)
 
 
+def test_paper_versions_preprint_published_pair():
+    """When a paper has a registered preprint_published equivalence, both
+    cite_claim and search_claims responses must annotate the relationship.
+    Preprint side gets a `canonical_paper_id` pointer; published side gets
+    an `alternate_versions` listing. No claim content is moved between
+    versions — annotation only.
+    """
+    import sqlite3, tempfile, os
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-core/src"))
+    from citare_core import Extraction
+    from citare_db.ingest import ingest_extraction
+    from citare_db.schema import init_db
+    from citare_mcp.queries import lookup_paper_versions, search_claims, cite_claim
+
+    tmpf = tempfile.NamedTemporaryFile(suffix=".db", delete=False).name
+    try:
+        conn = init_db(tmpf)
+
+        published = {
+            "paper": {"doi": "10.test/published", "title": "Paper Published",
+                      "year": 2025, "paper_type": "empirical"},
+            "claims": [
+                {"id": "auth2025_def1", "template_type": "DEFINITION",
+                 "source_text": "Published version DEFINITION", "source_page": 5,
+                 "confidence_score": 0.95},
+            ],
+            "claim_relations": [],
+        }
+        preprint = {
+            "paper": {"doi": None, "title": "Paper Preprint", "authors": ["Author A"],
+                      "year": 2025, "paper_type": "empirical"},
+            "claims": [
+                {"id": "auth2025_def1_pre", "template_type": "DEFINITION",
+                 "source_text": "Preprint DEFINITION", "source_page": None,
+                 "confidence_score": 0.95},
+            ],
+            "claim_relations": [],
+        }
+        ingest_extraction(conn, Extraction.model_validate(published))
+        ingest_extraction(conn, Extraction.model_validate(preprint))
+
+        # The preprint will have a content-hash-derived _no_doi_* id
+        preprint_pid = conn.execute(
+            "SELECT id FROM papers WHERE id LIKE '_no_doi_%' AND year = 2025"
+        ).fetchone()["id"]
+        published_pid = "10.test/published"
+
+        # Ensure lex order matches CHECK(paper_a_id < paper_b_id)
+        a, b = sorted([published_pid, preprint_pid])
+        conn.execute(
+            "INSERT INTO paper_equivalence "
+            "(paper_a_id, paper_b_id, equivalence_type, confidence, discovered_by) "
+            "VALUES (?, ?, 'preprint_published', 1.0, 'human_expert')",
+            (a, b),
+        )
+
+        # Preprint side: canonical pointer present
+        v_pre = lookup_paper_versions(conn, preprint_pid)
+        assert v_pre is not None
+        assert v_pre["this_paper_role"] == "preprint", v_pre
+        assert v_pre["canonical_paper_id"] == published_pid
+
+        # Published side: knows about the preprint
+        v_pub = lookup_paper_versions(conn, published_pid)
+        assert v_pub is not None
+        assert v_pub["this_paper_role"] == "published"
+        assert v_pub["canonical_paper_id"] is None
+        assert any(av["paper_id"] == preprint_pid for av in v_pub["alternate_versions"])
+
+        # search_claims annotates results
+        search_results = search_claims(conn, doi=preprint_pid)
+        assert len(search_results) >= 1
+        assert "paper_versions" in search_results[0], "search_claims must inject paper_versions"
+        assert search_results[0]["paper_versions"]["this_paper_role"] == "preprint"
+
+        # cite_claim annotates the nested paper object
+        claim_id = search_results[0]["id"]
+        cited = cite_claim(conn, claim_id)
+        assert "paper" in cited
+        assert "paper_versions" in cited["paper"], "cite_claim must inject paper.paper_versions"
+        assert cited["paper"]["paper_versions"]["this_paper_role"] == "preprint"
+
+        # Unrelated paper: no annotation
+        v_unrelated = lookup_paper_versions(conn, published_pid)
+        # (published has equivalence; check an unrelated id)
+        unrelated = {
+            "paper": {"doi": "10.test/unrelated", "title": "Other",
+                      "year": 2020, "paper_type": "empirical"},
+            "claims": [{"id": "x2020_def1", "template_type": "DEFINITION",
+                        "source_text": "nothing", "source_page": 1,
+                        "confidence_score": 0.9}],
+            "claim_relations": [],
+        }
+        ingest_extraction(conn, Extraction.model_validate(unrelated))
+        assert lookup_paper_versions(conn, "10.test/unrelated") is None
+        print("OK paper_versions annotation works on preprint, published, and unrelated papers")
+    finally:
+        os.unlink(tmpf)
+
+
 def test_quirks_idempotent_on_valid_input():
     """Valid extractions must pass through unchanged."""
     sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
@@ -348,5 +449,6 @@ if __name__ == "__main__":
     test_quirk_paper_type_synonyms()
     test_quirk_incompleteness_category_misuse()
     test_cross_paper_claim_id_collision_guard()
+    test_paper_versions_preprint_published_pair()
     test_quirks_idempotent_on_valid_input()
     print("\nAll tests passed.")

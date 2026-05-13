@@ -22,6 +22,89 @@ def _row_to_claim(row: sqlite3.Row) -> dict[str, Any]:
     return d
 
 
+def lookup_paper_versions(conn: sqlite3.Connection, paper_id: str) -> dict | None:
+    """Look up version/equivalence info for a paper.
+
+    Returns a dict describing the paper's role in any preprint/published/
+    duplicate/reissue relationship, or None if no equivalence is registered.
+
+    The shape is intentionally a single nested object on the response (NOT
+    merged into the claim itself) so the LLM consumer can tell at a glance
+    that this paper has alternate versions. Citare's policy is "annotate,
+    do not modify": we never copy claims between versions because doing so
+    would let a citation reference a claim that isn't actually in that
+    version's published PDF. Surfacing the canonical version's paper_id
+    lets the consumer follow up with `cite_claim` or `search_claims(doi=...)`
+    against the canonical to find the page-grounded equivalent.
+
+    Heuristic for which paper is canonical:
+      - paper_id starting with ``_no_doi_`` is treated as non-canonical
+        (it's a placeholder for a paper that had no DOI when extracted)
+      - otherwise the published-DOI'd partner is canonical
+      - if both have DOIs (or both are ``_no_doi_``), the response lists
+        the partner under ``also_known_as`` without claiming canonicalness
+
+    Returns:
+        Either ``None`` (no equivalence), or:
+        {
+            "this_paper_role": "preprint" | "published" | "alternate_version",
+            "canonical_paper_id": "<doi>" | None,
+            "alternate_versions": [
+                {"paper_id": "...", "equivalence_type": "preprint_published" | ...,
+                 "confidence": <float>, "discovered_by": "..."},
+                ...
+            ],
+            "advisory": "<short instructional string the LLM should surface>",
+        }
+    """
+    rows = conn.execute(
+        "SELECT paper_a_id, paper_b_id, equivalence_type, confidence, discovered_by "
+        "FROM paper_equivalence WHERE paper_a_id = ? OR paper_b_id = ?",
+        (paper_id, paper_id),
+    ).fetchall()
+    if not rows:
+        return None
+
+    canonical_paper_id: str | None = None
+    role = "alternate_version"
+    alternate_versions = []
+    for r in rows:
+        other = r["paper_b_id"] if r["paper_a_id"] == paper_id else r["paper_a_id"]
+        entry = {
+            "paper_id": other,
+            "equivalence_type": r["equivalence_type"],
+            "confidence": r["confidence"],
+            "discovered_by": r["discovered_by"],
+        }
+        alternate_versions.append(entry)
+        if r["equivalence_type"] == "preprint_published":
+            self_is_preprint = paper_id.startswith("_no_doi_")
+            other_is_preprint = other.startswith("_no_doi_")
+            if self_is_preprint and not other_is_preprint:
+                canonical_paper_id = other
+                role = "preprint"
+            elif other_is_preprint and not self_is_preprint:
+                role = "published"
+
+    if role == "preprint" and canonical_paper_id:
+        advisory = (
+            "This entry is the preprint version. Prefer the published version "
+            f"({canonical_paper_id}) for citation when possible — the page numbers "
+            "and verbatim wording in published versions are authoritative."
+        )
+    elif role == "published":
+        advisory = "This is the published canonical version; preprint variants also exist."
+    else:
+        advisory = "Equivalent or related papers are registered; consumer should check before citing."
+
+    return {
+        "this_paper_role": role,
+        "canonical_paper_id": canonical_paper_id,
+        "alternate_versions": alternate_versions,
+        "advisory": advisory,
+    }
+
+
 def search_claims(
     conn: sqlite3.Connection,
     query: str | None = None,
@@ -105,7 +188,7 @@ def search_claims(
     )
     params.append(limit)
     try:
-        return [_row_to_claim(r) for r in conn.execute(sql, params).fetchall()]
+        rows = conn.execute(sql, params).fetchall()
     except sqlite3.OperationalError as e:
         # FTS5 has a strict tiny grammar — any unhandled punctuation in the
         # query (rare after the token-quoting above) lands here. Treat as
@@ -113,6 +196,18 @@ def search_claims(
         if use_fts and "fts5" in str(e).lower():
             return []
         raise
+    results = [_row_to_claim(r) for r in rows]
+    # Cache version lookups per paper_id to avoid N+1 query inflation.
+    version_cache: dict[str, dict | None] = {}
+    for c in results:
+        pid = c.get("paper_id")
+        if pid is None:
+            continue
+        if pid not in version_cache:
+            version_cache[pid] = lookup_paper_versions(conn, pid)
+        if version_cache[pid] is not None:
+            c["paper_versions"] = version_cache[pid]
+    return results
 
 
 def cite_claim(
@@ -169,6 +264,9 @@ def cite_claim(
         from citare_mcp.formatters import format_paper_reference, normalise_style
         paper_dict["paper_reference"] = format_paper_reference(paper_dict, style)
         paper_dict["paper_reference_style"] = normalise_style(style)
+        versions = lookup_paper_versions(conn, paper_dict["id"])
+        if versions is not None:
+            paper_dict["paper_versions"] = versions
         claim["paper"] = paper_dict
 
     warnings = conn.execute(

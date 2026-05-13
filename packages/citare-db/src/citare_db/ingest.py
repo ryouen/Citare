@@ -321,6 +321,19 @@ def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -
        rejects. Coerce: extract leading digits if any, otherwise null +
        stash original in ``sample_size_note``. Same shape as Quirk 2.
 
+    4. **paper.paper_type synonym** (lessons_learned 2026-05-11: LLMs emit
+       ``theoretical`` for what Citare calls ``conceptual``, ``experimental``
+       for ``empirical``, etc.). Map known synonyms to the canonical enum
+       value before Pydantic validates.
+
+    5. **claim_relations[*].incompleteness_category misuse** (lessons_learned
+       2026-05-11: LLMs put ``apparent_tension`` here when it's actually a
+       RelationType value, not an IncompletenessCategory value). Map the
+       known offending values to ``none`` and stash the original so the
+       evidence isn't lost. The relation_type itself is left untouched —
+       if the LLM also wrote ``apparent_tension`` as the relation_type, that
+       remains valid.
+
     All quirks are consistent with WARNING-not-REJECT: we don't lose
     evidence because of a model formatting quirk on per-claim fields.
     """
@@ -360,6 +373,40 @@ def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -
                     mm["sample_size"] = None
                     mm["sample_size_note"] = ss
                 fixes_sample += 1
+    # Quirk 4 — paper.paper_type synonym mapping (top-level)
+    _PAPER_TYPE_SYNONYMS = {
+        "theoretical": "conceptual",
+        "experimental": "empirical",
+        "literature_review": "review",
+        "review_article": "review",
+        "review article": "review",
+        "meta-analysis": "meta_analysis",
+        "metaanalysis": "meta_analysis",
+        "book chapter": "book_chapter",
+        "book-chapter": "book_chapter",
+    }
+    fixes_ptype = 0
+    paper = raw.get("paper") or {}
+    pt = paper.get("paper_type")
+    if isinstance(pt, str):
+        pt_norm = pt.strip().lower()
+        if pt_norm in _PAPER_TYPE_SYNONYMS:
+            paper["paper_type"] = _PAPER_TYPE_SYNONYMS[pt_norm]
+            paper["paper_type_original"] = pt
+            fixes_ptype += 1
+
+    # Quirk 5 — incompleteness_category misuse on claim_relations
+    # Known offending values that are actually RelationType members:
+    _BAD_INCOMPLETENESS = {"apparent_tension", "supports", "extends",
+                           "contradicts", "qualifies", "replicates"}
+    fixes_incompleteness = 0
+    for cr in raw.get("claim_relations", []) or []:
+        ic = cr.get("incompleteness_category")
+        if isinstance(ic, str) and ic.strip().lower() in _BAD_INCOMPLETENESS:
+            cr["incompleteness_category_original"] = ic
+            cr["incompleteness_category"] = "none"
+            fixes_incompleteness += 1
+
     if report is not None:
         if fixes_l3:
             report.warn("l3_additional_string_coerced", count=fixes_l3)
@@ -367,6 +414,10 @@ def _coerce_extraction_quirks(raw: dict, report: "IngestReport | None" = None) -
             report.warn("source_page_string_coerced", count=fixes_page)
         if fixes_sample:
             report.warn("sample_size_string_coerced", count=fixes_sample)
+        if fixes_ptype:
+            report.warn("paper_type_synonym_coerced", count=fixes_ptype)
+        if fixes_incompleteness:
+            report.warn("incompleteness_category_misuse_coerced", count=fixes_incompleteness)
     return raw
 
 

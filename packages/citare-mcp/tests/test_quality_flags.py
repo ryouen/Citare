@@ -169,6 +169,72 @@ def test_compound_warn_rule_escalates_to_low():
         print(f"NOTE warn={warn_count} strong={strong_count} tier={q['confidence_tier']} — scenario didn't fire 2-warn rule")
 
 
+def test_quirk_paper_type_synonyms():
+    """Quirk 4: LLMs sometimes emit 'theoretical' / 'experimental' / 'literature_review'."""
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
+    from citare_db.ingest import _coerce_extraction_quirks
+
+    cases = [
+        ("theoretical", "conceptual"),
+        ("Experimental", "empirical"),
+        ("literature_review", "review"),
+        ("meta-analysis", "meta_analysis"),
+        ("book chapter", "book_chapter"),
+    ]
+    for input_val, expected in cases:
+        raw = {"paper": {"paper_type": input_val}, "claims": [], "claim_relations": []}
+        out = _coerce_extraction_quirks(raw, None)
+        assert out["paper"]["paper_type"] == expected, f"{input_val} should -> {expected}, got {out['paper']['paper_type']}"
+        assert out["paper"]["paper_type_original"] == input_val
+    print(f"OK paper_type synonyms: {len(cases)} mappings work")
+
+
+def test_quirk_incompleteness_category_misuse():
+    """Quirk 5: LLMs sometimes put a RelationType value (apparent_tension) into incompleteness_category."""
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
+    from citare_db.ingest import _coerce_extraction_quirks
+
+    raw = {
+        "paper": {},
+        "claims": [],
+        "claim_relations": [
+            {"source_id": "a", "target_id": "b", "relation_type": "apparent_tension",
+             "incompleteness_category": "apparent_tension"},
+        ],
+    }
+    out = _coerce_extraction_quirks(raw, None)
+    cr = out["claim_relations"][0]
+    assert cr["incompleteness_category"] == "none"
+    assert cr["incompleteness_category_original"] == "apparent_tension"
+    # relation_type itself untouched (apparent_tension IS a valid RelationType)
+    assert cr["relation_type"] == "apparent_tension"
+    print("OK incompleteness_category misuse coerced to 'none'; relation_type preserved")
+
+
+def test_quirks_idempotent_on_valid_input():
+    """Valid extractions must pass through unchanged."""
+    sys.path.insert(0, str(REPO_ROOT / "packages/citare-db/src"))
+    from citare_db.ingest import _coerce_extraction_quirks
+
+    raw = {
+        "paper": {"paper_type": "empirical"},
+        "claims": [{"source_page": 42, "method_metadata": {"sample_size": 51}}],
+        "claim_relations": [{"source_id": "a", "target_id": "b",
+                             "relation_type": "supports",
+                             "incompleteness_category": "boundary_condition"}],
+    }
+    import copy
+    before = copy.deepcopy(raw)
+    out = _coerce_extraction_quirks(raw, None)
+    # Note: function mutates in place AND returns the same object, so compare to deepcopy
+    assert out["paper"]["paper_type"] == "empirical"
+    assert "paper_type_original" not in out["paper"]
+    assert out["claims"][0]["source_page"] == 42
+    assert "source_page_note" not in out["claims"][0]
+    assert out["claim_relations"][0]["incompleteness_category"] == "boundary_condition"
+    print("OK valid input passes through unchanged")
+
+
 if __name__ == "__main__":
     test_healthy_empirical_paper_is_high()
     test_phase_d_truncated_is_low_with_re_extract()
@@ -176,4 +242,7 @@ if __name__ == "__main__":
     test_single_observation_is_not_a_flag()
     test_disputed_claims_trigger_review_action()
     test_compound_warn_rule_escalates_to_low()
+    test_quirk_paper_type_synonyms()
+    test_quirk_incompleteness_category_misuse()
+    test_quirks_idempotent_on_valid_input()
     print("\nAll tests passed.")
